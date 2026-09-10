@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package evm.state.v1;
+
+// Persisted EVM account-state changes for one block, keyed by the account
+// actually changed (never by call-to address). Only changes that survived
+// execution are included: successful calls, plus the gas / nonce effects of
+// failed transactions and the EIP-7702 authorization effects that persist
+// regardless of transaction status. Block-level (reward, system call) changes
+// are included too. See README "Semantics".
+message StateChanges {
+  BlockInfo block = 1;
+  repeated StorageChange storage_changes = 10;
+  repeated BalanceChange balance_changes = 11;
+  repeated NonceChange nonce_changes = 12;
+  repeated CodeChange code_changes = 13;
+  repeated SetCodeAuthorization set_code_authorizations = 14;
+}
+
+message BlockInfo {
+  uint64 number = 1;
+  bytes hash = 2;
+  bytes parent_hash = 3;
+  uint64 timestamp = 4; // unix seconds
+  bytes state_root = 5;
+  bytes coinbase = 6;
+  uint32 transaction_count = 7;
+}
+
+// Where in the block a change came from.
+enum Scope {
+  SCOPE_UNSPECIFIED = 0;
+  // Successful transaction, non-reverted call.
+  SCOPE_TX = 1;
+  // Failed/reverted transaction: gas balance changes and sender nonce that persist anyway.
+  SCOPE_TX_FAILED_PERSISTENT = 2;
+  // EIP-7702 authorization nonce/code change on a failed transaction (persists anyway).
+  SCOPE_TX_7702 = 3;
+  // Block.system_calls (e.g. EIP-2935 history storage, EIP-4788 beacon root).
+  SCOPE_SYSTEM_CALL = 4;
+  // Block.balance_changes / Block.code_changes (rewards, withdrawals, fork upgrades).
+  SCOPE_BLOCK = 5;
+}
+
+// Provenance shared by every change record.
+message Origin {
+  uint64 ordinal = 1;        // block-global execution ordinal
+  Scope scope = 2;
+  bytes tx_hash = 3;         // empty for system call / block scope
+  uint32 tx_index = 4;
+  int32 tx_status = 5;       // sf.ethereum.type.v2.TransactionTraceStatus (0 when no tx)
+  uint32 call_index = 6;
+}
+
+message StorageChange {
+  bytes address = 1;
+  bytes key = 2;             // 32 bytes
+  bytes old_value = 3;       // 32 bytes, may be empty (= zero)
+  bytes new_value = 4;       // 32 bytes, may be empty (= zero)
+  Origin origin = 10;
+}
+
+message BalanceChange {
+  bytes address = 1;
+  string old_value = 2;      // decimal wei, "0" when absent
+  string new_value = 3;      // decimal wei, "0" when absent
+  int32 reason = 4;          // sf.ethereum.type.v2.BalanceChange.Reason
+  Origin origin = 10;
+}
+
+message NonceChange {
+  bytes address = 1;
+  uint64 old_value = 2;
+  uint64 new_value = 3;
+  Origin origin = 10;
+}
+
+message CodeChange {
+  bytes address = 1;
+  bytes old_hash = 2;
+  bytes new_hash = 3;
+  bytes new_code = 4;        // full bytecode after the change (empty = no code)
+  Origin origin = 10;
+}
+
+// EIP-7702 authorization as carried by a TRX_TYPE_SET_CODE transaction.
+message SetCodeAuthorization {
+  bytes tx_hash = 1;
+  uint32 tx_index = 2;
+  uint32 index = 3;          // position in the authorization list
+  bytes authority = 4;       // recovered signer (may be empty when discarded)
+  bytes delegate = 5;        // address delegated to (may be empty on early BSC blocks)
+  uint64 nonce = 6;
+  bool discarded = 7;
+  int32 tx_status = 8;
+}

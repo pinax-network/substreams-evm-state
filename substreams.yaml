@@ -1,0 +1,68 @@
+specVersion: v0.1.0
+package:
+  name: evm_state
+  version: v0.1.0
+  url: https://github.com/pinax-network/substreams-evm-state
+  description: |
+    EVM account-state projection for Firehose Extended blocks.
+    Emits every persisted storage / balance / nonce / code change keyed by the
+    account actually changed (including failed-tx gas/nonce effects, EIP-7702
+    authorization effects, system calls and block-level rewards), optionally
+    filtered to a list of accounts, and projects them into PostgreSQL
+    current-state tables plus an event log via `substreams-sink-sql`.
+
+imports:
+  database_changes: ./spkg/substreams-sink-database-changes-v4.0.0.spkg
+
+protobuf:
+  files:
+    - evm/state/v1/state.proto
+  importPaths:
+    - ./proto
+  excludePaths:
+    - sf/substreams
+    - sf/ethereum
+    - google
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams_evm_state.wasm
+
+modules:
+  - name: map_state_changes
+    kind: map
+    doc: |
+      Persisted state changes for the block, keyed by changed account.
+      Params: comma-separated list of accounts to keep (0x-hex, case-insensitive).
+      Empty string = every account.
+    inputs:
+      - params: string
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:evm.state.v1.StateChanges
+
+  - name: db_out
+    kind: map
+    doc: PostgreSQL DatabaseChanges (blocks, accounts, storage, code, *_changes event log).
+    inputs:
+      - source: sf.substreams.v1.Clock
+      - map: map_state_changes
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+params:
+  # Accounts to track. Empty = all accounts (large!). Example below is the
+  # customer's sample contract + WBNB + the EIP-2935 history contract.
+  map_state_changes: ""
+
+sink:
+  module: db_out
+  type: sf.substreams.sink.sql.v1.Service
+  config:
+    schema: "./postgres/schema.sql"
+    engine: postgres
+    postgraphile_frontend:
+      enabled: false
+
+network: bsc

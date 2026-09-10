@@ -1,0 +1,24 @@
+[package]
+name = "substreams-evm-state"
+description = "EVM account state projection (storage/balance/nonce/code) Substreams — Postgres db_out"
+edition = "2021"
+version = "0.1.0"
+license = "Apache-2.0"
+repository = "https://github.com/pinax-network/substreams-evm-state"
+
+[lib]
+name = "substreams_evm_state"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+substreams = "0.7"
+substreams-ethereum = "0.11.1"
+substreams-database-change = "4.0.0"
+prost = "0.13"
+prost-types = "0.13"
+hex = "0.4"
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo"
