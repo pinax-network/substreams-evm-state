@@ -1,16 +1,18 @@
 # substreams-evm-state
 
 Account-keyed **EVM state projection** for Firehose *Extended* blocks, sunk into
-**PostgreSQL** with [`substreams-sink-sql`](https://github.com/streamingfast/substreams-sink-sql).
+**PostgreSQL** with the `substreams sink postgres` command of the
+[`substreams` CLI](https://github.com/streamingfast/substreams).
 
 Given a list of accounts (or none = every account), it streams every
 **persisted** storage / balance / nonce / code change of those accounts and
 maintains their current state plus an event log, block by block, with reorg
 handling delegated to the sink.
 
-> Status: **prototype (stage 1)**. Verified on BSC against `bsc.rpc.pinax.network`
+> Status: **prototype (stage 2)**. Verified on BSC against `bsc.rpc.pinax.network`
 > (see [Verification](#verification)). Network defaults to `bsc`; any chain
-> served as `sf.ethereum.type.v2.Block` Extended works.
+> served as `sf.ethereum.type.v2.Block` Extended works. BSC Firehose is
+> Extended from block 1 (`ver=3` historically, `ver=5` on current blocks).
 
 ## What it covers
 
@@ -23,7 +25,7 @@ handling delegated to the sink.
 | `Block.balance_changes` / `Block.code_changes` | ✅ | validator fee rewards, fork upgrades |
 | Empty / non-matching blocks | ✅ | a `blocks` row is written for every block, so cursor and snapshot continuity is preserved |
 | Reorgs | ✅ (sink) | `--final-blocks-only`, or undo via the sink's `substreams_history` table |
-| Initial state bootstrap | ❌ | this streams *changes*. State columns are `NULL` until first observed. Replaying from a contract's creation block reconstructs its full storage (see [Bootstrap](#bootstrap)) |
+| Initial state bootstrap | ◐ | this streams *changes*; state columns are `NULL` until first observed. Replaying from a contract's creation block reconstructs its full storage, verifiable with `scripts/verify_storage_root.py` (see [Bootstrap](#bootstrap)) |
 
 Filtering is on the **address of the changed account** in each state-change
 record, never on call-to / `tx.to`. A filtered run is an exact subset of an
@@ -32,38 +34,36 @@ unfiltered one.
 ## Modules
 
 ```
-sf.ethereum.type.v2.Block ─► map_state_changes ─► evm.state.v1.StateChanges ─► db_out ─► DatabaseChanges
-                              (params: accounts)                                (Clock)
+sf.ethereum.type.v2.Block ──► db_out(params) ──────────► DatabaseChanges   (the sink module)
+                          └─► map_state_changes(params) ► evm.state.v1.StateChanges   (optional, gRPC consumers)
 ```
 
-| Module | Output | Use |
-|--------|--------|-----|
-| `map_state_changes` | `evm.state.v1.StateChanges` | consume directly over gRPC; every record carries `ordinal`, `scope`, `tx_hash`, `tx_index`, `tx_status`, `call_index` |
-| `db_out` | `sf.substreams.sink.database.v1.DatabaseChanges` | feed `substreams-sink-sql` (Postgres) |
+`db_out` reads the Firehose block directly and applies the persistence rules
+itself, so the sink executes exactly one module and nothing intermediate is
+cached server-side. `map_state_changes` shares the same code and filter but is
+not a dependency of `db_out`; it is only executed if you request it.
 
 ### Params: the account filter
 
-`map_state_changes` takes one string param: a comma (or whitespace) separated
-list of 20-byte addresses, `0x` optional, case-insensitive. **Empty = all
-accounts** (see [Sizing](#sizing) before doing that).
+Both modules take one string param: a comma (or whitespace) separated list of
+20-byte addresses, `0x` optional, case-insensitive. **Empty = all accounts**
+(see [Sizing](#sizing) before doing that).
 
 ```bash
-# CLI / sink flag
--p "map_state_changes=0x32c59d556b16db81dfc32525efb3cb257f7e493d,0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
-
-# or in substreams.yaml
-params:
-  map_state_changes: "0x32c59d…,0xbb4cdb…"
+-p db_out=0x32c59d556b16db81dfc32525efb3cb257f7e493d,0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c
 ```
 
-Adding an account later: restart the sink with the new list from the block you
-want it tracked from. Its state columns fill in as changes arrive (or replay
-from its creation block, see [Bootstrap](#bootstrap)).
+The params value is part of the module hash. Changing the list changes the
+hash, so the sink warns about a cursor hash mismatch on restart; run with
+`--on-module-hash-mismatch=warn` (the Makefile does). Adding an account
+later: restart with the new list from the block you want it tracked from, or
+replay it from its creation block into the same database (see
+[Bootstrap](#bootstrap)).
 
 ## PostgreSQL schema
 
 `postgres/schema.*.sql` layers, concatenated by `make schema` into
-`postgres/schema.sql` (the file the sink applies).
+`postgres/schema.sql` (the file the sink applies on `setup`).
 
 **Current state** (block-end values, last write by ordinal wins):
 
@@ -71,34 +71,38 @@ from its creation block, see [Bootstrap](#bootstrap)).
 |-------|-----|---------|
 | `accounts` | `address` | `balance` (wei), `nonce`, `code_hash`, `block_num`, `balance_block_num`, `nonce_block_num`, `code_block_num` |
 | `storage` | `(address, slot)` | `value`, `block_num`, `ordinal` — slots cleared to zero keep a row with `0x00…00` |
-| `code` | `code_hash` | `code` (hex), `size`, `first_block_num` — deduplicated bytecode |
+| `code` | `code_hash` | `code` (`BYTEA`), `size`, `first_block_num` — deduplicated bytecode |
 | `blocks` | `block_num` | `block_hash`, `parent_hash`, `timestamp`, `state_root`, `coinbase`, `transaction_count`, per-type change counts |
 
-**Event log** (one row per persisted change, keyed `(block_num, ordinal)`):
-`storage_changes`, `balance_changes` (with `reason`), `nonce_changes`,
-`code_changes`, `set_code_authorizations`. Each carries
-`scope ∈ {tx, tx_failed_persistent, tx_7702, system_call, block}`, `tx_hash`,
-`tx_index`, `tx_status`, `call_index`.
+**Event log** (one row per persisted change, keyed `(block_num, ordinal)`,
+`PARTITION BY RANGE (block_num)`): `storage_changes`, `balance_changes`
+(with `reason`), `nonce_changes`, `code_changes`, `set_code_authorizations`.
+Each carries `scope ∈ {tx, tx_failed_persistent, tx_7702, system_call, block}`,
+`tx_hash`, `tx_index`, `tx_status`, `call_index`.
 
-**Views**: `storage_nonzero`, `account_state` (accounts ⋈ code), `head`.
+Partitions must exist before rows arrive. `make setup` creates them for
+`[PARTITION_FROM, PARTITION_TO)` in `PARTITION_STEP` blocks via the SQL
+function `create_event_partitions(from, to, step)`; a `DEFAULT` partition
+catches anything outside. Retention is `DROP TABLE storage_changes_p<from>`.
 
-Encoding: `0x`-prefixed lower-case hex `TEXT` for addresses, hashes, slots,
-values and bytecode; `NUMERIC` for wei; `BIGINT` for nonces and blocks.
-Timestamps are `TIMESTAMP` (UTC).
+**Views**: `storage_nonzero`, `account_state` (accounts ⋈ code, bytecode as hex), `head`.
+
+Encoding: `0x`-prefixed lower-case hex `TEXT` for addresses, hashes, slots and
+values; `BYTEA` for bytecode; `NUMERIC` for wei; `BIGINT` for nonces and
+blocks; `TIMESTAMP` (UTC).
 
 ## Quick start
 
 Prerequisites: Rust 1.88 + `wasm32-unknown-unknown` (via `rust-toolchain.toml`),
-[`substreams`](https://github.com/streamingfast/substreams/releases) CLI,
-[`substreams-sink-sql`](https://github.com/streamingfast/substreams-sink-sql/releases)
-≥ v4.12.0, Docker, `psql`.
+[`substreams`](https://github.com/streamingfast/substreams/releases) CLI
+≥ v1.20.2 (ships `substreams sink postgres`), Docker, `psql`, Python 3 with
+`pycryptodome` for the storage-root check.
 
 ```bash
-# auth for the Pinax endpoint (never commit keys; see .env.example)
-export SUBSTREAMS_API_KEY=...        # or SUBSTREAMS_API_TOKEN=...
+export SUBSTREAMS_API_KEY=...         # never commit keys; see .env.example
 
 make pg-up                            # local Postgres 16 on :5432 (docker compose)
-make setup                            # build wasm, pack spkg, create tables
+make setup                            # build wasm, pack spkg, create tables + partitions
 make dev                              # stream the default 32-block window into Postgres
 make psql                             # poke around
 ```
@@ -110,15 +114,18 @@ Defaults (override on the command line):
 | `ENDPOINT` | `bsc.substreams.pinax.network:443` | Substreams endpoint |
 | `START_BLOCK` / `STOP_BLOCK` | `120140091` / `120140123` | block range for `make dev` |
 | `ACCOUNTS` | sample contract + WBNB + EIP-2935 contract | params filter |
-| `PG_DSN` | local docker DSN | Postgres |
+| `PG_DSN` / `PG_URL` | local docker DSN | Postgres (sink DSN / psql URL) |
+| `PARTITION_FROM` / `PARTITION_TO` / `PARTITION_STEP` | `120000000` / `130000000` / `1000000` | event-log partitions created by `make setup` |
 
 ```bash
-make dev ACCOUNTS=0xabc…,0xdef… START_BLOCK=121114100 STOP_BLOCK=121114161
+make dev  ACCOUNTS=0xabc…,0xdef… START_BLOCK=121114100 STOP_BLOCK=121114161
 make sink START_BLOCK=121114100       # follow head, final blocks only
+make verify                           # RPC cross-check (RPC_API_KEY in env)
+make verify-root ADDRESS=0x…          # storage trie root vs eth_getProof
 ```
 
-`make dev` uses `--development-mode --undo-buffer-size 0` and flushes every
-block. `make sink` uses `--final-blocks-only --infinite-retry`. The sink
+`make dev` runs `substreams sink postgres … --development-mode --undo-buffer-size 0`
+and flushes every block. `make sink` adds `--final-blocks-only`. The sink
 resumes from the cursor stored in the `cursors` table; to re-run a different
 range, use a fresh database (`make pg-down && make pg-up && make setup`).
 
@@ -136,7 +143,7 @@ SELECT * FROM nonce_changes WHERE scope = 'tx_7702';             -- 7702 authori
 ## Semantics
 
 Rules applied by `src/persist.rs` (from the `sf.ethereum.type.v2` proto docs,
-confirmed on BSC Firehose `ver=5` blocks):
+confirmed on BSC Firehose):
 
 1. **`SUCCEEDED` tx** — record every change of every call with `state_reverted == false`.
 2. **`FAILED` / `REVERTED` tx** — consult only the root call. Keep balance
@@ -145,7 +152,8 @@ confirmed on BSC Firehose `ver=5` blocks):
    sender). Everything else is dropped.
 3. **EIP-7702** (`TRX_TYPE_SET_CODE`) — for each authorization with
    `discarded == false`, the `authority`'s nonce and code changes persist even
-   when the tx fails (`scope = tx_7702`).
+   when the tx fails (`scope = tx_7702`). On BSC the root call of a failed
+   set-code tx carries both the sender and the authority nonce; both are kept.
 4. **`Block.system_calls`** — calls with `state_reverted == false` (`scope = system_call`).
 5. **`Block.balance_changes`, `Block.code_changes`** — always (`scope = block`).
 6. No-op records (`old == new`) are dropped.
@@ -161,23 +169,21 @@ field (balance, nonce, code) with `eth_getStorageAt` / `eth_getBalance` /
 `eth_getTransactionCount` / `eth_getCode` at the DB head block, plus the block
 hash and `state_root` against `eth_getBlockByNumber`.
 
-```bash
-RPC_API_KEY=... python3 scripts/verify_rpc.py                 # whole DB at head
-RPC_API_KEY=... python3 scripts/verify_rpc.py --address 0x… --block 120140122
-```
+`scripts/verify_storage_root.py 0x<addr>` recomputes the account's storage
+trie root (secure Merkle Patricia Trie over `storage_nonzero`) and compares it
+with `eth_getProof(addr, [], block).storageHash`. A match is a proof that the
+`storage` table holds **every** non-zero slot of that account at that block.
+Most RPC nodes only serve `eth_getProof` within a few hundred blocks of head,
+so run it while the sink is live.
 
 Results on BSC (2026-09-10, `bsc.rpc.pinax.network`):
 
 | Test | Blocks | Filter | Checked | Mismatches |
 |------|--------|--------|---------|------------|
 | Contracts | 120140091–120140122 | sample contract, WBNB, EIP-2935 | 392 slots, 1 balance, hash, state_root | 0 |
-| EOAs, failed 7702 txs | 121114100–121114160 | 3 EOAs | 3 nonces, 2 balances, 1 code, 1 slot | 0 |
+| EOAs, failed 7702 txs | 121114100–121114160 | 3 EOAs + EIP-2935 | 62 slots, 3 nonces, 2 balances, 1 code (BYTEA), hash, state_root | 0 |
 | Live follow | 120140123–120155883 (15,763 blocks) | 7702 bot EOA | nonce | 0 |
-
-Failed-tx and 7702 paths were exercised on real data: txs
-`0x506ed5…` (REVERTED) and `0x9929e0…` (FAILED) at blocks 121114122 / 121114153
-produced exactly one `tx_failed_persistent` sender nonce and one `tx_7702`
-authority nonce each, and nothing else.
+| Storage root | 121114203–121122203 (creation → head, 8,001 blocks) | `0x98dd05…5ffff` | 46-slot trie root vs `eth_getProof.storageHash`, nonce, code_hash | 0 |
 
 Unit tests for the persistence rules: `make test`.
 
@@ -192,9 +198,9 @@ Measured on BSC (block time ≈ 0.75 s, ≈ 115k blocks/day):
 | Filtered live follow, per-block flush | — | ≈ 56 blocks/s throughput |
 
 Unfiltered event logging is not viable for a bounded local budget; the
-current-state tables alone are bounded by the number of live slots. If the
-event log is not needed, drop layer `postgres/schema.2.events.sql` and the
-corresponding rows in `src/db_out.rs` (or truncate on a schedule).
+current-state tables alone are bounded by the number of live slots. Keep the
+event log short with partition drops, or remove layer
+`postgres/schema.2.events.sql` and the corresponding rows in `src/db_out.rs`.
 
 ## Bootstrap
 
@@ -202,25 +208,42 @@ This package does not export initial state. Two options:
 
 * **Replay from creation.** Run with `ACCOUNTS=<addr>` from the contract's
   creation block: every slot it ever wrote is reconstructed, so `storage_nonzero`
-  is complete by construction. Completeness can be verified by recomputing the
-  storage trie root from `storage_nonzero` and comparing to
-  `eth_getProof(addr, [], block).storageHash` (not yet scripted).
+  is complete by construction. Prove it with `make verify-root ADDRESS=<addr>`
+  while the sink is at head. Tested on BSC: contract
+  `0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff` (created at block 121114203)
+  replayed 8,001 blocks to head in ≈ 30 s in production mode (50 parallel
+  workers), 46 non-zero slots, recomputed root `0x979eec…180f` equal to the
+  RPC `storageHash`. Older, hotter contracts (WBNB, 2020) mean tens of millions
+  of blocks; measure before promising a turnaround time.
 * **External snapshot.** Load `accounts` / `storage` / `code` from another
   source at block *N*, then start the sink at *N+1*.
 
 ## Layout
 
 ```
-substreams.yaml            # map_state_changes + db_out + sink (postgres)
+substreams.yaml            # db_out (sink) + map_state_changes (optional)
 proto/evm/state/v1/        # StateChanges proto
+src/lib.rs                 # collect(): shared core; both handlers
 src/persist.rs             # persistence rules (unit-tested)
 src/params.rs              # account filter
 src/db_out.rs              # Tables projection
 postgres/schema.*.sql      # numbered layers → schema.sql (generated)
 scripts/verify_rpc.py      # RPC cross-check
+scripts/verify_storage_root.py  # MPT storage root vs eth_getProof
 docker-compose.yml         # local Postgres 16
 docs/SCOPE.md              # scoping notes and open questions
 ```
+
+## Sink modes and why `db_out` stays
+
+`substreams sink postgres` auto-detects its mode from the output module type.
+A `DatabaseChanges` output runs in *database-changes* mode (create / update /
+upsert / delete, delta ops, undo via `substreams_history`). Any other protobuf
+with `schema.table` / `schema.field` annotations runs in *relational
+mappings* mode: tables inferred from the proto, bulk `COPY` loads, but
+**insert-only**. The current-state tables (`accounts`, `storage`, `code`) are
+upserts, so this package uses `db_out`. An event-log-only deployment could
+annotate `evm.state.v1.StateChanges` and drop `db_out`.
 
 ## Known issues / follow-ups
 
@@ -228,7 +251,5 @@ docs/SCOPE.md              # scoping notes and open questions
   current CLI builds embed those protos and the import causes
   `name conflict over sf.substreams.sink.sql.v1.Service` in `substreams run`,
   `gui` and `protogen`. The `sink:` section works without it.
-* Bytecode is stored as hex `TEXT`; `BYTEA` would halve the size of `code`.
-* Event-log tables are not partitioned yet; add `PARTITION BY RANGE (block_num)`
-  before running unfiltered or long-lived.
-* Storage-root completeness check against `eth_getProof` is not scripted yet.
+* `substreams-sink-sql` (standalone binary) is deprecated but still works with
+  this package and the same database; the Makefile uses the CLI.

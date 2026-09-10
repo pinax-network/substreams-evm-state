@@ -1,9 +1,12 @@
 //! EVM account-state projection Substreams.
 //!
-//! * `map_state_changes` — applies the persistence rules (`persist.rs`) to an
-//!   Extended `sf.ethereum.type.v2.Block`, filters on the changed account
-//!   (`params.rs`) and emits `evm.state.v1.StateChanges`.
-//! * `db_out` — projects those into PostgreSQL `DatabaseChanges`.
+//! * `db_out(params, Block)` — the sink module. Applies the persistence
+//!   rules (`persist.rs`), filters on the changed account (`params.rs`) and
+//!   emits PostgreSQL `DatabaseChanges` (`db_out.rs`). Reads the Firehose
+//!   block directly so nothing intermediate is cached on the server.
+//! * `map_state_changes(params, Block)` — optional sibling for gRPC
+//!   consumers; same rules, emits `evm.state.v1.StateChanges`. Not in
+//!   `db_out`'s dependency chain, so it is not executed by the sink.
 
 mod db_out;
 mod params;
@@ -11,7 +14,6 @@ pub mod pb;
 mod persist;
 
 use substreams::errors::Error;
-use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt as SBigInt;
 use substreams_database_change::pb::sf::substreams::sink::database::v1::DatabaseChanges;
 use substreams_ethereum::pb::eth::v2 as eth;
@@ -98,9 +100,9 @@ impl Sink for Collector<'_> {
     }
 }
 
-#[substreams::handlers::map]
-pub fn map_state_changes(params: String, block: eth::Block) -> Result<StateChanges, Error> {
-    let filter = Filter::parse(&params).map_err(|e| Error::msg(format!("params: {e}")))?;
+/// Shared core: persisted, filtered, ordinal-sorted state changes of a block.
+pub fn collect(params: &str, block: &eth::Block) -> Result<StateChanges, Error> {
+    let filter = Filter::parse(params).map_err(|e| Error::msg(format!("params: {e}")))?;
 
     let header = block.header.as_ref();
     let mut col = Collector {
@@ -119,7 +121,7 @@ pub fn map_state_changes(params: String, block: eth::Block) -> Result<StateChang
         },
     };
 
-    persist::collect_block(&block, &mut col);
+    persist::collect_block(block, &mut col);
 
     // EIP-7702 authorization list (informational; the persisted effects are
     // already in nonce_changes / code_changes). Kept when authority OR
@@ -146,13 +148,12 @@ pub fn map_state_changes(params: String, block: eth::Block) -> Result<StateChang
         }
     }
 
-    let out = col.out;
-    // Deterministic order for downstream consumers.
-    let mut out = out;
-    out.storage_changes.sort_by_key(|c| c.origin.as_ref().map(|o| o.ordinal).unwrap_or(0));
-    out.balance_changes.sort_by_key(|c| c.origin.as_ref().map(|o| o.ordinal).unwrap_or(0));
-    out.nonce_changes.sort_by_key(|c| c.origin.as_ref().map(|o| o.ordinal).unwrap_or(0));
-    out.code_changes.sort_by_key(|c| c.origin.as_ref().map(|o| o.ordinal).unwrap_or(0));
+    let mut out = col.out;
+    let ord = |o: &Option<Origin>| o.as_ref().map(|o| o.ordinal).unwrap_or(0);
+    out.storage_changes.sort_by_key(|c| ord(&c.origin));
+    out.balance_changes.sort_by_key(|c| ord(&c.origin));
+    out.nonce_changes.sort_by_key(|c| ord(&c.origin));
+    out.code_changes.sort_by_key(|c| ord(&c.origin));
 
     substreams::log::info!(
         "block {} filter={} storage={} balance={} nonce={} code={} auths={}",
@@ -168,6 +169,12 @@ pub fn map_state_changes(params: String, block: eth::Block) -> Result<StateChang
 }
 
 #[substreams::handlers::map]
-pub fn db_out(clock: Clock, changes: StateChanges) -> Result<DatabaseChanges, Error> {
-    Ok(db_out::project(&clock, &changes))
+pub fn map_state_changes(params: String, block: eth::Block) -> Result<StateChanges, Error> {
+    collect(&params, &block)
+}
+
+#[substreams::handlers::map]
+pub fn db_out(params: String, block: eth::Block) -> Result<DatabaseChanges, Error> {
+    let changes = collect(&params, &block)?;
+    Ok(db_out::project(&changes))
 }

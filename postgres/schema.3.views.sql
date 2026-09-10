@@ -8,7 +8,7 @@ WHERE value <> '0x00000000000000000000000000000000000000000000000000000000000000
 
 -- Account head state joined with bytecode.
 CREATE OR REPLACE VIEW account_state AS
-SELECT a.address, a.balance, a.nonce, a.code_hash, c.code, c.size AS code_size,
+SELECT a.address, a.balance, a.nonce, a.code_hash, '0x' || encode(c.code, 'hex') AS code, c.size AS code_size,
        a.block_num, a.balance_block_num, a.nonce_block_num, a.code_block_num
 FROM accounts a
 LEFT JOIN code c ON c.code_hash = a.code_hash;

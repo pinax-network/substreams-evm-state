@@ -30,7 +30,7 @@ CREATE INDEX IF NOT EXISTS idx_storage_block_num ON storage (block_num);
 -- Deduplicated bytecode.
 CREATE TABLE IF NOT EXISTS code (
     code_hash           TEXT PRIMARY KEY,
-    code                TEXT NOT NULL,      -- hex bytecode
+    code                BYTEA NOT NULL,     -- raw bytecode; encode(code, 'hex') for text
     size                INTEGER NOT NULL,
     first_block_num     BIGINT NOT NULL
 );

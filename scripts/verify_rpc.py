@@ -84,7 +84,7 @@ def main():
                 print(f"MISMATCH nonce {address}: db={nonce} rpc={got}")
         if code_hash:
             got = rpc("eth_getCode", [address, tag])
-            db_code = sql(f"SELECT code FROM code WHERE code_hash = '{code_hash}'")
+            db_code = sql(f"SELECT '0x' || encode(code, 'hex') FROM code WHERE code_hash = '{code_hash}'")
             if db_code and db_code[0][0].lower() == got.lower():
                 ok += 1
             else:

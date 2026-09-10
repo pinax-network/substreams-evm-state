@@ -296,12 +296,15 @@ unacceptable. Those still need the Parquet/export roadmap.
    (EIP-2935 history contract) writing one slot. Emitted with `scope = system_call`.
    Block-level `balance_changes` are two `REWARD_TRANSACTION_FEE` records per
    block (system address → coinbase). No block-level `code_changes` observed.
-2. **Extended range on BSC.** Still open — ask infra for the first `ver=5` block.
+2. **Extended range on BSC.** Resolved. Firehose `EndpointInfo` advertises `blockFeatures: [extended]`;
+   sampled blocks 1, 1M, 10M, 20M, 30M, 40M are all `DETAILLEVEL_EXTENDED` (`ver=3`), current
+   blocks are `ver=5`. Replay-from-creation works for any BSC contract.
 3. **Zero-slot policy.** Implemented as *keep row with zero value*; `storage_nonzero` view hides them.
-4. **Event log default.** Implemented as always-on (no partitioning yet). Unfiltered
-   measured at ≈ 2.3 MB/block ⇒ ≈ 250 GB/day on BSC; filtered to a few contracts
-   it is small. Decision on retention/partitioning deferred to the customer.
-5. **Encoding.** Hex `TEXT` everywhere, including bytecode. `BYTEA` is a follow-up.
+4. **Event log default.** Always-on, `PARTITION BY RANGE (block_num)` with a
+   `create_event_partitions(from, to, step)` helper and a DEFAULT partition;
+   retention = drop partitions. Unfiltered measured at ≈ 2.3 MB/block ⇒ ≈ 250 GB/day
+   on BSC; filtered to a few contracts it is small.
+5. **Encoding.** Hex `TEXT` for addresses/hashes/slots/values; bytecode is `BYTEA`.
 6. **7702 backfill note.** Observed on current BSC blocks that `SetCodeAuthorization.address`
    is populated. Code changes for the authority are recorded only when the
    delegate actually changes (a bot re-authorizing the same delegate produces
@@ -310,8 +313,14 @@ unacceptable. Those still need the Parquet/export roadmap.
    nonce *and* the authority nonce; the proto's "smallest ordinal" rule alone
    would drop the authority nonce. The mapper keeps both (`tx_failed_persistent`
    + `tx_7702`) and both verified against RPC.
-8. **Sink resume.** `substreams-sink-sql` resumes from the `cursors` table even in
+8. **Sink resume.** The sink resumes from the `cursors` table even in
    development mode; a different block range needs a fresh database.
+9. **Sink CLI.** `substreams-sink-sql` is deprecated; `substreams sink postgres` (CLI ≥ v1.20.2)
+   is a drop-in with the same database/cursors. Its relational-mappings mode (annotated
+   protobuf, insert-only, no `db_out`) does not fit the upsert state tables, so `db_out` stays.
+   `db_out` now reads the Block directly (no intermediate module cached server-side).
+10. **`eth_getProof` window.** `bsc.rpc.pinax.network` serves proofs only within a few
+   hundred blocks of head (504 beyond ~300, hard error beyond ~3000). Root checks run live.
 
 ## 10. Milestones
 
@@ -320,6 +329,6 @@ unacceptable. Those still need the Parquet/export roadmap.
 | 1 | ✅ Package skeleton, proto, `map_state_changes` with persistence rules + unit tests | §2 rules |
 | 2 | ✅ `db_out` + Postgres schema layers 0–3, `make setup`/`make dev` against the customer's 32-block window | WBNB storage count matches raw Firehose exactly |
 | 3 | ✅ RPC cross-check script (`scripts/verify_rpc.py`, §6 items 1–4) | 0 mismatches |
-| 4 | ◐ Event log layer 2 (no partitioning yet), sizing measured | Budget fit |
-| 5 | Storage-root check (§6 item 5) on one contract via replay-from-creation | §8 bootstrap claim |
+| 4 | ✅ Event log layer 2 partitioned, sizing measured | Budget fit |
+| 5 | ✅ `scripts/verify_storage_root.py` (§6 item 5), tested via replay-from-creation | §8 bootstrap claim |
 | 6 | README, publish spkg, hand the customer the params + run flags | Ship |

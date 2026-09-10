@@ -9,7 +9,7 @@ package:
     account actually changed (including failed-tx gas/nonce effects, EIP-7702
     authorization effects, system calls and block-level rewards), optionally
     filtered to a list of accounts, and projects them into PostgreSQL
-    current-state tables plus an event log via `substreams-sink-sql`.
+    current-state tables plus an event log via `substreams sink postgres`.
 
 imports:
   database_changes: ./spkg/substreams-sink-database-changes-v4.0.0.spkg
@@ -30,30 +30,36 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams_evm_state.wasm
 
 modules:
-  - name: map_state_changes
+  # Sink module. Reads the Firehose block directly (no intermediate module
+  # output to cache server-side).
+  - name: db_out
     kind: map
     doc: |
-      Persisted state changes for the block, keyed by changed account.
-      Params: comma-separated list of accounts to keep (0x-hex, case-insensitive).
-      Empty string = every account.
+      PostgreSQL DatabaseChanges: blocks, accounts, storage, code (current
+      state) + storage/balance/nonce/code_changes and set_code_authorizations
+      (event log). Params: comma-separated accounts to keep (0x-hex,
+      case-insensitive); empty = every account.
+    inputs:
+      - params: string
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+
+  # Optional: same rules and filter, as a protobuf stream for gRPC consumers.
+  # Not a dependency of db_out, so the sink never executes it.
+  - name: map_state_changes
+    kind: map
+    doc: Persisted state changes for the block, keyed by changed account. Same params as db_out.
     inputs:
       - params: string
       - source: sf.ethereum.type.v2.Block
     output:
       type: proto:evm.state.v1.StateChanges
 
-  - name: db_out
-    kind: map
-    doc: PostgreSQL DatabaseChanges (blocks, accounts, storage, code, *_changes event log).
-    inputs:
-      - source: sf.substreams.v1.Clock
-      - map: map_state_changes
-    output:
-      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
-
 params:
-  # Accounts to track. Empty = all accounts (large!). Example below is the
-  # customer's sample contract + WBNB + the EIP-2935 history contract.
+  # Accounts to track. Empty = all accounts (large!). Override with
+  # `-p db_out=0x...,0x...` (and `-p map_state_changes=...`).
+  db_out: ""
   map_state_changes: ""
 
 sink:

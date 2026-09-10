@@ -2,6 +2,9 @@
 //!
 //! Tables (see `postgres/schema.*.sql`):
 //! * `blocks`   — one row per block, always (continuity marker).
+//!
+//! Block metadata comes from `StateChanges.block` (filled from the Firehose
+//! header), so no `Clock` input is needed.
 //! * `accounts` / `storage` / `code` — current state, upserted with the
 //!   block-end value (last change by ordinal wins within the block).
 //! * `storage_changes` / `balance_changes` / `nonce_changes` /
@@ -12,7 +15,6 @@
 
 use std::collections::HashMap;
 
-use substreams::pb::substreams::Clock;
 use substreams_database_change::pb::sf::substreams::sink::database::v1::DatabaseChanges;
 use substreams_database_change::tables::{Row, Tables};
 
@@ -20,6 +22,11 @@ use crate::pb::evm::state::v1::{Origin, Scope, StateChanges};
 
 fn hex(b: &[u8]) -> String {
     format!("0x{}", hex::encode(b))
+}
+
+/// Postgres BYTEA literal (hex input format).
+fn bytea(b: &[u8]) -> String {
+    format!("\\x{}", hex::encode(b))
 }
 
 /// 32-byte, left-padded hex word (storage keys/values may arrive trimmed).
@@ -58,12 +65,12 @@ fn ord(o: Option<&Origin>) -> u64 {
     o.map(|o| o.ordinal).unwrap_or(0)
 }
 
-pub fn project(clock: &Clock, ch: &StateChanges) -> DatabaseChanges {
+pub fn project(ch: &StateChanges) -> DatabaseChanges {
     let mut tables = Tables::new();
-    let block_num = clock.number;
-    let block_hash = format!("0x{}", clock.id);
-    let timestamp = clock.timestamp.as_ref().map(|t| t.seconds).unwrap_or(0).to_string();
     let info = ch.block.clone().unwrap_or_default();
+    let block_num = info.number;
+    let block_hash = hex(&info.hash);
+    let timestamp = info.timestamp.to_string();
 
     // -- blocks: every block, including ones with no matching changes --------
     tables
@@ -120,8 +127,7 @@ pub fn project(clock: &Clock, ch: &StateChanges) -> DatabaseChanges {
     }
     for a in &ch.set_code_authorizations {
         tables
-            .upsert_row("set_code_authorizations", [("tx_hash", hex(&a.tx_hash)), ("auth_index", a.index.to_string())])
-            .set("block_num", block_num)
+            .upsert_row("set_code_authorizations", [("block_num", block_num.to_string()), ("tx_hash", hex(&a.tx_hash)), ("auth_index", a.index.to_string())])
             .set("block_hash", &block_hash)
             .set("timestamp", &timestamp)
             .set("tx_index", a.tx_index)
@@ -182,7 +188,7 @@ pub fn project(clock: &Clock, ch: &StateChanges) -> DatabaseChanges {
         if !c.new_code.is_empty() {
             tables
                 .upsert_row("code", [("code_hash", hex(&c.new_hash))])
-                .set("code", hex(&c.new_code))
+                .set("code", bytea(&c.new_code))
                 .set("size", c.new_code.len() as u64)
                 .set_if_null("first_block_num", block_num);
         }
