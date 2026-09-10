@@ -28,3 +28,6 @@ src/pb/*.rs
 
 # secrets
 .env
+
+# python
+__pycache__/
