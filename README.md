@@ -202,6 +202,41 @@ current-state tables alone are bounded by the number of live slots. Keep the
 event log short with partition drops, or remove layer
 `postgres/schema.2.events.sql` and the corresponding rows in `src/db_out.rs`.
 
+## Throughput and cost
+
+Measured 2026-09-10 on `bsc.substreams.pinax.network` with the default
+3-account filter (sample contract, WBNB, EIP-2935 contract). WBNB is one of
+the hottest contracts on BSC, so this is a pessimistic per-account profile.
+
+| Measurement | Value |
+|-------------|-------|
+| `db_out` output | ≈ 27 KB/block (≈ 165 rows/block; event log ≈ 2/3 of the bytes, state tables ≈ 1/3) |
+| Uncached backprocessing, 20 parallel workers, 10,000 blocks | 87 s ⇒ ≈ 115 blocks/s (≈ 10 blocks/s per worker, one 1,000-block segment per worker) |
+| Uncached backprocessing, 100 workers, 50,000 blocks | ≈ 98 s ⇒ ≈ 500 blocks/s (only 50 segments to run) |
+| Cached delivery of the same 50,000 blocks | 14 s ⇒ ≈ 3,500 blocks/s |
+| Live follow, per-block flush | ≈ 56 blocks/s, well above the 2.2 blocks/s BSC produces |
+
+Cache build (first backprocessing of a new params value) scales with
+`workers × ≈10 blocks/s`. Full BSC history (≈ 121M blocks) is ≈ 34 h at 100
+workers or ≈ 3 days at 50; a contract created in 2025 (block ≈ 47M+) is about
+60 % of that; a contract created last week is seconds. The params value is
+part of the module hash, so **each distinct account list is its own cache**.
+Add accounts by replaying only the new ones from their creation blocks
+(§ Bootstrap) instead of rebuilding the whole list.
+
+Cost at Pinax list prices ($150/TB of module output + $1.75 per 1M blocks;
+BSC ≈ 5.76M blocks/month at 0.45 s):
+
+| Scenario | Output | Monthly |
+|----------|--------|---------|
+| This package, 3 accounts incl. WBNB, state + event log | ≈ 27 KB/block ⇒ ≈ 155 GB/month | ≈ $23 + $10 = **≈ $33** |
+| Same, state tables only (drop the event log) | ≈ 9 KB/block ⇒ ≈ 52 GB/month | ≈ $8 + $10 = **≈ $18** |
+| Raw Firehose Extended blocks with CombinedFilter (customer's probe: 1.7 MB/block) | ≈ 9.8 TB/month | **≈ $1,480** |
+| One-time full-history cache build for the 3-account filter | ≈ 3.3 TB + 121M blocks | ≈ $490 + $212 ≈ **$700** |
+
+Costs scale with the number and activity of tracked accounts, not with
+chain size; a quiet contract adds almost nothing.
+
 ## Bootstrap
 
 This package does not export initial state. Two options:
@@ -253,3 +288,10 @@ annotate `evm.state.v1.StateChanges` and drop `db_out`.
   `gui` and `protogen`. The `sink:` section works without it.
 * `substreams-sink-sql` (standalone binary) is deprecated but still works with
   this package and the same database; the Makefile uses the CLI.
+* `substreams sink noop` is a cache warm-up: the server runs in noop mode and
+  only sends sparse progress messages (one per 1,000-block segment on
+  protocol v3, none on a fully cached range), so its `msg/s` and `total`
+  counters are not block counts and `last_block_seen` may lag or be `None`.
+  Judge a warm-up by wall time, then confirm with
+  `substreams run --production-mode -o clock` over the same range (cached
+  delivery ≈ 3,500 blocks/s).
