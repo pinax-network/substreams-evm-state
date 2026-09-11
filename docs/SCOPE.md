@@ -55,7 +55,9 @@ The current tables do not support arbitrary historical reads.
 The original PostgreSQL tests and measurements are baseline evidence, not full
 customer qualification. Native ClickHouse output, guarded ingestion, immutable
 checkpoint publication and account/header/storage proof verification are now
-implemented. Standalone exports and retention automation remain unfinished.
+implemented. Portable exports, verified restores, persistent reader pins and
+whole-checkpoint cleanup are also implemented. Native delta retention and peak
+disk accounting remain unfinished.
 
 ## Native ClickHouse route
 
@@ -122,7 +124,7 @@ account insertion, and fail native cursor writes after block data insertion.
 The runner binds database ownership, filter, package/module identity and local
 schema metadata, locks out competing local writers, and rejects cursor loss or
 database replacement. Keep the cursor, frozen package and spool on a durable
-volume. Power-loss recovery and publication coordination with retention still
+volume. Power-loss recovery and source-history retention still
 require qualification; annotations alone do not establish these guarantees.
 
 ## Bootstrap and growing account sets

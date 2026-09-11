@@ -5,8 +5,9 @@ Reconstruct complete storage, code, balance and nonce at a fixed finalized block
 verify the result, and publish an immutable checkpoint for local execution.
 
 **Prototype; v0.1.0 is not released yet.** Native ingestion, isolated checkpoint
-construction, proof verification and restart tests are implemented. Lifecycle
-qualification, exported checkpoint files and bounded retention remain unfinished.
+construction, proof verification, portable exports/restores, reader pins and
+checkpoint cleanup are implemented and tested. Lifecycle qualification, bounded
+source-history retention and peak disk accounting remain unfinished.
 The customer's actual 19/64-account lists have not been supplied, so their
 capacity, latency and cost are not qualified. See [scope](docs/SCOPE.md) and
 [current evidence](docs/QUALIFICATION.md).
@@ -137,8 +138,8 @@ database, accounts, start block and module hash recorded in the run's `run.json`
 ]
 ```
 
-The checkpoint destination must already exist. It may be the same database as
-its source; checkpoint tables use separate names.
+The checkpoint destination is created when needed. It may be the same database
+as its source; checkpoint tables use separate names.
 
 ```bash
 .venv/bin/evm-state --database bootstrap_example checkpoint \
@@ -158,10 +159,41 @@ block/hash before publication; cohorts cannot overlap. Existing checkpoints
 remain readable while onboarding or verification is in progress.
 
 The checkpoint manifest carries block identity, accounts, source records, counts,
-state checksum and proof evidence. Readers pin a `snapshot_id` and query its
-`checkpoint_accounts` and `checkpoint_storage` rows. A row in `checkpoints` is
-the readiness signal; raw source rows and failed candidate rows are not ready.
-Standalone paginated exports and automated rotation are still being developed.
+state checksum and proof evidence. A row in `checkpoints` is the readiness signal;
+raw source rows and failed candidate rows are not ready.
+
+## Export, restore and reader retention
+
+The [checkpoint operations guide](docs/CHECKPOINTS.md) covers pagination,
+portable files, recovery, onboarding and cleanup. A portable export contains an
+encoded header, account proofs, complete metadata/code and checksummed gzip
+storage pages. `manifest.json` is written last, after all exported state verifies.
+
+```bash
+.venv/bin/evm-state --database bootstrap_example export <snapshot-id> \
+  --output localdata/exports/checkpoint-1
+.venv/bin/evm-state verify-export localdata/exports/checkpoint-1 \
+  --expected-hash <independently-trusted-block-hash>
+.venv/bin/evm-state --database restored_state import-export \
+  localdata/exports/checkpoint-1 --expected-hash <independently-trusted-block-hash>
+```
+
+Offline verification requires no database, RPC connection or credentials. An
+import verifies the files first, then verifies the stored candidate before
+publishing a new snapshot ID. It preserves the original block and state checksum.
+
+Use `pin`, `page` and `unpin` for multi-request reads. Pins persist until explicitly
+released; `pins` lists them. `retention-plan` previews cleanup and
+`prune-checkpoints` removes whole old or failed generations, preserving every pin,
+the newest checkpoint for every account, and the requested recent generations.
+
+All checkpoint clients for a database must run on the same host and share the
+same durable `EVM_STATE_HOME` (default `localdata/control`). The database is bound
+to that directory; a second controller cannot bypass existing reader pins.
+Exports and in-progress builds exclude cleanup. Direct SQL readers must arrange
+their own pin through this interface. Distributed reader/writer coordination is
+not implemented. Older, unpartitioned prototype tables require export/import
+into a fresh database before checkpoint cleanup can be enabled.
 
 ## Verification and limits
 
@@ -184,8 +216,9 @@ matrix are not yet qualified. A mismatch leaves the candidate unpublished.
 The default checkpoint budget is 100,000,000,000 bytes. Current checks reject an
 already exhausted database budget and check again during verification; they do
 **not yet bound peak merges, pending spool, temporary trie files or all future
-growth**. This prototype has no proven 100 GB operating limit. Retention,
-reader pinning and peak-space accounting are release requirements.
+growth**. Checkpoint cleanup does not remove native delta history or exported
+files. This prototype has no proven 100 GB operating limit. Bounded source
+retention and peak-space accounting are release requirements.
 
 ## Tests and release
 
@@ -197,7 +230,8 @@ make test-integration      # local ClickHouse, published CLI, fault injection
 The integration suite uses uniquely named disposable databases. It tests native
 row encoding, direct/spooled restarts, a cursor-write failure after data insertion,
 coherent checkpoint publication, zero clears, account onboarding, proof failures
-and run-identity guards. It makes no provider requests and needs no API keys.
+run-identity guards, export tampering, restore failures, pinned pagination and
+interrupted checkpoint cleanup. It makes no provider requests and needs no API keys.
 The Go adapter only translates the native CLI's S2 gRPC compression for the local
 Python test server; it is not part of the production data path.
 

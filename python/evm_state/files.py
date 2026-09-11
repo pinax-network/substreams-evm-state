@@ -36,14 +36,21 @@ def atomic_json(path, value, overwrite=False):
 
 @contextmanager
 def exclusive_lock(path):
+    with file_lock(path, exclusive=True, blocking=False) as handle:
+        yield handle
+
+
+@contextmanager
+def file_lock(path, exclusive=False, blocking=True):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a+") as handle:
         try:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            mode = fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH
+            fcntl.flock(handle.fileno(), mode | (0 if blocking else fcntl.LOCK_NB))
         except BlockingIOError:
             raise ValueError("another process owns this state directory") from None
         try:
-            yield
+            yield handle
         finally:
             fcntl.flock(handle.fileno(), fcntl.LOCK_UN)

@@ -70,7 +70,8 @@ def native_template(tmp_path_factory):
 
 
 @pytest.fixture
-def databases(native_template):
+def databases(native_template, monkeypatch, tmp_path):
+    monkeypatch.setenv("EVM_STATE_HOME", str(tmp_path / "checkpoint-control"))
     admin = ClickHouse("default")
     created = []
 

@@ -10,6 +10,7 @@ from .ch import ClickHouse, identifier
 from .proof import VerificationError, address, unhex, verify_account, verify_complete, EMPTY_STORAGE_ROOT
 from .triedb import TrieDB
 from .header import verify_header
+from .control import control, object_id
 
 ZERO = "0x" + "00" * 32
 
@@ -28,6 +29,7 @@ def connect_like(client, database):
 
 
 def setup(client):
+    connect_like(client, "default").execute(f"CREATE DATABASE IF NOT EXISTS {client.database}")
     # Loaded via package data; works from an installed wheel as well as the repo.
     sql = (Path(__file__).parent / "checkpoints.sql").read_text()
     for statement in sql.split(";"):
@@ -36,6 +38,12 @@ def setup(client):
 
 
 def manifest(client, snapshot_id):
+    with control(client).reader():
+        return _manifest(client, snapshot_id)
+
+
+def _manifest(client, snapshot_id):
+    object_id(snapshot_id)
     row = client.one("SELECT manifest FROM checkpoints FINAL WHERE snapshot_id={id:String}", {"id": snapshot_id})
     data = json.loads(row["manifest"])
     if data.get("snapshot_id") != snapshot_id or data.get("status") != "ready":
@@ -122,13 +130,18 @@ def _observed_fields(client, sources, base, params):
 
 
 def build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, work_dir=None):
+    setup(client)
+    with control(client).publisher():
+        return _build(client, bundle, sources, base_id, budget_bytes, work_dir)
+
+
+def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, work_dir=None):
     """Build from disjoint account cohorts and optionally a previous ready checkpoint.
 
     A source starts at creation for new accounts, or at base.number+1 for existing
     accounts. Root verification establishes complete initial storage; source range
     assumptions alone never mark an account ready.
     """
-    setup(client)
     if bundle.get("format_version") != 1 or bundle.get("chain_id") != 56:
         raise VerificationError("v0.1 qualification requires a BSC proof bundle")
     header = bundle["header"]
@@ -142,7 +155,7 @@ def build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, w
     elif bundle["header_trust"] == "operator-pinned-hash":
         raise VerificationError("a pinned block hash requires its encoded header")
     accounts = canonical_accounts(bundle["accounts"])
-    base = manifest(client, base_id) if base_id else None
+    base = _manifest(client, base_id) if base_id else None
     base_accounts = set(base["accounts"]) if base else set()
     if base and (target <= base["header"]["number"] or not base_accounts.issubset(accounts)):
         raise VerificationError("checkpoint must advance its base and preserve all base accounts")
@@ -231,7 +244,12 @@ def build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, w
 
 
 def read_account(client, snapshot_id, account_address):
-    published = manifest(client, snapshot_id)
+    with control(client).reader():
+        return _read_account(client, snapshot_id, account_address)
+
+
+def _read_account(client, snapshot_id, account_address):
+    published = _manifest(client, snapshot_id)
     account_address = address(account_address)
     if account_address not in published["accounts"]:
         raise VerificationError("account is not ready in this checkpoint")

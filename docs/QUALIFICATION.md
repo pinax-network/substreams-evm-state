@@ -7,9 +7,9 @@ make an entire deliverable complete.
 | Deliverable | Evidence in this prototype | Remaining acceptance work |
 |---|---|---|
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards | Power-loss/metadata recovery, sustained follow and agreed read/publication latency; connect readiness checks to persisted source identity |
-| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up at a common finalized block preserves the old checkpoint | Portable paginated export, reader pinning and retention coordination; operational cutover/recovery runbook exercised end to end |
+| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable paginated export and verified import; real restore followed by 9,427 BSC blocks, pinned reads and checkpoint cleanup | Exercise representative multi-account onboarding and interrupted operational cutover; connect source identities and durable continuation evidence to readiness |
 | Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass | Producer/fork fixtures, persistent failed transaction and full 7702 matrix, CREATE/CREATE2 and deletion/recreation reconciliation; repair legacy verifier false-positive behavior |
-| Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; pinned native CLI, ClickHouse and Python dependencies; package-producing `make build`; CI integration job | Bounded delta/candidate/checkpoint retention, peak merge/spool/trie space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
+| Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate partition cleanup preserving readers and latest account state; pinned toolchain; package-producing `make build`; CI integration job | Bounded native delta retention, peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
 
@@ -18,7 +18,7 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 64 tests (35 offline, 29 integration).
+The Python suite currently contains 91 tests (35 offline, 56 integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 The native fixtures serve real packaged protobuf types over local gRPC. The test
 transport adapter translates the CLI's S2 request compression using its upstream
@@ -46,6 +46,16 @@ Onboarding tests add a separate cohort at the same target and preserve the old
 checkpoint, while balance-only changes leave nonce/code intact and zero clears
 cannot resurrect old nonzero storage.
 
+Export and retention tests additionally cover omitted/altered pages even after
+file checksums are rewritten, code/nonce/proof/header corruption, exact uint64
+nonce encoding for JSON consumers, path traversal, interrupted exports, changed
+files during import and verification of the stored candidate before publication.
+Pins survive newer publications, prevent checkpoint deletion between page calls,
+and reject cursors for another account or checkpoint. Cleanup preserves the latest
+state of quiet accounts and resumes removal of unpublished parts after interruption.
+Missing or mismatched controller metadata fails closed. These locks are local to
+one host and durable control directory, not a distributed coordination protocol.
+
 ## BSC evidence
 
 The [machine-readable record](evidence/bsc-bootstrap-2026-09-11.json) describes
@@ -72,6 +82,26 @@ This is a quiet, small account. It does **not** qualify WBNB, the customer's
 operation. Header finality is trusted to the RPC provider, not independently
 verified BSC consensus. The cache state of the original replay was not separately
 established, so its duration is not labeled cold-build or cached throughput.
+
+The [portable checkpoint record](evidence/bsc-portable-checkpoint-2026-09-11.json)
+then exercises this same account's export, restore and continuation:
+
+- The checkpoint at 121294292 exported to three storage pages and 15,857 total
+  bytes; offline header/account/storage/code verification passed.
+- Import into a fresh partitioned database preserved all 46 slots and the exact
+  state checksum, verifying the stored candidate before publishing it.
+- The published Substreams 1.22.0 binary ingested 9,427 contiguous blocks from
+  121294293 through 121303719 in 36.035 seconds. Cache warmth is unknown.
+- A new checkpoint verified in 0.331 seconds. Its encoded header hash is
+  `0x1f32bf3f8690dd58014f00465350e5cfae5a25afd093188b9681cdac6fa0fb4f`.
+- The older checkpoint remained pinned across the new publication and cleanup;
+  its 46 slots could still be paginated consistently. After unpinning, cleanup
+  removed it and preserved the newer checkpoint.
+
+No selected-account state changes occurred in this continuation interval. It
+qualifies empty-block continuity and restored-base preservation on BSC; changed
+slots and zero clears across restore are exercised by synthetic integration tests.
+These small-sample times and file sizes do not establish customer capacity or SLA.
 
 ## Inputs and release gates
 

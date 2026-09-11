@@ -10,6 +10,10 @@ from .checkpoint import build, canonical_accounts, manifest, read_account, setup
 from .rpc import RPC
 from .files import atomic_json
 from .ingest import ingest, prepare
+from .export import export_checkpoint, verify_export
+from .reader import page, pin, unpin, list_pins
+from .retention import plan as retention_plan, prune
+from .importer import import_checkpoint
 
 
 def main(argv=None):
@@ -43,6 +47,35 @@ def main(argv=None):
     show = commands.add_parser("show", help="show a published manifest or one account at that immutable checkpoint")
     show.add_argument("snapshot_id")
     show.add_argument("--address")
+    export = commands.add_parser("export", help="write a complete paginated checkpoint with offline proofs")
+    export.add_argument("snapshot_id")
+    export.add_argument("--output", type=Path, required=True)
+    export.add_argument("--page-size", type=int, default=10000)
+    export.add_argument("--work-dir", type=Path)
+    verify = commands.add_parser("verify-export", help="verify exported files without database or RPC access")
+    verify.add_argument("directory", type=Path)
+    verify.add_argument("--expected-hash")
+    verify.add_argument("--work-dir", type=Path)
+    restore = commands.add_parser("import-export", help="verify and restore a portable checkpoint into a new generation")
+    restore.add_argument("directory", type=Path)
+    restore.add_argument("--expected-hash")
+    restore.add_argument("--work-dir", type=Path)
+    restore.add_argument("--budget-bytes", type=int, default=100_000_000_000)
+    pinned = commands.add_parser("pin", help="protect a checkpoint while a consumer reads it")
+    pinned.add_argument("snapshot_id")
+    pinned.add_argument("--purpose", default="reader")
+    commands.add_parser("pins", help="list persistent checkpoint pins, including abandoned readers")
+    released = commands.add_parser("unpin", help="release a consumer's checkpoint retention pin")
+    released.add_argument("pin_id")
+    storage_page = commands.add_parser("page", help="page complete storage through an active checkpoint pin")
+    storage_page.add_argument("pin_id")
+    storage_page.add_argument("--address", required=True)
+    storage_page.add_argument("--cursor")
+    storage_page.add_argument("--limit", type=int, default=1000)
+    for name, help_text in [("retention-plan", "show which checkpoint generations can be removed"),
+                            ("prune-checkpoints", "remove old and failed checkpoints while preserving readers and latest account state")]:
+        retention = commands.add_parser(name, help=help_text)
+        retention.add_argument("--keep-latest", type=int, default=2)
     args = parser.parse_args(argv)
     try:
         client = ClickHouse(args.database)
@@ -69,10 +102,27 @@ def main(argv=None):
             if args.output:
                 atomic_json(args.output, result)
             result = {k: v for k, v in result.items() if k != "proof_bundle"}
+        elif args.command == "export":
+            result = export_checkpoint(client, args.snapshot_id, args.output, args.page_size, args.work_dir)
+        elif args.command == "verify-export":
+            result = verify_export(args.directory, args.expected_hash, args.work_dir)
+        elif args.command == "import-export":
+            restored = import_checkpoint(client, args.directory, args.expected_hash, args.work_dir, args.budget_bytes)
+            result = {k: v for k, v in restored.items() if k != "proof_bundle"}
+        elif args.command == "pin":
+            result = pin(client, args.snapshot_id, args.purpose)
+        elif args.command == "pins":
+            result = list_pins(client)
+        elif args.command == "unpin":
+            result = unpin(client, args.pin_id)
+        elif args.command == "page":
+            result = page(client, args.pin_id, args.address, args.cursor, args.limit)
+        elif args.command in {"retention-plan", "prune-checkpoints"}:
+            result = (retention_plan if args.command == "retention-plan" else prune)(client, args.keep_latest)
         else:
             result = read_account(client, args.snapshot_id, args.address) if args.address else manifest(client, args.snapshot_id)
         print(json.dumps(result, sort_keys=True, indent=2))
-    except (ValueError, RuntimeError, OSError, KeyError) as error:
+    except (ValueError, RuntimeError, OSError, KeyError, EOFError) as error:
         parser.exit(1, f"evm-state: {error}\n")
 
 

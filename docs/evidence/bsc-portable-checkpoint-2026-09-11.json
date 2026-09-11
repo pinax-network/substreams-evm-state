@@ -1,0 +1,95 @@
+{
+  "clickhouse": "26.3.33.24",
+  "continuation": {
+    "accounts": [
+      "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+    ],
+    "base_snapshot": "5783edd80bf7429eb2f6fc84b796971f",
+    "blocks": 9427,
+    "checkpoint_seconds": 0.3307674154639244,
+    "header": {
+      "hash": "0x1f32bf3f8690dd58014f00465350e5cfae5a25afd093188b9681cdac6fa0fb4f",
+      "number": 121303719,
+      "parent_hash": "0x3e3c7640edd51e7ce6156305b3647cc78c831c051de749b238ce4c94abf9ead3",
+      "state_root": "0x36e875baa4b211649f7a20ca2c838024772d98bde53273cc018935aaad71acb9",
+      "timestamp": 1789148500
+    },
+    "new_snapshot": "bbaf6abc52104e90bce043c2ba8265ac",
+    "nonzero_slots": 46,
+    "old_checkpoint_kept_while_pinned": true,
+    "old_checkpoint_removed_after_unpin": true,
+    "old_pin_pagination_slots": 46,
+    "retention": {
+      "applied": true,
+      "bytes_after": 17557,
+      "bytes_before": 34923,
+      "keep": [
+        "bbaf6abc52104e90bce043c2ba8265ac"
+      ],
+      "keep_latest": 1,
+      "latest_for_account": {
+        "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff": "bbaf6abc52104e90bce043c2ba8265ac"
+      },
+      "pins": [],
+      "remove": [
+        "5783edd80bf7429eb2f6fc84b796971f"
+      ],
+      "space_reclamation": "ClickHouse may retain inactive parts until background cleanup; bytes_after includes them",
+      "unpublished_candidates": []
+    },
+    "source": {
+      "accounts": [
+        "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+      ],
+      "database": "evm_restore_delta",
+      "final_blocks_only": true,
+      "module_hash": "9271ca26b8dc71b52ff09163115ffbde9b8a7e6b",
+      "start_block": 121294293
+    },
+    "source_parts_bytes": 2888122,
+    "state_sha256": "388627901da595ca5d1719fbfe5263674aaa6b94c68aa5544680518ef45ef330"
+  },
+  "ingest": {
+    "config": {
+      "accounts": [
+        "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+      ],
+      "base_snapshot": "5783edd80bf7429eb2f6fc84b796971f",
+      "database": "evm_restore_delta",
+      "start_block": 121294293,
+      "stop_block": 121303720
+    },
+    "elapsed_seconds": 36.03539204597473,
+    "exit_code": 0,
+    "start_utc_unix": 1789148818.829726
+  },
+  "kind": "single-account BSC portable checkpoint and continuation qualification",
+  "limitations": [
+    "Small public sample, not the customer account set.",
+    "Cache warmth not independently established.",
+    "No selected-account state changed during this continuation interval.",
+    "Header finality trusted to the provider; no independent consensus verification.",
+    "Checkpoint cleanup excludes native history, exports and temporary merge/trie/spool space.",
+    "Single host and durable control directory; direct SQL must respect reader pins."
+  ],
+  "native_cli": "1.22.0 / be35ad36f63a52ff49d3e15cf993de4cad6bfbd9",
+  "portable": {
+    "export_bytes": 15857,
+    "export_pages": 3,
+    "export_seconds": 0.062,
+    "header": {
+      "hash": "0xd0987f468e3b66fa2593eb2df41924fed5fd563c697828916416de436784bd90",
+      "number": 121294292,
+      "parent_hash": "0x4b3758a00e10ba5cdf55a92e0335655f3ec48239a3ed313e9cb40e5493f4c5c6",
+      "state_root": "0xbd949073c338b8122fd43351030496e21445c9dadf38f5f5cd9dfa4a66a9af22",
+      "timestamp": 1789144257
+    },
+    "nonzero_slots": 46,
+    "offline_verification": "passed",
+    "restore_seconds": 0.431,
+    "restore_verification": "stored candidate reverified before publication",
+    "restored_snapshot": "5783edd80bf7429eb2f6fc84b796971f",
+    "source_snapshot": "3d699ae59ca4474189ad93fa8b73beea",
+    "state_sha256": "388627901da595ca5d1719fbfe5263674aaa6b94c68aa5544680518ef45ef330"
+  }
+}
