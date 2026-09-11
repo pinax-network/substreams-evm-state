@@ -20,7 +20,7 @@ def initial(databases):
     bundle = proof_bundle(101, {A: state({1: 7, 2: 8})})
     insert_blocks(stream, [block(100, bundle, storage={(A, 1): 7, (A, 2): 8}, nonces={A: 1}, codes={A: CODE}),
                            block(101, bundle)])
-    ready = build(target, bundle, [source(stream, 100)])
+    ready = build(target, bundle, [source(stream, 100, target=target)])
     return target, ready
 
 
@@ -30,7 +30,7 @@ def test_onboarding_at_common_block_preserves_old_checkpoint_and_independent_fie
     bundle = proof_bundle(103, {A: state({2: 9}, balance=50), B: state({7: 11})})
     insert_blocks(live, [block(102, bundle, [A], storage={(A, 1): 0, (A, 2): 9}, balances={A: 50}), block(103, bundle, [A])])
     insert_blocks(new, [block(100, bundle, [B], storage={(B, 7): 11}), *[block(n, bundle, [B]) for n in range(101, 104)]])
-    args = (target, bundle, [source(live, 102), source(new, 100, [B])], base["snapshot_id"])
+    args = (target, bundle, [source(live, 102, target=target), source(new, 100, [B], target=target)], base["snapshot_id"])
     ready = build(*args)
     assert storage(target, ready["snapshot_id"]) == {word(2): word(9)}
     assert storage(target, ready["snapshot_id"], B) == {word(7): word(11)}
@@ -65,7 +65,7 @@ def test_bad_candidate_never_replaces_ready_state(databases, defect):
     elif defect == "extra_account": rows[0]["storage"] += block(102, bundle, storage={(B, 1): 7})["storage"]
     insert_blocks(stream, rows)
     with pytest.raises(VerificationError):
-        build(target, bundle, [source(stream, 102)], base["snapshot_id"])
+        build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"])
     assert list(target.rows("SELECT snapshot_id FROM ready_checkpoints")) == [{"snapshot_id": base["snapshot_id"]}]
     assert manifest(target, base["snapshot_id"])["state_sha256"] == base["state_sha256"]
 
@@ -93,10 +93,10 @@ def test_interrupted_publication_does_not_expose_partial_candidate(databases, mo
 
     monkeypatch.setattr(target, "insert", interrupted)
     with pytest.raises(OSError, match="injected"):
-        build(target, bundle, [source(stream, 102)], base["snapshot_id"])
+        build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"])
     assert target.one("SELECT snapshot_id FROM ready_checkpoints")["snapshot_id"] == base["snapshot_id"]
     monkeypatch.setattr(target, "insert", original)
-    resumed = build(target, bundle, [source(stream, 102)], base["snapshot_id"])
+    resumed = build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"])
     assert storage(target, resumed["snapshot_id"]) == storage(target, base["snapshot_id"])
 
 
@@ -105,7 +105,7 @@ def test_proven_empty_code_and_zero_storage_are_published(databases):
     stream = databases()
     bundle = proof_bundle(102, {A: state({}, nonce=0, balance=0, code="0x", exists=False)})
     insert_blocks(stream, [block(102, bundle, storage={(A, 1): 0, (A, 2): 0}, nonces={A: 0}, balances={A: 0}, codes={A: "0x"})])
-    ready = build(target, bundle, [source(stream, 102)], base["snapshot_id"])
+    ready = build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"])
     assert storage(target, ready["snapshot_id"]) == {}
     account = read_account(target, ready["snapshot_id"], A)
     assert (account["exists"], account["code"], account["nonce"], account["balance"]) == (False, "0x", 0, "0")
@@ -117,7 +117,7 @@ def test_disk_budget_rejects_before_allocating_candidate(databases):
     bundle = proof_bundle(102, {A: state({1: 7, 2: 8})})
     insert_blocks(stream, [block(102, bundle)])
     with pytest.raises(VerificationError, match="budget"):
-        build(target, bundle, [source(stream, 102)], base["snapshot_id"], budget_bytes=1)
+        build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"], budget_bytes=1)
     assert int(target.one("SELECT countDistinct(snapshot_id) AS n FROM checkpoint_storage")["n"]) == 1
 
 
@@ -127,4 +127,4 @@ def test_pinned_hash_claim_requires_header_commitment(databases):
     bundle["header_trust"] = "operator-pinned-hash"
     insert_blocks(stream, [block(100, bundle)])
     with pytest.raises(VerificationError, match="encoded header"):
-        build(target, bundle, [source(stream, 100)])
+        build(target, bundle, [source(stream, 100, target=target)])

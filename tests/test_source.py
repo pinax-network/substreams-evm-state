@@ -20,7 +20,7 @@ def test_checkpoint_rejects_source_identity_drift_before_state_allocation(databa
     stream, target = databases(), databases(False)
     bundle = proof_bundle(100, {A: state({1: 2})})
     insert_blocks(stream, [block(100, bundle, storage={(A, 1): 2})])
-    data = source(stream, 100)
+    data = source(stream, 100, target=target)
     owner = stream.one("SELECT run_id,identity FROM _evm_state_run")
     identity = json.loads(owner["identity"])
     directory = Path(identity["state_directory"])
@@ -72,9 +72,12 @@ def test_source_lock_protects_input_history_during_checkpoint_reads(databases):
 def test_real_prepared_run_identity_is_recorded_in_checkpoint(databases, tmp_path):
     stream, target = databases(False), databases(False)
     run = prepare(stream, SPKG, "bsc.substreams.pinax.network:443", [A], 100,
-                  tmp_path / "native", native_dsn(stream.database))
+                  tmp_path / "native", native_dsn(stream.database), checkpoint_database=target.database)
     bundle = proof_bundle(100, {A: state({1: 2})})
     insert_blocks(stream, [block(100, bundle, storage={(A, 1): 2})])
+    from evm_state.cursor import save_progress
+    from state_fixtures import native_cursor
+    save_progress(stream, run, tmp_path / "native", native_cursor(100, bundle["header"]["hash"]))
     data = {key: run["identity"][key] for key in ["database", "start_block", "accounts", "module_hash", "final_blocks_only"]}
     result = build(target, bundle, [data])
     provenance = result["sources"][0]

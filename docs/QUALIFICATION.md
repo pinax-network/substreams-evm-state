@@ -6,10 +6,10 @@ make an entire deliverable complete.
 
 | Deliverable | Evidence in this prototype | Remaining acceptance work |
 |---|---|---|
-| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; native child retains the writer lock after wrapper SIGKILL; publication checks persisted source identity | Power-loss/metadata recovery, durable cursor validation/backup, sustained follow and agreed read/publication latency |
-| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable paginated export and verified import; real restore followed by 9,427 BSC blocks, pinned reads and checkpoint cleanup; another 2,305-block continuation with verified native ownership | Exercise representative multi-account onboarding and interrupted operational cutover; connect durable cursor continuation evidence to readiness |
+| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication | Sustained follow and agreed read/publication latency; storage must honor sync writes (physical host power loss is not emulated) |
+| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage | Exercise representative multi-account onboarding and interrupted operational cutover |
 | Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass | Producer/fork fixtures, persistent failed transaction and full 7702 matrix, CREATE/CREATE2 and deletion/recreation reconciliation; repair legacy verifier false-positive behavior |
-| Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate partition cleanup preserving readers and latest account state; pinned toolchain; package-producing `make build`; CI integration job | Bounded native delta retention, peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
+| Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate cleanup preserving readers and latest account state; native history partition cleanup preserving every retained checkpoint's continuation and the durable cursor; pinned toolchain; package-producing `make build`; CI integration job | Bounded initial-history replay, peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
 
@@ -18,8 +18,11 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 110 tests (35 offline, 75 integration).
+The Python suite currently contains 153 tests (54 offline, 99 integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
+One fault test creates its own `evm-crash-` Docker container, kills/restarts that
+database process and removes the container afterward. It never restarts the
+configured development database. The full suite passed locally in 61.60 seconds.
 The native fixtures serve real packaged protobuf types over local gRPC. The test
 transport adapter translates the CLI's S2 request compression using its upstream
 library. These tests cover sink behavior; they do not execute the WASM mapper.
@@ -40,10 +43,25 @@ Native failure tests prove:
 - retried native rows read correctly with `FINAL`, including empty blocks.
 - a surviving native child retains the inherited writer lock after its wrapper
   is killed; copied directories and changed host identities cannot resume a run.
+- checked progress decodes upstream Go-generated cursor vectors and binds the
+  finalized block/hash to both native block data and marker rows;
+- missing, empty or torn cursor files recover only from a matching atomic backup;
+  wrong run/position/token, missing block data and missing markers fail closed;
+- direct and spooled native replay can resume after process kill and explicit
+  cursor repair, then publish a root-verified checkpoint;
+- a hard database-process restart before publication leaves a collectible,
+  unpublished candidate; restart after publication preserves the old snapshot,
+  followed by repaired-cursor replay and a separately verified new snapshot.
+
+These are process-crash and torn-file tests, not physical whole-host power-loss
+tests. Acknowledged ClickHouse parts use filesystem sync settings and local
+metadata uses synced atomic replacement; durable storage must honor those writes.
 
 Publication rejects missing or changed source ownership, mismatched declared
 filter/module/finality, changed package/schema metadata, replaced database identity,
 unsupported producer versions and source ranges before the native run began.
+It also rejects a different checkpoint destination or durable progress short of
+the requested target. Format 3 binds a source to its sole publication database.
 Synthetic checkpoint fixtures explicitly model these ownership records. Native
 preparation and the real BSC continuation separately exercise actual package hashes.
 
@@ -69,6 +87,13 @@ and reject cursors for another account or checkpoint. Cleanup preserves the late
 state of quiet accounts and resumes removal of unpublished parts after interruption.
 Missing or mismatched controller metadata fails closed. These locks are local to
 one host and durable control directory, not a distributed coordination protocol.
+
+Native retention tests span daily data and monthly block-marker partitions,
+preserve a pinned older checkpoint and its continuation, build a newer checkpoint
+after cleanup, then rotate the old checkpoint and reclaim more history. Active
+source writers/readers exclude cleanup. A failure between data and marker
+partition drops can resume without deleting the durable cursor's own rows.
+This does not yet bound an initial replay before its first verified checkpoint.
 
 ## BSC evidence
 
@@ -124,6 +149,28 @@ and state checksum. Its manifest records the verified native run ID, database UU
 module/package hashes and schema metadata. No selected state changed in this
 interval either; its 50.217-second ingestion time includes streaming overhead and
 is not a cold-cache or sustained-live measurement.
+
+The [cursor-recovery record](evidence/bsc-cursor-recovery-2026-09-11.json) replays
+195,056 blocks from 121114203 through 121309258 using destination-bound format 3:
+
+- The native process group was killed after checked progress at 121163736. Its
+  cursor file was deliberately truncated, restored from the validated backup,
+  and replay resumed with the published CLI.
+- The final checkpoint verified all 46 slots and account metadata/code with the
+  same logical state checksum. Its encoded header hashes to
+  `0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28`.
+- Replay including recovery took 37.104 seconds; checkpoint verification took
+  1.927 seconds. Overlapping history had already been processed; cache warmth was
+  not independently quantified. These are not cold-build or SLA measurements.
+- Native cleanup removed the complete 2026-09-10 data partition (48,092 block
+  envelopes), preserving the cursor and continuation intervals for all three
+  retained checkpoints. No monthly marker partition was eligible for removal.
+- Source database parts measured 70,959,941 bytes before cleanup and 60,529,347
+  afterward, including inactive parts at measurement time. Logical partition
+  removal does not promise immediate physical reclamation.
+
+This is still the same small, quiet account and does not establish a hot/shared
+contract bound, initial-history space cap or customer-set cost.
 
 The local test transport adapter uses gRPC-Go 1.83.2, incorporating the upstream
 fixes for the three dependency advisories reported against its earlier 1.83.0 pin.

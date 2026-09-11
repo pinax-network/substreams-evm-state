@@ -136,7 +136,8 @@ def _observed_fields(client, sources, base, params):
 def build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, work_dir=None):
     setup(client)
     with control(client).publisher(), ExitStack() as inputs:
-        checked = [inputs.enter_context(verified_source(connect_like(client, source["database"]), source))
+        checked = [inputs.enter_context(verified_source(connect_like(client, source["database"]), source,
+                                                       client, int(bundle["header"]["number"])))
                    for source in sources]
         return _build(client, bundle, checked, base_id, budget_bytes, work_dir)
 

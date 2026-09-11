@@ -15,6 +15,8 @@ import uuid
 from .checkpoint import canonical_accounts, connect_like
 from .files import atomic_json, atomic_write, exclusive_lock
 from .proof import VerificationError
+from .ch import identifier
+from .cursor import load_progress, observe, save_progress
 
 MODULE = "map_block_state"
 
@@ -28,7 +30,7 @@ def _native(command, dsn):
     return result.stdout
 
 
-def _identity(client, spkg, endpoint, accounts, start_block, directory, dsn):
+def _identity(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database=None):
     if isinstance(start_block, bool) or not isinstance(start_block, int) or start_block < 0:
         raise ValueError("start block must be an absolute nonnegative integer")
     parsed = urllib.parse.urlsplit(dsn)
@@ -46,7 +48,8 @@ def _identity(client, spkg, endpoint, accounts, start_block, directory, dsn):
     module = next((v for v in info["modules"] if v["name"] == MODULE), {})
     if info.get("network") != "bsc" or module.get("output_type") != "proto:evm.state.v1.BlockState":
         raise VerificationError("expected the BSC native block-state package")
-    return {"format_version": 2, "database": client.database, "http_url": client.url,
+    return {"format_version": 3, "database": client.database, "http_url": client.url,
+        "checkpoint_database": identifier(checkpoint_database or client.database),
         "state_directory": str(directory), "host": socket.gethostname(),
         "native_target": f"{parsed.hostname}:{parsed.port or 9000}/{client.database}",
         "endpoint": endpoint, "accounts": selected, "start_block": start_block,
@@ -54,8 +57,8 @@ def _identity(client, spkg, endpoint, accounts, start_block, directory, dsn):
         "network": "bsc", "schema_version": 1, "final_blocks_only": True}, package
 
 
-def _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn):
-    identity, package = _identity(client, spkg, endpoint, accounts, start_block, directory, dsn)
+def _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database=None):
+    identity, package = _identity(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database)
     record_path = directory / "run.json"
     admin = connect_like(client, "default")
     exists = bool(int(admin.one("SELECT count() AS n FROM system.databases WHERE name={db:String}",
@@ -120,29 +123,58 @@ def _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn):
     return record
 
 
-def prepare(client, spkg, endpoint, accounts, start_block, directory, dsn):
+def prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database=None):
     directory = Path(directory).resolve()
     with exclusive_lock(directory / "run.lock"):
-        return _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn)
+        return _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database)
 
 
-def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_block=None, max_retries=3):
+def recover_cursor(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database=None):
+    directory = Path(directory).resolve()
+    with exclusive_lock(directory / "run.lock"):
+        run = _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database)
+        progress = load_progress(client, run, directory)
+        cursor = directory / "cursor.txt"
+        # Preserve the damaged cursor as evidence without treating it as trusted
+        # progress. Never overwrite a directory or silently adopt an older run.
+        if cursor.is_file():
+            atomic_write(directory / ("cursor-before-recovery-" + uuid.uuid4().hex + ".txt"), cursor.read_bytes())
+        atomic_write(cursor, progress["cursor"].encode(), overwrite=True)
+        return {"run_id": run["run_id"], "recovered": True, "position": progress["position"]}
+
+
+def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_block=None, max_retries=3,
+           checkpoint_database=None, decode_batch_size=32):
     directory = Path(directory).resolve()
     if stop_block is not None and stop_block <= start_block:
         raise ValueError("stop block must be greater than start block (exclusive)")
+    if isinstance(decode_batch_size, bool) or not isinstance(decode_batch_size, int) or decode_batch_size < 1:
+        raise ValueError("decode batch size must be a positive integer")
     with exclusive_lock(directory / "run.lock") as run_lock:
-        record = _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn)
+        record = _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database)
         cursor = directory / "cursor.txt"
         blocks = int(client.one("SELECT count() AS n FROM state_blocks FINAL")["n"])
         if blocks and (not cursor.is_file() or not cursor.read_text().strip()):
             raise VerificationError("native cursor is missing or empty for existing data; explicit recovery is required")
         if not blocks and cursor.exists():
             raise VerificationError("cursor exists without its block data; restore matching database and metadata")
+        report = {"run_id": record["run_id"], "source": {"database": client.database,
+            "accounts": record["identity"]["accounts"], "start_block": start_block,
+            "module_hash": record["identity"]["module_hash"], "final_blocks_only": True}}
+        if blocks:
+            progress = save_progress(client, record, directory, cursor.read_text().strip())
+            if stop_block is not None and progress["position"]["block"]["number"] >= stop_block - 1:
+                if progress["position"]["block"]["number"] != stop_block - 1:
+                    raise VerificationError("requested stop precedes the already ingested cursor")
+                return {**report, "already_complete": True, "position": progress["position"]}
+        elif (directory / "durable_progress.json").exists():
+            raise VerificationError("durable progress exists without its block data")
         command = ["substreams", "sink", "clickhouse", str(directory / "package.spkg"), MODULE,
             "-e", endpoint, "-p", MODULE + "=" + ",".join(record["identity"]["accounts"]), "-s", str(start_block),
             "--final-blocks-only", "--bytes-encoding", "0xhex", "--sink-info-folder", str(directory / "meta"),
             "--cursor-file-path", str(cursor), "--spool-dir", str(directory / "spool"), "--spool-max-size", "1GiB",
             "--spool-max-idle", "1s", "--max-retries", str(max_retries)]
+        command.extend(["--decode-batch-size", str(decode_batch_size)])
         if stop_block is not None:
             command.extend(["-t", str(stop_block)])
         # If this wrapper is SIGKILLed, its native child may remain alive. Keep
@@ -152,7 +184,12 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
         process = subprocess.Popen(command, env=dict(os.environ, SUBSTREAMS_SINK_DSN=dsn),
                                    pass_fds=(run_lock.fileno(),))
         try:
-            result = process.wait()
+            while True:
+                try:
+                    result = process.wait(timeout=1)
+                    break
+                except subprocess.TimeoutExpired:
+                    observe(client, record, directory)
             if result:
                 raise RuntimeError(f"native sink exited with status {result}; retain its cursor and spool for recovery")
         finally:
@@ -162,9 +199,12 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
                     process.wait(timeout=15)
                 except subprocess.TimeoutExpired:
                     process.kill(); process.wait()
-        if cursor.is_file():
-            with cursor.open("rb") as handle:
-                os.fsync(handle.fileno())
-            atomic_write(directory / "last_completed_cursor.txt", cursor.read_bytes(), overwrite=True)
-        return {"run_id": record["run_id"], "source": {"database": client.database, "accounts": record["identity"]["accounts"],
-                "start_block": start_block, "module_hash": record["identity"]["module_hash"], "final_blocks_only": True}}
+        progress = observe(client, record, directory)
+        if progress is None:
+            raise VerificationError("native sink completed without a valid cursor; recover from durable progress")
+        if stop_block is not None and progress["position"]["block"]["number"] != stop_block - 1:
+            raise VerificationError("native sink stopped before its requested final block")
+        with cursor.open("rb") as handle:
+            os.fsync(handle.fileno())
+        atomic_write(directory / "last_completed_cursor.txt", progress["cursor"].encode(), overwrite=True)
+        return {**report, "position": progress["position"]}

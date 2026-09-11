@@ -30,5 +30,5 @@ def checkpoint(databases, values=None, number=100, target=None):
     row = block(number, bundle, storage=changes)
     row.update(hash=bundle["header"]["hash"], parent_hash=bundle["header"]["parent_hash"])
     insert_blocks(stream, [row])
-    ready = build(target, bundle, [source(stream, number, values)])
+    ready = build(target, bundle, [source(stream, number, values, target=target)])
     return target, ready

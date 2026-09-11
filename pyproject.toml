@@ -7,7 +7,7 @@ name = "substreams-evm-state"
 version = "0.1.0"
 description = "Verified selective EVM checkpoints over native ClickHouse Substreams output"
 requires-python = ">=3.10"
-dependencies = ["trie==4.0.0", "rlp==5.0.0", "pycryptodome==3.23.0"]
+dependencies = ["trie==4.0.0", "rlp==5.0.0", "pycryptodome==3.23.0", "PyNaCl==1.6.2"]
 
 [project.optional-dependencies]
 test = ["pytest==9.1.1", "grpcio==1.83.1", "protobuf==7.36.1"]
@@ -23,4 +23,5 @@ evm_state = ["*.sql"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["clickhouse: integration tests requiring a disposable local ClickHouse server and Substreams CLI"]
+markers = ["clickhouse: integration tests requiring a disposable local ClickHouse server and Substreams CLI",
+           "database_crash: destructive fault injection confined to its own disposable Docker container"]

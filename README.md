@@ -5,9 +5,10 @@ Reconstruct complete storage, code, balance and nonce at a fixed finalized block
 verify the result, and publish an immutable checkpoint for local execution.
 
 **Prototype; v0.1.0 is not released yet.** Native ingestion, isolated checkpoint
-construction, proof verification, portable exports/restores, reader pins and
-checkpoint cleanup are implemented and tested. Lifecycle qualification, bounded
-source-history retention and peak disk accounting remain unfinished.
+construction, proof verification, portable exports/restores, reader pins,
+cursor recovery and checkpoint/native-history cleanup are implemented and tested.
+Lifecycle qualification, bounded initial-history replay and peak disk accounting
+remain unfinished.
 The customer's actual 19/64-account lists have not been supplied, so their
 capacity, latency and cost are not qualified. See [scope](docs/SCOPE.md) and
 [current evidence](docs/QUALIFICATION.md).
@@ -60,6 +61,7 @@ and `19000` for the native protocol, bound to loopback. Docker volumes retain da
 | Setting | Default |
 |---|---|
 | `CH_DATABASE` | `evm_native` |
+| `CH_CHECKPOINT_DATABASE` | same as `CH_DATABASE`; immutable publication destination |
 | `CH_STATE` | `localdata/evm_native` |
 | `START_BLOCK` / `STOP_BLOCK` | `120140091` / `120140123` (stop is exclusive) |
 | `ACCOUNTS` | sample contract, WBNB, EIP-2935 history contract |
@@ -91,13 +93,26 @@ to resume an existing run after changing the repository package.
 
 Missing/empty cursors, missing schema metadata and replaced databases fail closed.
 Do not delete a cursor to force a replay over existing data. Restore matching
-database and run metadata, or bootstrap into a new isolated database. A cleanly
-completed run also saves `last_completed_cursor.txt`; preserve the spool during
-an interrupted run. Power-loss recovery still needs qualification.
+database and run metadata, or use `recover-cursor` with the matching run arguments
+to repair a damaged cursor from `durable_progress.json`. The runner periodically
+checks the cursor's finalized block/hash against both native data and block-marker
+rows before saving that backup with atomic replacement and filesystem sync.
+Recovery rechecks those rows and the run binding; an absent or mismatched backup
+is insufficient. Preserve the spool during an interrupted run. A cleanly completed
+run also saves `last_completed_cursor.txt`, but recovery uses the checked backup.
+See the [recovery commands](docs/CHECKPOINTS.md#native-cursor-recovery).
 
-Run identity format 2 adds the host/directory binding. Older prototype runs fail
-the new guard; preserve them and export a verified checkpoint, then start a
-fresh guarded continuation from that checkpoint in a new database/directory.
+Run identity format 3 binds the host/directory and a single checkpoint destination.
+Set `CH_CHECKPOINT_DATABASE` (or `--checkpoint-database`) when publishing into a
+separate database. Older prototype runs fail the new guard; preserve them and
+export a verified checkpoint, then start a fresh guarded continuation from that
+checkpoint in a new database/directory.
+
+A bounded run succeeds only when its validated cursor reaches `STOP_BLOCK - 1`.
+Repeating that completed range returns its checked position without replaying it.
+Publication also requires durable progress covering the chosen checkpoint target.
+Local tests exercise database-process SIGKILL and torn cursor recovery; they do
+not emulate a physical host power failure. Durable storage must honor sync writes.
 
 The mapper rejects empty account filters, non-Extended blocks, unsupported
 producer versions, invalid block identity and incomplete transaction traces.
@@ -144,8 +159,9 @@ database, accounts, start block and module hash recorded in the run's `run.json`
 ]
 ```
 
-The checkpoint destination is created when needed. It may be the same database
-as its source; checkpoint tables use separate names.
+The checkpoint destination is created when needed. It must match the destination
+bound at source preparation. It may be the same database as its source;
+checkpoint tables use separate names.
 
 ```bash
 .venv/bin/evm-state --database bootstrap_example checkpoint \
@@ -208,6 +224,13 @@ their own pin through this interface. Distributed reader/writer coordination is
 not implemented. Older, unpartitioned prototype tables require export/import
 into a fresh database before checkpoint cleanup can be enabled.
 
+After publishing a verified checkpoint, `source-retention-plan` and `prune-source`
+can remove covered native history in whole daily data/monthly marker partitions.
+Stop that source's writer first. Cleanup preserves the cursor block, the requested
+recent block window and the update interval after every retained checkpoint for
+the source's accounts. Pinned older checkpoints can therefore retain more history.
+See [native history cleanup](docs/CHECKPOINTS.md#native-history-cleanup).
+
 ## Verification and limits
 
 The verifier reconstructs the trie from **all nonzero slots**, verifies the
@@ -229,9 +252,10 @@ matrix are not yet qualified. A mismatch leaves the candidate unpublished.
 The default checkpoint budget is 100,000,000,000 bytes. Current checks reject an
 already exhausted database budget and check again during verification; they do
 **not yet bound peak merges, pending spool, temporary trie files or all future
-growth**. Checkpoint cleanup does not remove native delta history or exported
-files. This prototype has no proven 100 GB operating limit. Bounded source
-retention and peak-space accounting are release requirements.
+growth**. Source cleanup requires a verified checkpoint and does not bound the
+initial replay before that checkpoint. Export files also require separate space.
+This prototype has no proven 100 GB operating limit. Bounded initial replay and
+peak-space accounting are release requirements.
 
 ## Tests and release
 
@@ -242,9 +266,12 @@ make test-integration      # local ClickHouse, published CLI, fault injection
 
 The integration suite uses uniquely named disposable databases. It tests native
 row encoding, direct/spooled restarts, a cursor-write failure after data insertion,
-coherent checkpoint publication, zero clears, account onboarding, proof failures
+coherent checkpoint publication, zero clears, account onboarding, proof failures,
 run-identity guards, export tampering, restore failures, pinned pagination and
-interrupted checkpoint cleanup. It makes no provider requests and needs no API keys.
+interrupted checkpoint/native-history cleanup. A separate disposable ClickHouse
+container is killed and restarted before and after publication to test database
+recovery; the configured development database is never restarted by that test.
+The suite makes no provider requests and needs no API keys.
 The Go adapter only translates the native CLI's S2 gRPC compression for the local
 Python test server; it is not part of the production data path.
 

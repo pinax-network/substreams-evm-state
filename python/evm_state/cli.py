@@ -9,11 +9,12 @@ from .ch import ClickHouse
 from .checkpoint import build, canonical_accounts, manifest, read_account, setup
 from .rpc import RPC
 from .files import atomic_json
-from .ingest import ingest, prepare
+from .ingest import ingest, prepare, recover_cursor
 from .export import export_checkpoint, verify_export
 from .reader import page, pin, unpin, list_pins
 from .retention import plan as retention_plan, prune
 from .importer import import_checkpoint
+from .history import cleanup as cleanup_history
 
 
 def main(argv=None):
@@ -22,16 +23,19 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("init", help="create checkpoint tables (native block tables use substreams sink clickhouse setup)")
     for name, help_text in [("prepare", "bind a native sink to an isolated database and durable state directory"),
-                            ("ingest", "run or resume the guarded finalized native sink")]:
+                            ("ingest", "run or resume the guarded finalized native sink"),
+                            ("recover-cursor", "restore a damaged native cursor from verified durable progress")]:
         native = commands.add_parser(name, help=help_text)
         native.add_argument("--package", type=Path, required=True)
         native.add_argument("--endpoint", default="bsc.substreams.pinax.network:443")
         native.add_argument("--accounts", required=True)
         native.add_argument("--start-block", type=int, required=True)
         native.add_argument("--state-dir", type=Path, required=True)
+        native.add_argument("--checkpoint-database", help="sole checkpoint destination for this source (default: source database)")
         if name == "ingest":
             native.add_argument("--stop-block", type=int)
             native.add_argument("--max-retries", type=int, default=3)
+            native.add_argument("--decode-batch-size", type=int, default=32)
     capture = commands.add_parser("capture-proofs", help="capture a finalized header, account proofs and code before replay")
     capture.add_argument("--accounts", required=True)
     capture.add_argument("--block", default="finalized")
@@ -76,18 +80,25 @@ def main(argv=None):
                             ("prune-checkpoints", "remove old and failed checkpoints while preserving readers and latest account state")]:
         retention = commands.add_parser(name, help=help_text)
         retention.add_argument("--keep-latest", type=int, default=2)
+    for name in ["source-retention-plan", "prune-source"]:
+        native_retention = commands.add_parser(name, help="plan or remove checkpointed native history partitions")
+        native_retention.add_argument("snapshot_id")
+        native_retention.add_argument("--state-dir", type=Path, required=True)
+        native_retention.add_argument("--keep-blocks", type=int, default=10000)
     args = parser.parse_args(argv)
     try:
         client = ClickHouse(args.database)
         if args.command == "init":
             setup(client)
             result = {"database": client.database, "checkpoint_schema": "ready"}
-        elif args.command in {"prepare", "ingest"}:
+        elif args.command in {"prepare", "ingest", "recover-cursor"}:
             dsn = os.environ.get("SUBSTREAMS_SINK_DSN")
             if not dsn:
                 raise ValueError("set SUBSTREAMS_SINK_DSN to the native ClickHouse connection string")
             values = (client, args.package, args.endpoint, args.accounts, args.start_block, args.state_dir, dsn)
-            result = prepare(*values) if args.command == "prepare" else ingest(*values, args.stop_block, args.max_retries)
+            result = (ingest(*values, args.stop_block, args.max_retries, args.checkpoint_database, args.decode_batch_size)
+                      if args.command == "ingest" else {"prepare": prepare, "recover-cursor": recover_cursor}[args.command](
+                          *values, checkpoint_database=args.checkpoint_database))
         elif args.command == "capture-proofs":
             if args.output.exists():
                 raise ValueError("proof output already exists; choose a new capture file")
@@ -119,6 +130,8 @@ def main(argv=None):
             result = page(client, args.pin_id, args.address, args.cursor, args.limit)
         elif args.command in {"retention-plan", "prune-checkpoints"}:
             result = (retention_plan if args.command == "retention-plan" else prune)(client, args.keep_latest)
+        elif args.command in {"source-retention-plan", "prune-source"}:
+            result = cleanup_history(client, args.state_dir, args.snapshot_id, args.keep_blocks, args.command == "prune-source")
         else:
             result = read_account(client, args.snapshot_id, args.address) if args.address else manifest(client, args.snapshot_id)
         print(json.dumps(result, sort_keys=True, indent=2))

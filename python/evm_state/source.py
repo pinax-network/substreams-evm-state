@@ -8,6 +8,7 @@ import socket
 
 from .files import file_lock
 from .proof import VerificationError, address
+from .cursor import load_progress
 
 
 def _selected(values):
@@ -17,7 +18,7 @@ def _selected(values):
 
 
 def _validate(client, source, identity, run_id, directory):
-    if (identity.get("format_version") != 2 or identity.get("host") != socket.gethostname()
+    if (identity.get("format_version") != 3 or identity.get("host") != socket.gethostname()
             or identity.get("state_directory") != str(directory)):
         raise VerificationError("source run has no matching host/directory binding; use a fresh guarded continuation")
     if (identity.get("database") != client.database or identity.get("http_url") != client.url
@@ -50,7 +51,7 @@ def _validate(client, source, identity, run_id, directory):
 
 
 @contextmanager
-def verified_source(client, source):
+def verified_source(client, source, checkpoint_client=None, end_block=None):
     exists = int(client.one("SELECT count() AS n FROM system.tables WHERE database={db:String} "
         "AND name='_evm_state_run'", {"db": client.database})["n"])
     if not exists:
@@ -60,8 +61,10 @@ def verified_source(client, source):
         identity = json.loads(owner["identity"])
         # Old prototype sources can be exported through existing ready checkpoints;
         # do not silently adopt their mutable history into newly published state.
-        if not isinstance(identity, dict) or identity.get("format_version") != 2:
+        if not isinstance(identity, dict) or identity.get("format_version") != 3:
             raise VerificationError("source uses an old native run identity; use a fresh guarded continuation")
+        if checkpoint_client is not None and identity.get("checkpoint_database") != checkpoint_client.database:
+            raise VerificationError("source is bound to a different checkpoint database")
         directory = Path(identity["state_directory"]).resolve()
         if (identity["state_directory"] != str(directory) or not directory.is_dir()
                 or identity.get("host") != socket.gethostname()):
@@ -73,6 +76,11 @@ def verified_source(client, source):
     with file_lock(directory / "source_readers.lock"):
         try:
             checked = _validate(client, source, identity, owner["run_id"], directory)
+            if end_block is not None:
+                progress = load_progress(client, json.loads((directory / "run.json").read_text()), directory)
+                if progress["position"]["block"]["number"] < end_block:
+                    raise VerificationError("durable native progress has not reached the checkpoint target")
+                checked["durable_position"] = progress["position"]["block"]
         except (KeyError, TypeError, OSError, AttributeError) as error:
             raise VerificationError("source run metadata is missing or invalid") from error
         yield checked

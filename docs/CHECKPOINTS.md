@@ -103,7 +103,8 @@ To advance it:
 2. Start a fresh, guarded native source database at exactly
    `restored.header.number + 1`. Replay through the new captured target inclusive
    (`--stop-block` is target plus one). The frozen account filter must cover the
-   existing accounts.
+   existing accounts. Bind `--checkpoint-database restored_checkpoints` at source
+   preparation, or set `CH_CHECKPOINT_DATABASE=restored_checkpoints` with Make.
 3. Create `sources.json` from the new run's recorded account list, module hash,
    database and continuation start, as shown in the README. The publisher checks
    this against the database's native ownership row, prepared local run, frozen
@@ -122,7 +123,9 @@ the base plus one; cohorts must not overlap. Build and verify the combined
 checkpoint before consumers switch. A source package/filter change is a new
 native run identity, not a reason to ignore module-hash mismatches.
 
-Native identity format 2 binds the run's host and absolute directory. Earlier
+Native identity format 3 binds the run's host, absolute directory and sole
+checkpoint destination. All cohorts for one publication use that same destination.
+Earlier
 prototype identities cannot be used for new publication or resumed by the new
 guard. Keep their existing ready checkpoint, export/import it if needed, and
 continue in a fresh guarded source. Do not rewrite old ownership rows to force
@@ -132,6 +135,38 @@ cleanup must acquire it exclusively as well as excluding the native writer.
 The real BSC export/restore/continuation exercise is recorded in
 [qualification evidence](QUALIFICATION.md). Synthetic tests also change and
 clear storage after a restore and inject failures before publication.
+
+## Native cursor recovery
+
+The runner periodically saves `durable_progress.json` with an atomic, synced write.
+It decodes the pinned upstream cursor format and verifies its finalized block/hash
+against both `state_blocks FINAL` and `_blocks_ FINAL`, binding the result to the
+run ID, full run identity and database UUID. Checkpoint publication requires this
+checked progress to cover its target. The cursor encoding is public obfuscation;
+the cursor by itself is neither authentication nor proof of complete account state.
+
+If `cursor.txt` is missing, empty or torn after an interrupted run, stop its native
+writer and recover with the original immutable arguments and frozen package:
+
+```bash
+SUBSTREAMS_SINK_DSN='<native-source-dsn>' .venv/bin/evm-state --database <source-db> \
+  recover-cursor --package <state-dir>/package.spkg --state-dir <state-dir> \
+  --endpoint <original-endpoint> --accounts <original-account-list> \
+  --start-block <original-start> --checkpoint-database <checkpoint-db>
+```
+
+The command rechecks database/run/schema identity and the backup's block data,
+preserves the damaged file when present, then restores the checked cursor. Resume
+the same `ingest` command afterward and retain its spool. Do not substitute a
+copied `last_completed_cursor.txt` or invent a cursor to bypass validation. Without
+a matching backup and database, restore matching metadata or start a fresh source
+from a verified exported checkpoint.
+
+Tests cover native direct/spooled process kills, a torn cursor, and a separate
+ClickHouse server process killed before and after checkpoint publication. They
+verify that incomplete candidates stay unpublished and a published checkpoint
+survives restart. They do not emulate physical power loss; the storage system must
+honor the configured filesystem sync operations.
 
 ## Checkpoint cleanup
 
@@ -158,7 +193,33 @@ unpartitioned prototype databases remain readable and exportable; migrate using
 export/import into a fresh database before cleanup. A portable export also
 requires a captured encoded header, which the earliest prototype bundles lack.
 
-This cleanup does **not** prune native `state_blocks` history, spool files,
-exports or temporary verification files. The current budget checks do not bound
-all of those or peak merge space. Keep their measured headroom separate; a proven
-100 GB operating cap is still an open release gate.
+## Native history cleanup
+
+Once a ready checkpoint covers every account of an exact native source, stop
+that source writer and preview cleanup:
+
+```bash
+.venv/bin/evm-state --database <source-db> source-retention-plan <snapshot-id> \
+  --state-dir <state-dir> --keep-blocks 10000
+.venv/bin/evm-state --database <source-db> prune-source <snapshot-id> \
+  --state-dir <state-dir> --keep-blocks 10000
+```
+
+The snapshot must be in the source's bound checkpoint database and its manifest
+must record that exact run, package, schema, database UUID and account set. The
+current cursor must match its checked durable backup and cover the checkpoint.
+Cleanup excludes the native writer, source readers and checkpoint publishers.
+
+It preserves the update interval after **every retained checkpoint** containing
+any source account, including imported checkpoints and persistent pins. Rotate
+unneeded checkpoints first if those intervals no longer need to be retained.
+The native cursor block and at least `--keep-blocks` recent blocks are preserved.
+Only whole daily `state_blocks` and monthly `_blocks_` partitions whose maximum
+height precedes the cutoff are removed, so actual retained history can be larger
+than the requested minimum. Interrupted cleanup can be repeated; it recomputes
+the plan and verifies the cursor still has its data and marker afterward.
+
+This operation bounds already-checkpointed history at partition granularity; it
+does **not** bound the initial bootstrap before its first verified checkpoint.
+Spool, exports, temporary verification files and peak merge space need separate
+accounting. A proven 100 GB operating cap remains an open release gate.

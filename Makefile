@@ -22,8 +22,9 @@ SPKG   := spkg/evm-state-v0.1.0.spkg
 CH_DATABASE ?= evm_native
 CH_DSN ?= clickhouse://evm_state:local-development-only@localhost:19000/$(CH_DATABASE)
 CH_STATE ?= localdata/$(CH_DATABASE)
+CH_CHECKPOINT_DATABASE ?= $(CH_DATABASE)
 PYTHON ?= .venv/bin/python
-CH_ARGS := --package $(SPKG) --endpoint $(ENDPOINT) --accounts "$(ACCOUNTS)" --start-block $(START_BLOCK) --state-dir "$(CH_STATE)"
+CH_ARGS := --package $(SPKG) --endpoint $(ENDPOINT) --accounts "$(ACCOUNTS)" --start-block $(START_BLOCK) --state-dir "$(CH_STATE)" --checkpoint-database $(CH_CHECKPOINT_DATABASE)
 
 .PHONY: protogen
 protogen: schema
@@ -43,7 +44,7 @@ test:
 
 .PHONY: test-integration python-deps
 test-integration: pack
-	$(PYTHON) -m pytest --run-clickhouse -q
+	$(PYTHON) -m pytest --run-clickhouse --run-database-crash -q
 
 python-deps:
 	python3 -m venv .venv

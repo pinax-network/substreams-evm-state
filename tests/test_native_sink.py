@@ -17,7 +17,7 @@ def assert_whole_interval(client, target, bundle):
     rows = list(client.rows("SELECT number, length(storage.address) AS slots FROM state_blocks FINAL ORDER BY number"))
     assert rows == [{"number": 100, "slots": 2}, {"number": 101, "slots": 2},
                     {"number": 102, "slots": 0}, {"number": 103, "slots": 0}]
-    ready = build(target, bundle, [source(client, 100)])
+    ready = build(target, bundle, [source(client, 100, target=target)])
     assert ready["nonzero_slots"] == 1
     assert ready["verification"][A]["account_proof"] == "verified"
     return ready

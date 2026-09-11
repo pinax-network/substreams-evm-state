@@ -56,8 +56,9 @@ The original PostgreSQL tests and measurements are baseline evidence, not full
 customer qualification. Native ClickHouse output, guarded ingestion, immutable
 checkpoint publication and account/header/storage proof verification are now
 implemented. Portable exports, verified restores, persistent reader pins and
-whole-checkpoint cleanup are also implemented. Native delta retention and peak
-disk accounting remain unfinished.
+whole-checkpoint cleanup are also implemented. Cursor validation/backup/recovery
+and native history partition cleanup are implemented. Bounded initial replay and
+peak disk accounting remain unfinished.
 
 ## Native ClickHouse route
 
@@ -124,8 +125,12 @@ account insertion, and fail native cursor writes after block data insertion.
 The runner binds database ownership, filter, package/module identity and local
 schema metadata, locks out competing local writers, and rejects cursor loss or
 database replacement. Keep the cursor, frozen package and spool on a durable
-volume. Power-loss recovery and source-history retention still
-require qualification; annotations alone do not establish these guarantees.
+volume. A checked, synced cursor backup supports explicit torn-cursor recovery;
+publication requires durable native progress covering its target. A source binds
+to one checkpoint destination so history cleanup can preserve all of its retained
+checkpoint continuation intervals. Tests kill the native and database processes;
+physical host power loss is not emulated and storage must honor sync writes.
+Initial replay bounds and peak disk usage still require qualification.
 
 ## Bootstrap and growing account sets
 

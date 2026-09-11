@@ -16,9 +16,14 @@ SPKG = ROOT / "spkg/evm-state-v0.1.0.spkg"
 
 def pytest_addoption(parser):
     parser.addoption("--run-clickhouse", action="store_true", help="run local ClickHouse/native sink integration tests")
+    parser.addoption("--run-database-crash", action="store_true", help="hard-restart a separate disposable ClickHouse container")
 
 
 def pytest_collection_modifyitems(config, items):
+    if not config.getoption("--run-database-crash"):
+        for item in items:
+            if "database_crash" in item.keywords:
+                item.add_marker(pytest.mark.skip(reason="use --run-database-crash for the isolated container test"))
     if not config.getoption("--run-clickhouse"):
         for item in items:
             if "clickhouse" in item.keywords:
@@ -82,6 +87,7 @@ def databases(native_template, monkeypatch, tmp_path):
         client = ClickHouse(database)
         if native:
             client.execute(f"CREATE TABLE state_blocks AS {native_template}.state_blocks")
+            client.execute(f"CREATE TABLE _blocks_ AS {native_template}._blocks_")
         return client
 
     yield create

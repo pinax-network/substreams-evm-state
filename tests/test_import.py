@@ -26,7 +26,7 @@ def test_verified_export_restores_into_new_database_and_continues_from_its_block
     row = block(101, bundle, storage={(A, 1): 0})
     row.update(hash=bundle["header"]["hash"], parent_hash=bundle["header"]["parent_hash"])
     insert_blocks(stream, [row])
-    advanced = build(target, bundle, [source(stream, 101, [A, B])], restored["snapshot_id"])
+    advanced = build(target, bundle, [source(stream, 101, [A, B], target=target)], restored["snapshot_id"])
     assert advanced["nonzero_slots"] == 2
     assert prune(target, keep_latest=1)["remove"] == [restored["snapshot_id"]]
     assert read_account(target, advanced["snapshot_id"], B)["nonzero_slots"] == 1

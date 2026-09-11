@@ -1,0 +1,87 @@
+{
+  "account": "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff",
+  "blocks": 195056,
+  "cache_note": "Overlapping history had already been processed. Cache warmth not independently quantified; not a cold-build measurement.",
+  "checkpoint_database": "evm_checkpoint_v01",
+  "checkpoint_seconds": 1.9273895416408777,
+  "database": "evm_recovery_bootstrap",
+  "elapsed_seconds_including_recovery": 37.104345083236694,
+  "failure_injection": "Killed native process group after saved progress, deliberately truncated cursor.txt, recovered from validated durable_progress.json, resumed to exact stop.",
+  "header": {
+    "hash": "0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28",
+    "number": 121309258,
+    "parent_hash": "0xa332fea9971fbf90fd73d1beb85b40e6399241e59c4cd21f4469e273b1cd9059",
+    "state_root": "0x5b7c64587627f60b4f2904ff274349ac5805e2010edf3e055351339d2cec78e8",
+    "timestamp": 1789150993
+  },
+  "header_trust": "RPC provider finalized header; encoded header hash verified, BSC consensus not independently verified.",
+  "local_path_note": "Source host and absolute directory bindings were verified; local paths omitted from this published record.",
+  "native_identity_format": 3,
+  "nonzero_slots": 46,
+  "recovered_block": {
+    "hash": "0xf19ee6f9bfcabb8fe34ed03e1827ecd2c9be6896b71130ddc3d1b788116c3c25",
+    "number": 121163736
+  },
+  "retention": {
+    "applied": true,
+    "bytes_after": 60529347,
+    "bytes_before": 70959941,
+    "checkpoint": "994e979872e647999e6c61431cc10b1f",
+    "durable_block": {
+      "hash": "0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28",
+      "number": 121309258
+    },
+    "keep_blocks": 10000,
+    "partitions": {
+      "_blocks_": [],
+      "state_blocks": [
+        {
+          "first": 121114203,
+          "id": "20260910",
+          "last": 121162294
+        }
+      ]
+    },
+    "protected_checkpoints": [
+      "994e979872e647999e6c61431cc10b1f",
+      "bbaf6abc52104e90bce043c2ba8265ac",
+      "d69cbb59e92d48f28307d29c9ab4dfbb"
+    ],
+    "remove_before": 121299259,
+    "source": {
+      "accounts": [
+        "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+      ],
+      "database": "evm_recovery_bootstrap",
+      "database_uuid": "45ade5dd-8ccc-45ab-964f-4cd335ef0cad",
+      "final_blocks_only": true,
+      "module_hash": "9271ca26b8dc71b52ff09163115ffbde9b8a7e6b",
+      "package_sha256": "5fb72764857920f1aa385bd002db1dc5e5733f21d9e2b43d460f2b4ff82dbaaa",
+      "run_id": "a271842742724aa2b9f07479e26c89f0",
+      "schema_hash": "8891fb77bedb528f",
+      "start_block": 121114203
+    },
+    "space_reclamation": "inactive parts may remain until ClickHouse background cleanup; byte counts include them"
+  },
+  "snapshot_id": "994e979872e647999e6c61431cc10b1f",
+  "source": {
+    "accounts": [
+      "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+    ],
+    "database": "evm_recovery_bootstrap",
+    "database_uuid": "45ade5dd-8ccc-45ab-964f-4cd335ef0cad",
+    "durable_position": {
+      "hash": "0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28",
+      "number": 121309258
+    },
+    "final_blocks_only": true,
+    "module_hash": "9271ca26b8dc71b52ff09163115ffbde9b8a7e6b",
+    "package_sha256": "5fb72764857920f1aa385bd002db1dc5e5733f21d9e2b43d460f2b4ff82dbaaa",
+    "run_id": "a271842742724aa2b9f07479e26c89f0",
+    "schema_hash": "8891fb77bedb528f",
+    "start_block": 121114203
+  },
+  "start_block": 121114203,
+  "state_sha256": "388627901da595ca5d1719fbfe5263674aaa6b94c68aa5544680518ef45ef330",
+  "stop_block": 121309259
+}
