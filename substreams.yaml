@@ -8,8 +8,9 @@ package:
     Emits every persisted storage / balance / nonce / code change keyed by the
     account actually changed (including failed-tx gas/nonce effects, EIP-7702
     authorization effects, system calls and block-level rewards), optionally
-    filtered to a list of accounts, and projects them into PostgreSQL
-    current-state tables plus an event log via `substreams sink postgres`.
+    filtered to a list of accounts. Native ClickHouse output stores all
+    block-end changes together in one typed row. A PostgreSQL DatabaseChanges
+    output and a granular change stream are also included.
 
 imports:
   database_changes: ./spkg/substreams-sink-database-changes-v4.0.0.spkg
@@ -17,6 +18,7 @@ imports:
 protobuf:
   files:
     - evm/state/v1/state.proto
+    - evm/state/v1/block_state.proto
   importPaths:
     - ./proto
   excludePaths:
@@ -30,6 +32,18 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams_evm_state.wasm
 
 modules:
+  - name: map_block_state
+    kind: map
+    doc: |
+      Native ClickHouse block-end state. One row per finalized block with inline
+      storage, balance, nonce, code and lifecycle arrays. Requires a non-empty
+      account list. Reads the Extended Block directly; no db_out dependency.
+    inputs:
+      - params: string
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:evm.state.v1.BlockState
+
   # Sink module. Reads the Firehose block directly (no intermediate module
   # output to cache server-side).
   - name: db_out
@@ -61,9 +75,10 @@ params:
   # `-p db_out=0x...,0x...` (and `-p map_state_changes=...`).
   db_out: ""
   map_state_changes: ""
+  map_block_state: ""
 
 sink:
-  module: db_out
+  module: map_block_state
   type: sf.substreams.sink.sql.v1.Service
   config:
     schema: "./postgres/schema.sql"
