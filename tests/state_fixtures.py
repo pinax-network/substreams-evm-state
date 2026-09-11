@@ -1,4 +1,11 @@
 """Synthetic chain state with actual Ethereum trie proofs, for adversarial tests."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import socket
+import uuid
+
 import rlp
 from trie import HexaryTrie
 
@@ -68,5 +75,30 @@ def insert_blocks(client, blocks):
 
 
 def source(client, start, accounts=(A,)):
+    """Synthetic ownership fixture; NativeRun/ingest tests exercise the real CLI.
+
+    Explicitly model durable source identity as well as rows. Tests cannot bypass
+    the production publication guard merely by supplying sources.json fields.
+    """
+    from conftest import SPKG
+    directory = Path(os.environ["EVM_STATE_HOME"]).resolve() / ("source-" + client.database)
+    if not (directory / "run.json").exists():
+        directory.mkdir(parents=True)
+        package = SPKG.read_bytes()
+        (directory / "package.spkg").write_bytes(package)
+        (directory / "meta").mkdir()
+        schema_hash = "synthetic-generated-schema"
+        (directory / "meta" / f"{client.database}_schema_hash.txt").write_text(schema_hash)
+        identity = {"format_version": 2, "database": client.database, "http_url": client.url,
+            "module": "map_block_state", "module_hash": "f" * 40, "network": "bsc", "schema_version": 1,
+            "final_blocks_only": True, "accounts": sorted(accounts), "start_block": start,
+            "state_directory": str(directory), "host": socket.gethostname(),
+            "package_sha256": hashlib.sha256(package).hexdigest()}
+        record = {"run_id": uuid.uuid4().hex, "phase": "prepared", "identity": identity, "schema_hash": schema_hash,
+            "database_uuid": client.one("SELECT toString(uuid) AS id FROM system.databases WHERE name={db:String}",
+                                        {"db": client.database})["id"]}
+        (directory / "run.json").write_text(json.dumps(record))
+        client.execute("CREATE TABLE _evm_state_run (run_id String, identity String) ENGINE=MergeTree ORDER BY run_id")
+        client.insert("_evm_state_run", [{"run_id": record["run_id"], "identity": json.dumps(identity)}])
     return {"database": client.database, "start_block": start, "accounts": list(accounts),
-            "final_blocks_only": True, "module_hash": "synthetic-fixture"}
+            "final_blocks_only": True, "module_hash": "f" * 40}

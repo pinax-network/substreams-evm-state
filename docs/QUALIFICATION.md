@@ -6,8 +6,8 @@ make an entire deliverable complete.
 
 | Deliverable | Evidence in this prototype | Remaining acceptance work |
 |---|---|---|
-| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards | Power-loss/metadata recovery, sustained follow and agreed read/publication latency; connect readiness checks to persisted source identity |
-| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable paginated export and verified import; real restore followed by 9,427 BSC blocks, pinned reads and checkpoint cleanup | Exercise representative multi-account onboarding and interrupted operational cutover; connect source identities and durable continuation evidence to readiness |
+| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; native child retains the writer lock after wrapper SIGKILL; publication checks persisted source identity | Power-loss/metadata recovery, durable cursor validation/backup, sustained follow and agreed read/publication latency |
+| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable paginated export and verified import; real restore followed by 9,427 BSC blocks, pinned reads and checkpoint cleanup; another 2,305-block continuation with verified native ownership | Exercise representative multi-account onboarding and interrupted operational cutover; connect durable cursor continuation evidence to readiness |
 | Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass | Producer/fork fixtures, persistent failed transaction and full 7702 matrix, CREATE/CREATE2 and deletion/recreation reconciliation; repair legacy verifier false-positive behavior |
 | Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate partition cleanup preserving readers and latest account state; pinned toolchain; package-producing `make build`; CI integration job | Bounded native delta retention, peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
@@ -18,7 +18,7 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 91 tests (35 offline, 56 integration).
+The Python suite currently contains 110 tests (35 offline, 75 integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 The native fixtures serve real packaged protobuf types over local gRPC. The test
 transport adapter translates the CLI's S2 request compression using its upstream
@@ -32,6 +32,14 @@ Native failure tests prove:
 - a failed cursor-file write after block data insertion can recover from the
   previous saved cursor without missing or partially published block state;
 - retried native rows read correctly with `FINAL`, including empty blocks.
+- a surviving native child retains the inherited writer lock after its wrapper
+  is killed; copied directories and changed host identities cannot resume a run.
+
+Publication rejects missing or changed source ownership, mismatched declared
+filter/module/finality, changed package/schema metadata, replaced database identity,
+unsupported producer versions and source ranges before the native run began.
+Synthetic checkpoint fixtures explicitly model these ownership records. Native
+preparation and the real BSC continuation separately exercise actual package hashes.
 
 The guarded `make dev` quick start was also run against BSC using the published
 CLI. It ingested all 32 expected blocks (120140091–120140122), 1,293 storage
@@ -102,6 +110,18 @@ No selected-account state changes occurred in this continuation interval. It
 qualifies empty-block continuity and restored-base preservation on BSC; changed
 slots and zero clears across restore are exercised by synthetic integration tests.
 These small-sample times and file sizes do not establish customer capacity or SLA.
+
+The [bound-source continuation record](evidence/bsc-bound-source-2026-09-11.json)
+advances that checkpoint by another 2,305 blocks, through 121306024, using native
+identity format 2. The checkpoint verified in 0.272 seconds with the same 46 slots
+and state checksum. Its manifest records the verified native run ID, database UUID,
+module/package hashes and schema metadata. No selected state changed in this
+interval either; its 50.217-second ingestion time includes streaming overhead and
+is not a cold-cache or sustained-live measurement.
+
+The local test transport adapter uses gRPC-Go 1.83.2, incorporating the upstream
+fixes for the three dependency advisories reported against its earlier 1.83.0 pin.
+It remains outside the production data path.
 
 ## Inputs and release gates
 

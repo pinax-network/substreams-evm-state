@@ -76,8 +76,10 @@ sets that from `CH_DSN`. Custom connections must point to the same host/database
 
 `make setup`, `make dev` and `make sink` use the guarded Python runner. It binds
 the normalized account list, package checksum, module hash, endpoint, starting
-block and database identity to a durable state directory. A database ownership
-record and local process lock reject competing runs. The package is copied into
+block and database identity to a durable state directory and host. A database ownership
+record and local process lock reject competing runs, including copied directories.
+The native child inherits the lock, so it continues to exclude another writer if
+its wrapper is killed. The package is copied into
 that directory so an in-progress run cannot change when the repository is rebuilt.
 Operate one runner on one host per source database. Do not copy a run directory
 to another host and start a second writer; distributed writer leases are not implemented.
@@ -92,6 +94,10 @@ Do not delete a cursor to force a replay over existing data. Restore matching
 database and run metadata, or bootstrap into a new isolated database. A cleanly
 completed run also saves `last_completed_cursor.txt`; preserve the spool during
 an interrupted run. Power-loss recovery still needs qualification.
+
+Run identity format 2 adds the host/directory binding. Older prototype runs fail
+the new guard; preserve them and export a verified checkpoint, then start a
+fresh guarded continuation from that checkpoint in a new database/directory.
 
 The mapper rejects empty account filters, non-Extended blocks, unsupported
 producer versions, invalid block identity and incomplete transaction traces.
@@ -157,6 +163,13 @@ continue at exactly `base.header.number + 1`. Newly discovered accounts use a
 separate source cohort and cursor. All cohorts must reach the same finalized
 block/hash before publication; cohorts cannot overlap. Existing checkpoints
 remain readable while onboarding or verification is in progress.
+
+Publication checks each source against its database ownership record and local
+prepared run, including the frozen package checksum, module hash, account filter,
+schema metadata, host/directory and database UUID. The requested interval may
+begin later than the run's original start, but cannot precede it. The manifest
+records that checked provenance. An arbitrary `sources.json` cannot claim a
+native run identity on its own.
 
 The checkpoint manifest carries block identity, accounts, source records, counts,
 state checksum and proof evidence. A row in `checkpoints` is the readiness signal;

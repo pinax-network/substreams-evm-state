@@ -1,5 +1,6 @@
 """Build immutable ClickHouse checkpoints, verify, then publish one manifest row."""
 import hashlib
+from contextlib import ExitStack
 import json
 from pathlib import Path
 import tempfile
@@ -11,6 +12,7 @@ from .proof import VerificationError, address, unhex, verify_account, verify_com
 from .triedb import TrieDB
 from .header import verify_header
 from .control import control, object_id
+from .source import verified_source
 
 ZERO = "0x" + "00" * 32
 
@@ -61,7 +63,7 @@ def validate_interval(client, source, header):
     previous_hash = None
     count = 0
     for row in client.rows(
-        "SELECT number, hash, parent_hash, state_root, accounts, schema_version "
+        "SELECT number, hash, parent_hash, state_root, accounts, schema_version, producer_version "
         "FROM state_blocks FINAL WHERE number >= {start:UInt64} AND number <= {end:UInt64} ORDER BY number, hash",
         {"start": expected, "end": end},
     ):
@@ -70,6 +72,8 @@ def validate_interval(client, source, header):
             raise VerificationError(f"missing or conflicting block at {expected}")
         if row["accounts"] != accounts or int(row["schema_version"]) != 1:
             raise VerificationError(f"account filter or schema changed at block {number}")
+        if int(row["producer_version"]) not in {3, 4, 5}:
+            raise VerificationError(f"unsupported producer version at block {number}")
         unhex(row["hash"], 32)
         unhex(row["parent_hash"], 32)
         if previous_hash is not None and row["parent_hash"] != previous_hash:
@@ -131,8 +135,10 @@ def _observed_fields(client, sources, base, params):
 
 def build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, work_dir=None):
     setup(client)
-    with control(client).publisher():
-        return _build(client, bundle, sources, base_id, budget_bytes, work_dir)
+    with control(client).publisher(), ExitStack() as inputs:
+        checked = [inputs.enter_context(verified_source(connect_like(client, source["database"]), source))
+                   for source in sources]
+        return _build(client, bundle, checked, base_id, budget_bytes, work_dir)
 
 
 def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, work_dir=None):

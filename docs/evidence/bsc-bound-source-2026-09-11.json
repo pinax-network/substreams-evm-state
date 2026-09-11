@@ -1,0 +1,50 @@
+{
+  "base_snapshot": "bbaf6abc52104e90bce043c2ba8265ac",
+  "blocks": 2305,
+  "cache_state": "not independently established",
+  "checkpoint_seconds": 0.27170862443745136,
+  "clickhouse": "26.3.33.24",
+  "header": {
+    "hash": "0x62ae461fc9fa8ba418d149c909e3b2d79a39613df5c9a2dac4444f5adb6e79d7",
+    "number": 121306024,
+    "parent_hash": "0x9375bd0dfdaeb9f76691febc9b4b8d9fb322b3b75f73a6a4310d425151225633",
+    "state_root": "0x4f3832b3f6a220ea6c53cf267bfb3ca6ae02d21a958a54d27fab03d94d4ba37a",
+    "timestamp": 1789149537
+  },
+  "kind": "BSC continuation with persisted source identity verification",
+  "limitations": [
+    "Small quiet account, not the customer account set.",
+    "No selected state changed in this interval.",
+    "Header finality is trusted to the RPC provider.",
+    "The local absolute directory path is omitted from this published evidence.",
+    "Cursor validation, native delta retention and peak space qualification remain open."
+  ],
+  "native_cli": "1.22.0 / be35ad36f63a52ff49d3e15cf993de4cad6bfbd9",
+  "native_identity_format": 2,
+  "native_seconds": 50.217436709441245,
+  "new_snapshot": "d69cbb59e92d48f28307d29c9ab4dfbb",
+  "nonzero_slots": 46,
+  "source": {
+    "accounts": [
+      "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+    ],
+    "database": "evm_bound_delta",
+    "database_uuid": "b3aa9128-d5aa-4c53-80b5-54d5e725be3f",
+    "final_blocks_only": true,
+    "module_hash": "9271ca26b8dc71b52ff09163115ffbde9b8a7e6b",
+    "package_sha256": "da1384802a28ad2b68f8b9bde616f33e10c7415c856c8c45044e129afd93b401",
+    "parent_hash": "0x1f32bf3f8690dd58014f00465350e5cfae5a25afd093188b9681cdac6fa0fb4f",
+    "run_id": "f832fbf8a3b04876ac5791dbbe3c309a",
+    "schema_hash": "75f5a3d57462fb36",
+    "start_block": 121303720
+  },
+  "state_directory_binding_verified": true,
+  "state_sha256": "388627901da595ca5d1719fbfe5263674aaa6b94c68aa5544680518ef45ef330",
+  "stats": {
+    "balance_changes": 0,
+    "blocks": 2305,
+    "code_changes": 0,
+    "nonce_changes": 0,
+    "storage_changes": 0
+  }
+}

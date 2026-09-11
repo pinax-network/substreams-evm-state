@@ -105,7 +105,10 @@ To advance it:
    (`--stop-block` is target plus one). The frozen account filter must cover the
    existing accounts.
 3. Create `sources.json` from the new run's recorded account list, module hash,
-   database and continuation start, as shown in the README.
+   database and continuation start, as shown in the README. The publisher checks
+   this against the database's native ownership row, prepared local run, frozen
+   package and schema metadata. Keep those source directories accessible on this
+   host; source data alone is insufficient to publish a new checkpoint.
 4. Run `checkpoint` against `restored_checkpoints` with `--base <restored-id>`,
    the new proof bundle and source records. The first source block must point to
    the restored header hash; every block through the target must be present.
@@ -118,6 +121,13 @@ combined account set at a common target. Existing-account cohorts continue from
 the base plus one; cohorts must not overlap. Build and verify the combined
 checkpoint before consumers switch. A source package/filter change is a new
 native run identity, not a reason to ignore module-hash mismatches.
+
+Native identity format 2 binds the run's host and absolute directory. Earlier
+prototype identities cannot be used for new publication or resumed by the new
+guard. Keep their existing ready checkpoint, export/import it if needed, and
+continue in a fresh guarded source. Do not rewrite old ownership rows to force
+an upgrade. The source reader lock is held through publication; source-history
+cleanup must acquire it exclusively as well as excluding the native writer.
 
 The real BSC export/restore/continuation exercise is recorded in
 [qualification evidence](QUALIFICATION.md). Synthetic tests also change and

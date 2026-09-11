@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import socket
 import subprocess
 import urllib.parse
 import uuid
@@ -27,7 +28,7 @@ def _native(command, dsn):
     return result.stdout
 
 
-def _identity(client, spkg, endpoint, accounts, start_block, dsn):
+def _identity(client, spkg, endpoint, accounts, start_block, directory, dsn):
     if isinstance(start_block, bool) or not isinstance(start_block, int) or start_block < 0:
         raise ValueError("start block must be an absolute nonnegative integer")
     parsed = urllib.parse.urlsplit(dsn)
@@ -45,7 +46,8 @@ def _identity(client, spkg, endpoint, accounts, start_block, dsn):
     module = next((v for v in info["modules"] if v["name"] == MODULE), {})
     if info.get("network") != "bsc" or module.get("output_type") != "proto:evm.state.v1.BlockState":
         raise VerificationError("expected the BSC native block-state package")
-    return {"format_version": 1, "database": client.database, "http_url": client.url,
+    return {"format_version": 2, "database": client.database, "http_url": client.url,
+        "state_directory": str(directory), "host": socket.gethostname(),
         "native_target": f"{parsed.hostname}:{parsed.port or 9000}/{client.database}",
         "endpoint": endpoint, "accounts": selected, "start_block": start_block,
         "module": MODULE, "module_hash": module["hash"], "package_sha256": hashlib.sha256(package).hexdigest(),
@@ -53,7 +55,7 @@ def _identity(client, spkg, endpoint, accounts, start_block, dsn):
 
 
 def _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn):
-    identity, package = _identity(client, spkg, endpoint, accounts, start_block, dsn)
+    identity, package = _identity(client, spkg, endpoint, accounts, start_block, directory, dsn)
     record_path = directory / "run.json"
     admin = connect_like(client, "default")
     exists = bool(int(admin.one("SELECT count() AS n FROM system.databases WHERE name={db:String}",
@@ -128,7 +130,7 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
     directory = Path(directory).resolve()
     if stop_block is not None and stop_block <= start_block:
         raise ValueError("stop block must be greater than start block (exclusive)")
-    with exclusive_lock(directory / "run.lock"):
+    with exclusive_lock(directory / "run.lock") as run_lock:
         record = _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn)
         cursor = directory / "cursor.txt"
         blocks = int(client.one("SELECT count() AS n FROM state_blocks FINAL")["n"])
@@ -143,7 +145,12 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
             "--spool-max-idle", "1s", "--max-retries", str(max_retries)]
         if stop_block is not None:
             command.extend(["-t", str(stop_block)])
-        process = subprocess.Popen(command, env=dict(os.environ, SUBSTREAMS_SINK_DSN=dsn))
+        # If this wrapper is SIGKILLed, its native child may remain alive. Keep
+        # the same flock open in that child so another wrapper cannot take over
+        # while the orphan still writes. Normal cleanup waits for the child
+        # before releasing the lock. Supported platforms are POSIX (Linux/macOS).
+        process = subprocess.Popen(command, env=dict(os.environ, SUBSTREAMS_SINK_DSN=dsn),
+                                   pass_fds=(run_lock.fileno(),))
         try:
             result = process.wait()
             if result:

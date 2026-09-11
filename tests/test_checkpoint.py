@@ -45,7 +45,7 @@ def test_onboarding_at_common_block_preserves_old_checkpoint_and_independent_fie
     assert replay["state_sha256"] == ready["state_sha256"]
 
 
-@pytest.mark.parametrize("defect", ["gap", "fork", "parent", "filter", "schema", "proof", "wrong_nonce", "wrong_code", "missing_slot", "extra_account"])
+@pytest.mark.parametrize("defect", ["gap", "fork", "parent", "filter", "schema", "producer", "proof", "wrong_nonce", "wrong_code", "missing_slot", "extra_account"])
 def test_bad_candidate_never_replaces_ready_state(databases, defect):
     target, base = initial(databases)
     stream = databases()
@@ -57,6 +57,7 @@ def test_bad_candidate_never_replaces_ready_state(databases, defect):
     elif defect == "parent": rows[0]["parent_hash"] = word(555)
     elif defect == "filter": rows[0]["accounts"] = B
     elif defect == "schema": rows[0]["schema_version"] = 2
+    elif defect == "producer": rows[0]["producer_version"] = 6
     elif defect == "proof": bundle["accounts"][A]["proof"]["accountProof"] = []
     elif defect == "wrong_nonce": rows[0]["nonces"] = [{"address": A, "value": 99, "ordinal": 1}]
     elif defect == "wrong_code": rows[0]["codes"] = block(102, bundle, codes={A: "0x"})["codes"]

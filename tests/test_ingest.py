@@ -1,12 +1,18 @@
 import json
+import os
+import shutil
+import signal
+import subprocess
+import sys
 
 import pytest
 
-from conftest import SPKG, native_dsn
+from conftest import SPKG, native_dsn, native_env
 from evm_state.ingest import ingest, prepare
 from evm_state.files import exclusive_lock
 from evm_state.proof import VerificationError
 from state_fixtures import A, B, block, insert_blocks, proof_bundle, state
+from native_stream import CURSORS, NativeStream, wait_until
 
 pytestmark = pytest.mark.clickhouse
 ENDPOINT = "bsc.substreams.pinax.network:443"
@@ -81,3 +87,63 @@ def test_second_local_writer_is_excluded(databases, tmp_path):
     with exclusive_lock(tmp_path / "run.lock"):
         with pytest.raises(ValueError, match="another process"):
             prepare(*args)
+
+
+def test_copied_run_directory_cannot_create_another_writer(databases, tmp_path):
+    _, args, _ = prepared(databases, tmp_path / "first")
+    shutil.copytree(tmp_path / "first", tmp_path / "copy")
+    copied = list(args); copied[5] = tmp_path / "copy"
+    with pytest.raises(VerificationError, match="identity changed"):
+        prepare(*copied)
+
+
+def test_run_cannot_be_resumed_from_a_different_host(databases, tmp_path, monkeypatch):
+    _, args, _ = prepared(databases, tmp_path)
+    monkeypatch.setattr("evm_state.ingest.socket.gethostname", lambda: "another-host")
+    with pytest.raises(VerificationError, match="identity changed"):
+        prepare(*args)
+
+
+def test_native_child_retains_writer_lock_when_wrapper_is_killed(databases, tmp_path, native_proxy):
+    client = databases(False)
+    bundle = proof_bundle(100, {A: state()})
+    def hold(stream, context):
+        while context.is_active() and not stream.closed.wait(0.02):
+            pass
+    stream = NativeStream([block(100, bundle)], native_proxy, after_blocks=hold)
+    args = (client, SPKG, stream.endpoint, [A], 100, tmp_path, native_dsn(client.database))
+    prepare(*args)
+    command = [sys.executable, "-m", "evm_state.cli", "--database", client.database, "ingest",
+        "--package", str(SPKG), "--endpoint", stream.endpoint, "--accounts", A, "--start-block", "100",
+        "--stop-block", "102", "--state-dir", str(tmp_path), "--max-retries", "0"]
+    process = None
+    try:
+        with (tmp_path / "wrapper.log").open("w") as log:
+            process = subprocess.Popen(command, env=native_env(client.database), start_new_session=True,
+                                       stdout=log, stderr=subprocess.STDOUT)
+            cursor = tmp_path / "cursor.txt"
+            wait_until(lambda: cursor.exists() and cursor.read_text() == CURSORS["1"]["100"], process)
+            process.kill()
+            process.wait(timeout=10)
+            # The wrapper is demonstrably gone, while the real native sink's
+            # open stream keeps it alive. Only the inherited fd excludes us.
+            with pytest.raises(ValueError, match="another process"):
+                with exclusive_lock(tmp_path / "run.lock"):
+                    pass
+            os.killpg(process.pid, signal.SIGKILL)
+            def released():
+                try:
+                    with exclusive_lock(tmp_path / "run.lock"):
+                        return True
+                except ValueError:
+                    return False
+            wait_until(released)
+            assert not stream.errors, stream.errors
+    finally:
+        if process is not None:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait(timeout=10)
+        stream.close()
