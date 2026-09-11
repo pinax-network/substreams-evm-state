@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package evm.state.v1;
+
+import "sf/substreams/sink/sql/schema/v1/schema.proto";
+
+// One physical ClickHouse row contains the entire account-filtered block.
+// Nested fields deliberately remain in this table, so no reader can observe
+// half of a block's account updates. Consumers require finalized input and
+// validate parent/hash continuity; _blocks_ is not a publication marker.
+message BlockState {
+  option (schema.table) = {
+    name: "state_blocks"
+    clickhouse_table_options: {
+      order_by_fields: [{name: "number"}, {name: "hash"}]
+      partition_fields: [{name: "_block_timestamp_", function: toDate}]
+    }
+  };
+  uint64 number = 1 [(schema.field) = {primary_key: true}];
+  string hash = 2;
+  string parent_hash = 3;
+  uint64 timestamp = 4;
+  string state_root = 5;
+  int32 producer_version = 6;
+  // Canonical, sorted account list. Empty is rejected by map_block_state.
+  string accounts = 7;
+  uint32 schema_version = 8;
+  repeated StorageValue storage = 10 [(schema.field) = {inline: true}];
+  repeated BalanceValue balances = 11 [(schema.field) = {inline: true}];
+  repeated NonceValue nonces = 12 [(schema.field) = {inline: true}];
+  repeated CodeValue codes = 13 [(schema.field) = {inline: true}];
+  // These accounts require proof-backed reconciliation before publication.
+  repeated LifecycleEffect lifecycle = 14 [(schema.field) = {inline: true}];
+}
+
+message StorageValue {
+  string address = 1;
+  string slot = 2;
+  string value = 3;
+  uint64 ordinal = 4;
+}
+
+message BalanceValue {
+  string address = 1;
+  string value = 2; // exact decimal wei; no float conversion
+  uint64 ordinal = 3;
+}
+
+message NonceValue {
+  string address = 1;
+  uint64 value = 2;
+  uint64 ordinal = 3;
+}
+
+message CodeValue {
+  string address = 1;
+  string hash = 2;
+  string code = 3; // hex, "0x" explicitly means empty bytecode
+  uint64 ordinal = 4;
+}
+
+message LifecycleEffect {
+  string address = 1;
+  string kind = 2;
+  uint64 ordinal = 3;
+}

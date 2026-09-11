@@ -25,10 +25,15 @@ postgres/schema.sql
 src/pb/*.rs
 !src/pb/mod.rs
 !src/pb/evm.state.v1.rs
+!src/pb/schema.rs
 *.spkg.tmp
+localdata/
+.venv/
+.pytest_cache/
 
 # secrets
 .env
 
 # python
 __pycache__/
+*.egg-info/

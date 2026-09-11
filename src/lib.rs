@@ -9,6 +9,7 @@
 //!   `db_out`'s dependency chain, so it is not executed by the sink.
 
 mod db_out;
+mod block_state;
 mod params;
 pub mod pb;
 mod persist;
@@ -177,4 +178,9 @@ pub fn map_state_changes(params: String, block: eth::Block) -> Result<StateChang
 pub fn db_out(params: String, block: eth::Block) -> Result<DatabaseChanges, Error> {
     let changes = collect(&params, &block)?;
     Ok(db_out::project(&changes))
+}
+
+#[substreams::handlers::map]
+pub fn map_block_state(params: String, block: eth::Block) -> Result<pb::evm::state::v1::BlockState, Error> {
+    block_state::project(&params, &block)
 }

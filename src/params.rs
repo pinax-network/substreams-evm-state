@@ -37,6 +37,12 @@ impl Filter {
         self.accounts.len()
     }
 
+    pub fn canonical(&self) -> String {
+        let mut accounts: Vec<_> = self.accounts.iter().map(|a| format!("0x{}", hex::encode(a))).collect();
+        accounts.sort();
+        accounts.join(",")
+    }
+
     pub fn matches(&self, address: &[u8]) -> bool {
         if self.accounts.is_empty() {
             return true;

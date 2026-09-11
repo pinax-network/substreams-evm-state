@@ -1,0 +1,48 @@
+{
+  "account_count": 1,
+  "cache_state": "not independently established",
+  "checkpoint_build_seconds": 1.848,
+  "clickhouse": "26.3.33.24",
+  "consecutive_blocks": 180090,
+  "encoded_header_hash_verified": true,
+  "header": {
+    "hash": "0xd0987f468e3b66fa2593eb2df41924fed5fd563c697828916416de436784bd90",
+    "number": 121294292,
+    "parent_hash": "0x4b3758a00e10ba5cdf55a92e0335655f3ec48239a3ed313e9cb40e5493f4c5c6",
+    "state_root": "0xbd949073c338b8122fd43351030496e21445c9dadf38f5f5cd9dfa4a66a9af22",
+    "timestamp": 1789144257
+  },
+  "header_trust": "provider-finalized-header",
+  "kind": "single-account BSC bootstrap qualification sample",
+  "limitations": [
+    "Account is a small public sample, not the customer 19/64-account set.",
+    "Header finality is trusted to the RPC provider; consensus was not independently verified.",
+    "This proves a complete checkpoint at the recorded root, not every lifecycle or historical producer case.",
+    "This replay predates the new run-ownership wrapper; its source identity is recorded in the local run log.",
+    "Retention and peak disk/merge/temp space qualification are still pending."
+  ],
+  "native_cli": "dev, built from v1.22.0 / be35ad36f63a52ff49d3e15cf993de4cad6bfbd9",
+  "nonzero_slots": 46,
+  "not_customer_account_set": true,
+  "replay_finish_time": "2026-09-11T12:33:23.638-0400",
+  "replay_start_time": "2026-09-11T12:31:23.691-0400",
+  "replay_wall_seconds": 119.947,
+  "source": {
+    "accounts": "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff",
+    "database": "evm_bootstrap_sample",
+    "endpoint": "bsc.substreams.pinax.network:443",
+    "final_blocks_only": true,
+    "module_hash": "9271ca26b8dc71b52ff09163115ffbde9b8a7e6b",
+    "start_block": 121114203,
+    "stop_block": 121294293
+  },
+  "source_parts_bytes_on_disk": 52398130,
+  "state_sha256": "388627901da595ca5d1719fbfe5263674aaa6b94c68aa5544680518ef45ef330",
+  "verification": {
+    "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff": {
+      "account_proof": "verified",
+      "nonzero_slots": 46,
+      "storage_root": "verified"
+    }
+  }
+}

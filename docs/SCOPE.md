@@ -1,8 +1,8 @@
 # EVM selective state: qualification scope
 
-Updated 2026-09-11 after reviewing prototype commit `8433af7`. This document
-separates the implemented PostgreSQL baseline from the proposed ClickHouse
-qualification. Findings and source references are in [REVIEW.md](REVIEW.md).
+Updated 2026-09-11. The review of prototype `8433af7` is in [REVIEW.md](REVIEW.md).
+The ClickHouse implementation now exists; acceptance evidence and remaining
+release gates are tracked in [QUALIFICATION.md](QUALIFICATION.md).
 
 ## Customer requirements and boundaries
 
@@ -52,16 +52,16 @@ partial: an unobserved field is unknown, not zero. Zeroed storage rows are kept,
 so even current storage grows with slots ever touched, not only live nonzero slots.
 The current tables do not support arbitrary historical reads.
 
-Seven existing Rust tests pass. The prior agent reported RPC checks and one
-8,001-block replay with a matching RPC-reported storage root. These are useful
-prototype evidence, not full customer qualification. No ClickHouse output,
-readiness controller, checkpoint exporter or retention automation is implemented.
+The original PostgreSQL tests and measurements are baseline evidence, not full
+customer qualification. Native ClickHouse output, guarded ingestion, immutable
+checkpoint publication and account/header/storage proof verification are now
+implemented. Standalone exports and retention automation remain unfinished.
 
-## Proposed native ClickHouse route
+## Native ClickHouse route
 
 ```text
 Extended Block + account params
-  └──> map_block_state (proposed, shares persistence collector)
+  └──> map_block_state (shares persistence collector)
          └──> annotated protobuf
                 └──> substreams sink clickhouse
                        └──> block-end versions + published checkpoint/read views
@@ -71,23 +71,23 @@ There is no `DatabaseChanges`/`db_out` step on this path. A native SQL sink is
 still needed to write the map output. Preserve the existing granular
 `map_state_changes` stream for consumers needing individual changes.
 
-Prefer one final value per changed key **per block**, with separate streams for
-balance, nonce and code. A balance-only replacement must not erase the last
-known nonce or code. Retain explicit unknown/known and empty-code semantics.
+One physical `state_blocks` row contains the complete block's changes as inline
+Nested arrays, with one final value per changed key **per block**. Balance, nonce
+and code are independent groups; a balance-only change does not replace the other
+fields. This avoids the native sink's lack of transactions across multiple tables.
 
-| Proposed row | Logical identity | Value |
+| Envelope group | Logical identity | Value |
 |---|---|---|
-| Block metadata | block number/hash | Parent, timestamp, state root, expected row counts |
+| Block metadata | block number/hash | Parent, timestamp, state root, filter/schema identity |
 | Storage version | address, slot, block identity | Final value and ordinal, including zero |
 | Balance version | address, block identity | Final balance |
 | Nonce version | address, block identity | Final nonce |
 | Code version | address, block identity | Final code hash, explicit empty code |
-| Bytecode | code hash | Complete bytes |
+| Lifecycle | address, ordinal | Destruction, nonce reset and code-clear signals |
 
-Encode a composite identity into one protobuf key if using `primary_key`:
-the inspected native schema parser permits one annotated primary-key field.
-Inspect the actual generated DDL; annotation names alone do not establish
-replacement behavior.
+The native generated DDL uses `ORDER BY (number, hash)`, a `number` primary key,
+and a daily partition. Integration tests create their tables with the real
+native CLI from the built package, including the inline Nested arrays.
 
 Why keep block versions for qualification:
 
@@ -112,16 +112,18 @@ equivalent), then select the latest version at or below an explicitly published
 block/hash. Apply the zero-slot filter **after** selecting the latest version,
 otherwise old nonzero values can reappear. Resolve account fields independently.
 
-A block row alone is not a publication signal: the ClickHouse sink inserts
-tables separately, its transaction methods are no-ops, and its cursor is a local
-file. A publication mechanism must verify all expected rows, continuity and the
-durable cursor before exposing that block. Test interruption between table
-inserts. Finality does not make multi-table writes atomic.
+The one-row block envelope supplies block-level atomicity. Checkpoint candidates
+are built separately and receive a ready manifest only after complete storage,
+metadata, code, account proofs and interval continuity verify. A failed candidate
+cannot change previously published checkpoints. Native internal `_blocks_` rows
+are not publication signals. Tests interrupt publication after storage and after
+account insertion, and fail native cursor writes after block data insertion.
 
-Persist the cursor and schema metadata on a durable volume. Freeze schema/module
-identity for a run and define recovery when either metadata or data is missing.
-Choose and benchmark the publication/checkpoint mechanism in the prototype;
-it is a deliverable, not functionality already provided by annotations.
+The runner binds database ownership, filter, package/module identity and local
+schema metadata, locks out competing local writers, and rejects cursor loss or
+database replacement. Keep the cursor, frozen package and spool on a durable
+volume. Power-loss recovery and publication coordination with retention still
+require qualification; annotations alone do not establish these guarantees.
 
 ## Bootstrap and growing account sets
 

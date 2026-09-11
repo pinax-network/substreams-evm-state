@@ -190,4 +190,96 @@ impl Scope {
         }
     }
 }
+/// One physical ClickHouse row contains the entire account-filtered block.
+/// Nested fields deliberately remain in this table, so no reader can observe
+/// half of a block's account updates. Consumers require finalized input and
+/// validate parent/hash continuity; _blocks_ is not a publication marker.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BlockState {
+    #[prost(uint64, tag="1")]
+    pub number: u64,
+    #[prost(string, tag="2")]
+    pub hash: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub parent_hash: ::prost::alloc::string::String,
+    #[prost(uint64, tag="4")]
+    pub timestamp: u64,
+    #[prost(string, tag="5")]
+    pub state_root: ::prost::alloc::string::String,
+    #[prost(int32, tag="6")]
+    pub producer_version: i32,
+    /// Canonical, sorted account list. Empty is rejected by map_block_state.
+    #[prost(string, tag="7")]
+    pub accounts: ::prost::alloc::string::String,
+    #[prost(uint32, tag="8")]
+    pub schema_version: u32,
+    #[prost(message, repeated, tag="10")]
+    pub storage: ::prost::alloc::vec::Vec<StorageValue>,
+    #[prost(message, repeated, tag="11")]
+    pub balances: ::prost::alloc::vec::Vec<BalanceValue>,
+    #[prost(message, repeated, tag="12")]
+    pub nonces: ::prost::alloc::vec::Vec<NonceValue>,
+    #[prost(message, repeated, tag="13")]
+    pub codes: ::prost::alloc::vec::Vec<CodeValue>,
+    /// These accounts require proof-backed reconciliation before publication.
+    #[prost(message, repeated, tag="14")]
+    pub lifecycle: ::prost::alloc::vec::Vec<LifecycleEffect>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StorageValue {
+    #[prost(string, tag="1")]
+    pub address: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub slot: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub value: ::prost::alloc::string::String,
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BalanceValue {
+    #[prost(string, tag="1")]
+    pub address: ::prost::alloc::string::String,
+    /// exact decimal wei; no float conversion
+    #[prost(string, tag="2")]
+    pub value: ::prost::alloc::string::String,
+    #[prost(uint64, tag="3")]
+    pub ordinal: u64,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NonceValue {
+    #[prost(string, tag="1")]
+    pub address: ::prost::alloc::string::String,
+    #[prost(uint64, tag="2")]
+    pub value: u64,
+    #[prost(uint64, tag="3")]
+    pub ordinal: u64,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CodeValue {
+    #[prost(string, tag="1")]
+    pub address: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub hash: ::prost::alloc::string::String,
+    /// hex, "0x" explicitly means empty bytecode
+    #[prost(string, tag="3")]
+    pub code: ::prost::alloc::string::String,
+    #[prost(uint64, tag="4")]
+    pub ordinal: u64,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LifecycleEffect {
+    #[prost(string, tag="1")]
+    pub address: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub kind: ::prost::alloc::string::String,
+    #[prost(uint64, tag="3")]
+    pub ordinal: u64,
+}
 // @@protoc_insertion_point(module)

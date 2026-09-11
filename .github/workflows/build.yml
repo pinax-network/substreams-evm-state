@@ -20,3 +20,40 @@ jobs:
         run: cargo test --locked
       - name: Build Substreams module
         run: cargo build --locked --release --target wasm32-unknown-unknown
+
+  clickhouse:
+    name: Checkpoints and native ClickHouse recovery
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      clickhouse:
+        image: clickhouse/clickhouse-server:26.3.33.24
+        env:
+          CLICKHOUSE_USER: evm_state
+          CLICKHOUSE_PASSWORD: local-development-only
+          CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+        ports:
+          - 18123:8123
+          - 19000:9000
+        options: >-
+          --health-cmd "clickhouse-client --user evm_state --password local-development-only --query 'SELECT 1'"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.5'
+          cache-dependency-path: tests/grpc_proxy/go.sum
+      - name: Install pinned CLI and Python dependencies
+        run: |
+          python scripts/install_substreams.py
+          echo "$PWD/localdata/toolchain/bin" >> "$GITHUB_PATH"
+          python -m pip install -r requirements-test.lock
+          python -m pip install --no-deps -e .
+      - name: Build the release package from source
+        run: make build
+      - name: Verify proofs, publication, ownership and real sink recovery
+        run: python -m pytest --run-clickhouse -q
