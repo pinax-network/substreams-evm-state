@@ -10,9 +10,12 @@ maintains their current state plus an event log, block by block, with reorg
 handling delegated to the sink.
 
 > Status: **prototype (stage 2)**. Verified on BSC against `bsc.rpc.pinax.network`
-> (see [Verification](#verification)). Network defaults to `bsc`; any chain
-> served as `sf.ethereum.type.v2.Block` Extended works. BSC Firehose is
-> Extended from block 1 (`ver=3` historically, `ver=5` on current blocks).
+> (see [Verification](#verification)). Network defaults to `bsc`; other EVM
+> Extended chains require separate qualification. Historical BSC samples include
+> Extended block 1 (`ver=3`), with `ver=5` on the tested current blocks.
+> See the [handoff review](docs/REVIEW.md) and [revised scope](docs/SCOPE.md):
+> native ClickHouse ingestion is proposed, while complete bootstrap, lifecycle
+> coverage, proof-backed readiness and bounded retention remain open.
 
 ## What it covers
 
@@ -24,8 +27,8 @@ handling delegated to the sink.
 | `Block.system_calls` | ✅ | e.g. EIP-2935 history contract `0x0000f908…2935`, written every BSC block |
 | `Block.balance_changes` / `Block.code_changes` | ✅ | validator fee rewards, fork upgrades |
 | Empty / non-matching blocks | ✅ | a `blocks` row is written for every block, so cursor and snapshot continuity is preserved |
-| Reorgs | ✅ (sink) | `--final-blocks-only`, or undo via the sink's `substreams_history` table |
-| Initial state bootstrap | ◐ | this streams *changes*; state columns are `NULL` until first observed. Replaying from a contract's creation block reconstructs its full storage, verifiable with `scripts/verify_storage_root.py` (see [Bootstrap](#bootstrap)) |
+| Reorgs | ◐ (sink) | `--final-blocks-only`, or PostgreSQL undo via `substreams_history`; rollback still needs an integration test |
+| Initial state bootstrap | ◐ | this streams *changes*; state columns are `NULL` until first observed. Replay from creation is a candidate bootstrap, subject to lifecycle/history coverage and fixed-block verification (see [Bootstrap](#bootstrap)) |
 
 Filtering is on the **address of the changed account** in each state-change
 record, never on call-to / `tx.to`. A filtered run is an exact subset of an
@@ -54,11 +57,11 @@ Both modules take one string param: a comma (or whitespace) separated list of
 ```
 
 The params value is part of the module hash. Changing the list changes the
-hash, so the sink warns about a cursor hash mismatch on restart; run with
-`--on-module-hash-mismatch=warn` (the Makefile does). Adding an account
-later: restart with the new list from the block you want it tracked from, or
-replay it from its creation block into the same database (see
-[Bootstrap](#bootstrap)).
+hash. The Makefile currently sets `--on-module-hash-mismatch=warn`; this bypass
+does not initialize a new account or prove continuity. Bootstrap new accounts
+with separate staging data and cursor state, verify and catch up, then deliberately
+cut over the live filter. Do not replay an older range over live state: current
+upserts do not reject older block numbers. See [Bootstrap](#bootstrap).
 
 ## PostgreSQL schema
 
@@ -97,6 +100,9 @@ Prerequisites: Rust 1.88 + `wasm32-unknown-unknown` (via `rust-toolchain.toml`),
 [`substreams`](https://github.com/streamingfast/substreams/releases) CLI
 ≥ v1.20.2 (ships `substreams sink postgres`), Docker, `psql`, Python 3 with
 `pycryptodome` for the storage-root check.
+
+Generated Rust protobuf bindings are committed so a fresh checkout builds
+directly. Run `make protogen` when changing the protobuf schema.
 
 ```bash
 export SUBSTREAMS_API_KEY=...         # never commit keys; see .env.example
@@ -160,23 +166,32 @@ confirmed on BSC Firehose):
 7. Within a block, state tables receive the **last change by ordinal** per key;
    the event log keeps every change.
 
-Every row is an upsert, so re-processing a block is idempotent.
+Reprocessing the same block over the same state is idempotent. This does not make
+out-of-order replay safe: an older upsert can replace a newer current-state value.
+Lifecycle completeness (including deletion/recreation) and unsupported-source
+rejection still require qualification; see [the review](docs/REVIEW.md).
 
 ## Verification
 
-`scripts/verify_rpc.py` compares every `storage` slot and every `accounts`
-field (balance, nonce, code) with `eth_getStorageAt` / `eth_getBalance` /
+`scripts/verify_rpc.py` compares up to 1,000 `storage` slots by default (override
+with `--limit`) and observed `accounts`
+fields (balance, nonce, code) with `eth_getStorageAt` / `eth_getBalance` /
 `eth_getTransactionCount` / `eth_getCode` at the DB head block, plus the block
 hash and `state_root` against `eth_getBlockByNumber`.
 
 `scripts/verify_storage_root.py 0x<addr>` recomputes the account's storage
 trie root (secure Merkle Patricia Trie over `storage_nonzero`) and compares it
-with `eth_getProof(addr, [], block).storageHash`. A match is a proof that the
-`storage` table holds **every** non-zero slot of that account at that block.
-Most RPC nodes only serve `eth_getProof` within a few hundred blocks of head,
-so run it while the sink is live.
+with `eth_getProof(addr, [], block).storageHash`. A match checks completeness
+relative to the **RPC-reported root**; the script does not verify `accountProof`
+against the header's state root. It can also exit successfully despite metadata
+mismatches. Neither script reads a consistent database snapshot while writes run,
+and `--block` does not provide historical DB state. Pause ingestion at the target
+for diagnostic checks; these scripts are not a production readiness gate.
+The previously tested endpoint had a short recent-proof window. Full fixed-block
+proof verification is part of the [remaining scope](docs/SCOPE.md).
 
-Results on BSC (2026-09-10, `bsc.rpc.pinax.network`):
+Results reported by the prior prototype run on BSC (2026-09-10,
+`bsc.rpc.pinax.network`; not re-run during the 2026-09-11 review):
 
 | Test | Blocks | Filter | Checked | Mismatches |
 |------|--------|--------|---------|------------|
@@ -189,7 +204,8 @@ Unit tests for the persistence rules: `make test`.
 
 ## Sizing
 
-Measured on BSC (block time ≈ 0.75 s, ≈ 115k blocks/day):
+Prior BSC samples below. The daily estimate uses the older 0.75 s/block
+assumption (≈ 115k blocks/day), not the 0.45 s scenario used for monthly costs:
 
 | Run | Rows / block (event log) | DB growth |
 |-----|--------------------------|-----------|
@@ -198,60 +214,73 @@ Measured on BSC (block time ≈ 0.75 s, ≈ 115k blocks/day):
 | Filtered live follow, per-block flush | — | ≈ 56 blocks/s throughput |
 
 Unfiltered event logging is not viable for a bounded local budget; the
-current-state tables alone are bounded by the number of live slots. Keep the
-event log short with partition drops, or remove layer
-`postgres/schema.2.events.sql` and the corresponding rows in `src/db_out.rs`.
+current storage grows with slots **ever touched**, including cleared slots.
+Blocks and bytecode also accumulate. Event retention currently requires manual
+partition drops; a state-only mode would require code/schema changes, not just
+a run flag. The customer's retained-data budget has not yet been qualified.
 
 ## Throughput and cost
 
-Measured 2026-09-10 on `bsc.substreams.pinax.network` with the default
-3-account filter (sample contract, WBNB, EIP-2935 contract). WBNB is one of
-the hottest contracts on BSC, so this is a pessimistic per-account profile.
+Prior measurements from 2026-09-10 on `bsc.substreams.pinax.network`, using the
+three-account sample filter (sample contract, WBNB, EIP-2935). This differs from
+the customer's 19-account filter; it is not a per-account upper bound.
 
-| Measurement | Value |
-|-------------|-------|
-| `db_out` output | ≈ 27 KB/block (≈ 165 rows/block; event log ≈ 2/3 of the bytes, state tables ≈ 1/3) |
-| Uncached backprocessing, 20 parallel workers, 10,000 blocks | 87 s ⇒ ≈ 115 blocks/s (≈ 10 blocks/s per worker, one 1,000-block segment per worker) |
-| Uncached backprocessing, 100 workers, 50,000 blocks | ≈ 98 s ⇒ ≈ 500 blocks/s (only 50 segments to run) |
-| Cached delivery of the same 50,000 blocks | 14 s ⇒ ≈ 3,500 blocks/s |
-| Live follow, per-block flush | ≈ 56 blocks/s, well above the 2.2 blocks/s BSC produces |
+| Measurement | Prior result |
+|-------------|--------------|
+| `db_out` output | ≈ 27 KB/block (≈ 165 rows/block; estimated 2/3 event bytes, 1/3 state bytes) |
+| Reported uncached backprocessing, 20 workers, 10,000 blocks | 87 s ⇒ ≈ 115 blocks/s |
+| 100 workers requested, 50,000 blocks | ≈ 98 s ⇒ ≈ 500 blocks/s; recovered log reports at most 50 active jobs |
+| Reported cached delivery of the same 50,000 blocks | 14 s ⇒ ≈ 3,500 blocks/s |
+| Live follow, per-block flush | ≈ 56 blocks/s |
 
-Cache build (first backprocessing of a new params value) scales with
-`workers × ≈10 blocks/s`. Full BSC history (≈ 121M blocks) is ≈ 34 h at 100
-workers or ≈ 3 days at 50; a contract created in 2025 (block ≈ 47M+) is about
-60 % of that; a contract created last week is seconds. The params value is
-part of the module hash, so **each distinct account list is its own cache**.
-Add accounts by replaying only the new ones from their creation blocks
-(§ Bootstrap) instead of rebuilding the whole list.
+The recovered 50,000-block log supports its wall time, not sustained linear
+worker scaling or an independently verified cold cache. At 500 blocks/s,
+121M blocks would take about **67 hours**. The former 34-hour estimate assumed
+an unmeasured 1,000 blocks/s. Historical ranges, producer versions, account
+activity and worker availability need representative measurement before an SLA.
+Recent creation narrows the range; it does not guarantee a seconds-long bootstrap.
 
-Cost at Pinax list prices ($150/TB of module output + $1.75 per 1M blocks;
-BSC ≈ 5.76M blocks/month at 0.45 s):
+Illustrative usage costs using the published
+[Substreams](https://pinax.network/pricing/substreams) and
+[Firehose](https://pinax.network/pricing/firehose) rates checked 2026-09-11:
+**$150/TiB + $1.75/million processed blocks**, USD. Assume 5.76M blocks per
+30 days (0.45 s/block), decimal KB/GB for the output estimates, and convert bytes
+to TiB (`2^40`) for billing. Hosting, retention and other services are excluded.
 
-| Scenario | Output | Monthly |
-|----------|--------|---------|
-| This package, 3 accounts incl. WBNB, state + event log | ≈ 27 KB/block ⇒ ≈ 155 GB/month | ≈ $23 + $10 = **≈ $33** |
-| Same, state tables only (drop the event log) | ≈ 9 KB/block ⇒ ≈ 52 GB/month | ≈ $8 + $10 = **≈ $18** |
-| Raw Firehose Extended blocks with CombinedFilter (customer's probe: 1.7 MB/block) | ≈ 9.8 TB/month | **≈ $1,480** |
-| One-time full-history cache build for the 3-account filter | ≈ 3.3 TB + 121M blocks | ≈ $490 + $212 ≈ **$700** |
+| Scenario | Assumed decoded output | Approximate usage cost |
+|----------|------------------------|------------------------|
+| Three-account `db_out`, state + events | 27 KB/block ⇒ 155.5 GB/month | $31/month |
+| Hypothetical state-only output (not an implemented mode) | 9 KB/block ⇒ 51.8 GB/month | $17/month |
+| Firehose at the customer's probe rate (different filter) | 55,549,962 bytes / 32 blocks ⇒ 10,000 GB/month | $1,374/month |
+| One full 121M-block delivery at 27 KB/block | 3,267 GB | $657 once |
 
-Costs scale with the number and activity of tracked accounts, not with
-chain size; a quiet contract adds almost nothing.
+The last row models **delivered output**, not a measured noop cache-build bill.
+Confirm actual billed bytes and processed blocks for warm-up and subsequent
+replay before quoting a bootstrap total. Compute still depends on the scanned
+block range; output depends on tracked account activity. These examples do not
+establish a customer-specific savings multiplier, retained database size, or
+native ClickHouse cost. See [the measurement audit](docs/REVIEW.md).
 
 ## Bootstrap
 
-This package does not export initial state. Two options:
+This package does not export a complete initial state checkpoint. Candidate paths:
 
-* **Replay from creation.** Run with `ACCOUNTS=<addr>` from the contract's
-  creation block: every slot it ever wrote is reconstructed, so `storage_nonzero`
-  is complete by construction. Prove it with `make verify-root ADDRESS=<addr>`
-  while the sink is at head. Tested on BSC: contract
-  `0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff` (created at block 121114203)
-  replayed 8,001 blocks to head in ≈ 30 s in production mode (50 parallel
-  workers), 46 non-zero slots, recomputed root `0x979eec…180f` equal to the
-  RPC `storageHash`. Older, hotter contracts (WBNB, 2020) mean tens of millions
-  of blocks; measure before promising a turnaround time.
-* **External snapshot.** Load `accounts` / `storage` / `code` from another
-  source at block *N*, then start the sink at *N+1*.
+* **Replay from creation into isolated staging.** The prior run replayed
+  `0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff` from block 121114203 through
+  121122203 (8,001 blocks), reportedly in about 30 seconds with 50 workers.
+  Its 46-slot storage trie matched the RPC-reported `storageHash`. This is one
+  successful storage sample, not a general lifecycle or account-completeness
+  proof. Older, hotter contracts require representative replay measurements.
+* **External snapshot.** A compatible complete snapshot at block/hash N can
+  seed staging before incremental updates at N+1. No supported snapshot importer
+  or export service is included here.
+
+For a growing live filter, keep bootstrap data and cursors separate, verify
+storage **and** metadata/code at a fixed finalized block/hash, catch up to a common
+cutover point, then promote. Do not replay old blocks directly into the live
+state tables. A creation-block replay can leave unchanged metadata unknown and
+needs qualified source history and deletion/recreation semantics. Proof-backed
+readiness and checkpoint publication remain in the [delivery scope](docs/SCOPE.md).
 
 ## Layout
 
@@ -267,18 +296,30 @@ scripts/verify_rpc.py      # RPC cross-check
 scripts/verify_storage_root.py  # MPT storage root vs eth_getProof
 docker-compose.yml         # local Postgres 16
 docs/SCOPE.md              # scoping notes and open questions
+docs/REVIEW.md             # handoff findings and native ClickHouse constraints
 ```
 
-## Sink modes and why `db_out` stays
+## Sink modes and the proposed ClickHouse route
 
 `substreams sink postgres` auto-detects its mode from the output module type.
 A `DatabaseChanges` output runs in *database-changes* mode (create / update /
 upsert / delete, delta ops, undo via `substreams_history`). Any other protobuf
 with `schema.table` / `schema.field` annotations runs in *relational
-mappings* mode: tables inferred from the proto, bulk `COPY` loads, but
-**insert-only**. The current-state tables (`accounts`, `storage`, `code`) are
-upserts, so this package uses `db_out`. An event-log-only deployment could
-annotate `evm.state.v1.StateChanges` and drop `db_out`.
+mappings* mode. On **PostgreSQL**, tables are inferred from the proto and data
+uses insert/COPY paths without state upserts. PostgreSQL itself supports upserts;
+this native mapping path is the limitation. The current PostgreSQL state design
+therefore keeps `db_out`.
+
+On **ClickHouse**, the native mapping path creates
+`ReplacingMergeTree(_version_, _deleted_)`, so a protobuf map can provide
+replacement rows without `DatabaseChanges`. This is not a drop-in equivalent of
+PostgreSQL upserts: replacement follows the sorting key, `_version_` is assigned
+at ingestion time, and table writes are not one atomic block transaction.
+
+The proposed next milestone is a native `map_block_state` output with finalized
+block-end versions, independent account fields, retry-safe reads, and an explicit
+publication/checkpoint boundary. It is **not implemented yet**. See
+[scope and acceptance tests](docs/SCOPE.md) and [upstream source review](docs/REVIEW.md).
 
 ## Known issues / follow-ups
 
