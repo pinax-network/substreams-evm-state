@@ -24,6 +24,7 @@ target
 postgres/schema.sql
 src/pb/*.rs
 !src/pb/mod.rs
+!src/pb/evm.state.v1.rs
 *.spkg.tmp
 
 # secrets
