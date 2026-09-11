@@ -25,6 +25,12 @@ transport adapter translates the CLI's S2 request compression using its upstream
 library. These tests cover sink behavior; they do not execute the WASM mapper.
 Rust projection tests and the separately measured BSC replay cover that path.
 
+CI installs the Python package as a regular wheel and checks its dependency
+consistency before running the suite. A separate fresh virtual environment also
+installed the wheel and verified the real 46-slot BSC export with provider and
+database credentials removed. This exercises the packaged proof code without
+relying on an editable checkout or database access.
+
 Native failure tests prove:
 
 - killing a process after committed data/cursor resumes at the saved cursor;

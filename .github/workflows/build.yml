@@ -52,7 +52,10 @@ jobs:
           python scripts/install_substreams.py
           echo "$PWD/localdata/toolchain/bin" >> "$GITHUB_PATH"
           python -m pip install -r requirements-test.lock
-          python -m pip install --no-deps -e .
+          # Exercise the installed wheel and its bundled SQL, not an editable
+          # checkout that could hide missing package data.
+          python -m pip install --no-deps .
+          python -m pip check
       - name: Build the release package from source
         run: make build
       - name: Verify proofs, publication, ownership and real sink recovery
