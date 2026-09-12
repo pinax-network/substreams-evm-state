@@ -134,6 +134,12 @@ impl ClickHouse {
             "ClickHouse query failed (HTTP {})",
             response.status().as_u16()
         );
+        if let Some(code) = response.headers().get("X-ClickHouse-Exception-Code") {
+            ensure!(
+                code.to_str().ok() == Some("0"),
+                "ClickHouse reported a query exception"
+            );
+        }
         Ok(response)
     }
 
@@ -142,6 +148,10 @@ impl ClickHouse {
         self.request(sql, params, Vec::new())?
             .read_to_string(&mut result)
             .context("incomplete ClickHouse response")?;
+        ensure!(
+            !result.trim_start().starts_with("Code:") && !result.contains("DB::Exception:"),
+            "ClickHouse reported a query exception after response headers"
+        );
         Ok(result)
     }
 
@@ -197,13 +207,21 @@ impl ClickHouse {
     }
 
     fn insert_body(&self, table: &str, body: Vec<u8>) -> Result<()> {
-        let mut response = self.request(
+        let response = self.request(
             &format!("INSERT INTO {table} FORMAT JSONEachRow"),
             &Params::new(),
             body,
         )?;
-        std::io::copy(&mut response, &mut std::io::sink())
+        let mut acknowledgement = Vec::new();
+        response
+            .take(8193)
+            .read_to_end(&mut acknowledgement)
             .context("incomplete ClickHouse insert response")?;
+        ensure!(
+            acknowledgement.len() <= 8192
+                && acknowledgement.iter().all(|b| b.is_ascii_whitespace()),
+            "ClickHouse returned an invalid insert acknowledgement"
+        );
         Ok(())
     }
 

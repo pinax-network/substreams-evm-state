@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use evm_state::{ch::ClickHouse, checkpoint, reader, retention};
 use serde_json::json;
 use std::path::PathBuf;
@@ -15,6 +15,38 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Verify isolated source state and publish an immutable checkpoint.
+    Checkpoint {
+        #[arg(long)]
+        proofs: PathBuf,
+        #[arg(long)]
+        sources: PathBuf,
+        #[arg(long)]
+        base: Option<String>,
+        #[arg(long, default_value_t = 100_000_000_000_u64)]
+        budget_bytes: u64,
+        #[arg(long, default_value = "localdata/verification")]
+        work_dir: PathBuf,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    /// Bind a native sink to an isolated database and durable directory.
+    Prepare(NativeArgs),
+    /// Run or resume the guarded finalized native sink.
+    Ingest(IngestArgs),
+    /// Restore a damaged native cursor from verified durable progress.
+    RecoverCursor(NativeArgs),
+    /// Capture a finalized header, account proofs and code before replay.
+    CaptureProofs {
+        #[arg(long)]
+        accounts: String,
+        #[arg(long, default_value = "finalized")]
+        block: String,
+        #[arg(long)]
+        expected_hash: Option<String>,
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Measure whole data directories against a declared policy.
     CapacityReport {
         #[arg(long)]
@@ -71,10 +103,139 @@ enum Commands {
     },
 }
 
+#[derive(Args)]
+struct NativeArgs {
+    #[arg(long)]
+    package: PathBuf,
+    #[arg(long, default_value = "bsc.substreams.pinax.network:443")]
+    endpoint: String,
+    #[arg(long)]
+    accounts: String,
+    #[arg(long)]
+    start_block: u64,
+    #[arg(long)]
+    state_dir: PathBuf,
+    #[arg(long)]
+    checkpoint_database: Option<String>,
+}
+impl NativeArgs {
+    fn options(self) -> Result<evm_state::ingest::NativeOptions> {
+        Ok(evm_state::ingest::NativeOptions {
+            package: self.package,
+            endpoint: self.endpoint,
+            accounts: json!(self.accounts),
+            start_block: self.start_block,
+            state_dir: self.state_dir,
+            checkpoint_database: self.checkpoint_database,
+            dsn: std::env::var("SUBSTREAMS_SINK_DSN").map_err(|_| {
+                anyhow::anyhow!(
+                    "set SUBSTREAMS_SINK_DSN to the native ClickHouse connection string"
+                )
+            })?,
+        })
+    }
+}
+#[derive(Args)]
+struct IngestArgs {
+    #[command(flatten)]
+    native: NativeArgs,
+    #[arg(long)]
+    stop_block: Option<u64>,
+    #[arg(long, default_value_t = 3)]
+    max_retries: u32,
+    #[arg(long, default_value_t = 1)]
+    decode_batch_size: u32,
+    #[arg(long, default_value_t = 100)]
+    spool_max_idle_ms: u64,
+    #[arg(long)]
+    prometheus_addr: Option<String>,
+    #[arg(long)]
+    parallel_workers: Option<u32>,
+}
+
 fn run() -> Result<()> {
     let args = Cli::parse();
     let client = ClickHouse::new(&args.database)?;
     let result = match args.command {
+        Commands::Checkpoint {
+            proofs,
+            sources,
+            base,
+            budget_bytes,
+            work_dir,
+            output,
+        } => {
+            if let Some(output) = &output {
+                anyhow::ensure!(
+                    !output.try_exists()?,
+                    "checkpoint output already exists; choose a new output file"
+                );
+            }
+            let mut paths = vec![proofs.clone(), sources.clone()];
+            if let Some(output) = &output {
+                paths.push(output.parent().unwrap_or(std::path::Path::new(".")).into());
+            }
+            evm_state::capacity::check(&client, &paths, "checkpoint-files")?;
+            let bundle: serde_json::Value = serde_json::from_slice(&std::fs::read(proofs)?)?;
+            let inputs: Vec<serde_json::Value> = serde_json::from_slice(&std::fs::read(sources)?)?;
+            let mut record = checkpoint::build(
+                &client,
+                &bundle,
+                &inputs,
+                base.as_deref(),
+                budget_bytes,
+                &work_dir,
+            )?;
+            if let Some(output) = output {
+                evm_state::files::atomic_json(&output, &record, false)?;
+            }
+            record.as_object_mut().unwrap().remove("proof_bundle");
+            record
+        }
+        Commands::Prepare(native) => evm_state::ingest::prepare(&client, &native.options()?)?,
+        Commands::RecoverCursor(native) => {
+            evm_state::ingest::recover_cursor(&client, &native.options()?)?
+        }
+        Commands::Ingest(args) => {
+            let options = evm_state::ingest::IngestOptions {
+                stop_block: args.stop_block,
+                max_retries: args.max_retries,
+                decode_batch_size: args.decode_batch_size,
+                spool_max_idle_ms: args.spool_max_idle_ms,
+                prometheus_addr: args.prometheus_addr,
+                parallel_workers: args.parallel_workers,
+            };
+            evm_state::ingest::ingest(&client, &args.native.options()?, &options)?
+        }
+        Commands::CaptureProofs {
+            accounts,
+            block,
+            expected_hash,
+            output,
+        } => {
+            anyhow::ensure!(
+                !output.try_exists()?,
+                "proof output already exists; choose a new capture file"
+            );
+            evm_state::capacity::check(
+                &client,
+                &[output.parent().unwrap_or(std::path::Path::new(".")).into()],
+                "proof-capture",
+            )?;
+            let number = if block == "finalized" {
+                None
+            } else {
+                Some(block.parse::<u64>()?)
+            };
+            let bundle = evm_state::rpc::capture(
+                &evm_state::rpc::Rpc::new(None, None)?,
+                checkpoint::canonical_accounts(&json!(accounts))?,
+                number,
+                expected_hash.as_deref(),
+            )?;
+            evm_state::files::atomic_json(&output, &bundle, false)?;
+            json!({"output":output,"header":bundle["header"],"header_trust":bundle["header_trust"]})
+        }
         Commands::CapacityReport { config } => evm_state::capacity::Meter::new(
             &client,
             serde_json::from_slice(&std::fs::read(config)?)?,

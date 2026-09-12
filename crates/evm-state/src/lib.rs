@@ -1,4 +1,5 @@
 //! Native checkpoint tools. The Substreams WASM package remains a separate crate.
+pub mod bootstrap;
 pub mod capacity;
 pub mod ch;
 pub mod checkpoint;
@@ -7,6 +8,7 @@ pub mod cursor;
 pub mod files;
 pub mod header;
 pub mod host;
+pub mod ingest;
 pub mod process;
 pub mod proof;
 pub mod qualification;

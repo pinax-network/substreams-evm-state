@@ -15,6 +15,28 @@ pub struct Output {
     pub stderr: Vec<u8>,
 }
 
+/// A native child must be reaped on every error path before its wrapper returns.
+pub struct ChildGuard(pub Child);
+impl std::ops::Deref for ChildGuard {
+    type Target = Child;
+    fn deref(&self) -> &Child {
+        &self.0
+    }
+}
+impl std::ops::DerefMut for ChildGuard {
+    fn deref_mut(&mut self) -> &mut Child {
+        &mut self.0
+    }
+}
+impl Drop for ChildGuard {
+    fn drop(&mut self) {
+        if !matches!(self.0.try_wait(), Ok(Some(_))) {
+            let _ = self.0.kill();
+            let _ = self.0.wait();
+        }
+    }
+}
+
 pub fn capture(command: &mut Command, timeout: Duration) -> Result<Option<Output>> {
     const LIMIT: u64 = 16 * 1024 * 1024;
     let mut child = command

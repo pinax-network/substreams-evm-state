@@ -78,6 +78,25 @@ pub struct Lock {
     _file: File,
 }
 
+impl Lock {
+    /// Keep the same flock open in a native child even if its wrapper is killed.
+    pub fn inherit_in(&self, command: &mut std::process::Command) {
+        use std::os::{fd::AsRawFd, unix::process::CommandExt};
+        let fd = self._file.as_raw_fd();
+        // SAFETY: only async-signal-safe fcntl calls run between fork and exec.
+        // The caller retains this Lock while spawning and waiting for the child.
+        unsafe {
+            command.pre_exec(move || {
+                let flags = libc::fcntl(fd, libc::F_GETFD);
+                if flags == -1 || libc::fcntl(fd, libc::F_SETFD, flags & !libc::FD_CLOEXEC) == -1 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                Ok(())
+            });
+        }
+    }
+}
+
 pub fn file_lock(path: &Path, exclusive: bool, blocking: bool) -> Result<Lock> {
     fs::create_dir_all(path.parent().context("lock path has no parent")?)?;
     let file = OpenOptions::new()

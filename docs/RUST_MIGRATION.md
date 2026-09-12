@@ -39,8 +39,11 @@ BSC header hashing, public native cursor decoding and durable progress, atomic
 metadata and OS identity, database/controller ownership, source validation,
 checkpoint reads, durable pins, pagination, generation retention, RPC proof
 capture, capacity sampling/supervision, and the private-prefix growth recorder.
-The native CLI currently exposes reads, pins, retention and capacity commands;
-it does not yet replace the ingestion or checkpoint publication commands.
+The native CLI exposes reads, pins, retention, capacity, proof capture, native
+preparation/ingestion/cursor recovery and checkpoint publication. It validates
+existing private bootstrap prefixes; compaction/replay and portable export/import
+still need their Rust replacements. The native wrapper has not yet passed the
+full fault-injection streaming qualification needed to take over the long replays.
 
 The first checks passed locally on Rust 1.88: 29 native unit/integration scenarios
 without ClickHouse, plus 9 isolated ClickHouse reader/retention/progress scenarios.
@@ -52,3 +55,12 @@ path; complete returned-state qualification must still run in Rust.
 CI runs `cargo test --locked --workspace` and the opt-in Rust ClickHouse suite in
 addition to the existing migration baseline. Python and the Go transport helper
 remain temporarily until all replacement workflows have their required evidence.
+
+The next Rust checks cover native preparation and source ownership, explicit
+cursor recovery, finalized flush/worker arguments, full checkpoint publication,
+storage clears, bad metadata, missing blocks, filter drift, unexpected accounts,
+and lifecycle resets against a previous ready checkpoint. There are now 34
+standalone Rust test functions and 18 opt-in ClickHouse test functions, alongside
+the existing 43 mapper tests. Several tests run multiple corruption scenarios.
+HTTP tests also reject failed queries/inserts returned with HTTP 200, consistent
+with ClickHouse's [HTTP response caveats](https://clickhouse.com/docs/concepts/features/interfaces/http#http-response-codes-caveats).
