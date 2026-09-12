@@ -1,0 +1,145 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "runtime": "Rust 1.88 release profile",
+  "measurement": {
+    "account": "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff",
+    "binary_sha256": "7daaf5c231494799c8e4b8bcad748ebaff7d3468d3e777b032d58d204159decb",
+    "calls": [
+      {
+        "json_bytes": 3058,
+        "page": 0,
+        "pass": 0,
+        "rows": 10,
+        "seconds": 0.039697833
+      },
+      {
+        "json_bytes": 3058,
+        "page": 1,
+        "pass": 0,
+        "rows": 10,
+        "seconds": 0.047651792
+      },
+      {
+        "json_bytes": 3058,
+        "page": 2,
+        "pass": 0,
+        "rows": 10,
+        "seconds": 0.040367917
+      },
+      {
+        "json_bytes": 3058,
+        "page": 3,
+        "pass": 0,
+        "rows": 10,
+        "seconds": 0.041483333
+      },
+      {
+        "json_bytes": 2156,
+        "page": 4,
+        "pass": 0,
+        "rows": 6,
+        "seconds": 0.050228917
+      },
+      {
+        "json_bytes": 3058,
+        "page": 0,
+        "pass": 1,
+        "rows": 10,
+        "seconds": 0.0671175
+      },
+      {
+        "json_bytes": 3058,
+        "page": 1,
+        "pass": 1,
+        "rows": 10,
+        "seconds": 0.051854666
+      },
+      {
+        "json_bytes": 3058,
+        "page": 2,
+        "pass": 1,
+        "rows": 10,
+        "seconds": 0.04263125
+      },
+      {
+        "json_bytes": 3058,
+        "page": 3,
+        "pass": 1,
+        "rows": 10,
+        "seconds": 0.0440245
+      },
+      {
+        "json_bytes": 2156,
+        "page": 4,
+        "pass": 1,
+        "rows": 6,
+        "seconds": 0.044057708
+      }
+    ],
+    "database": "evm_rust_portable_20260912",
+    "finished_at_unix_ns": 1789250080969597000,
+    "format_version": 2,
+    "header": {
+      "hash": "0x7d4fc350fa04cb7d9b63ae5435f252301d67ca41363b9273adc6365d7a7a1abe",
+      "number": 121462462,
+      "parent_hash": "0x5f1ea4274ff6589306a60304d0d0ec29de23f0ad27dde6f5c7b8cf5493de054c",
+      "state_root": "0x66840c1ef6ff8840f4f569ab3bc19f0645bf929cd2b99c0b89499227bac35c8e",
+      "timestamp": 1789219970
+    },
+    "limitations": [
+      "local Rust reader, controller locks and ClickHouse SQL; no remote API network",
+      "sequential repeated scans, not concurrent reader load or a cold database cache",
+      "scan_and_staging_seconds includes slot validation and SQLite staging between page calls",
+      "root_hash_seconds includes the SQLite commit and ordered root assembly; capacity guards excluded from pass timings",
+      "immutable published generation; publication latency measured separately"
+    ],
+    "ordered_storage_sha256": "75a95c09ca6dddc2e43cf067c16ab1df16f75f4a7f6992f2a2098292b82da675",
+    "page_latency_seconds": {
+      "max": 0.0671175,
+      "min": 0.039697833,
+      "p50": 0.0440245,
+      "p95": 0.0671175,
+      "samples": 10
+    },
+    "page_size": 10,
+    "passes": [
+      {
+        "nonzero_slots": 46,
+        "page_call_seconds": 0.219429792,
+        "pass": 0,
+        "root_hash_seconds": 0.00026541699999999,
+        "scan_and_staging_seconds": 0.219788708,
+        "scan_and_verification_seconds": 0.220054125
+      },
+      {
+        "nonzero_slots": 46,
+        "page_call_seconds": 0.249685624,
+        "pass": 1,
+        "root_hash_seconds": 0.0002375000000000016,
+        "scan_and_staging_seconds": 0.250138209,
+        "scan_and_verification_seconds": 0.250375709
+      }
+    ],
+    "proof_bundle_sha256": "2c9ad21e1285f0145875f853abef2dbb0c362ece5d905bbb8f3a616b794093a9",
+    "root_matches_captured_account_proof": true,
+    "runtime": "Rust",
+    "snapshot_id": "a949a7b452004b65ae466ee8f8f5bccf",
+    "started_at_unix_ns": 1789250070709593000,
+    "verified_storage_root": "0x979eecf7c7a2cca67f69e54871848cf9259f70a8f7b3912189f2bbecc991180f"
+  },
+  "capacity": {
+    "status": "completed",
+    "samples": 5,
+    "failed_samples": 0,
+    "guard_samples": 4,
+    "failed_guard_samples": 0,
+    "peak_observed_allocated_bytes": 10772955136,
+    "maximum_sample_gap_ns": 11714838000,
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "overall_budget_bytes": 100000000000,
+  "qualification": "Rust proved every returned page from the real restored BSC checkpoint against its captured account proof and encoded header. Two complete scans use the immutable 46-slot generation; this does not qualify the unfinished hot-account bootstrap or concurrent reader load."
+}

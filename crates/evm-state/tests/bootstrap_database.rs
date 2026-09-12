@@ -542,3 +542,126 @@ fn history_rejects_cursor_drift_writers_readers_and_wrong_provenance() -> Result
     }
     Ok(())
 }
+
+fn legacy(db: &mut Native) -> Result<PathBuf> {
+    db.initial()?;
+    db.compact()?;
+    let control = evm_state::control::Control::open(&db.target)?;
+    db.run["identity"]["host"] = json!("legacy-host");
+    files::atomic_json(&db.options.state_dir.join("run.json"), &db.run, true)?;
+    db.client.execute("ALTER TABLE _evm_state_run UPDATE identity={identity:String} WHERE run_id={id:String} SETTINGS mutations_sync=2",&params(json!({"id":db.run["run_id"],"identity":files::canonical_json(&db.run["identity"])?}))?)?;
+    let mut progress: Value = serde_json::from_slice(&fs::read(
+        db.options.state_dir.join("durable_progress.json"),
+    )?)?;
+    progress
+        .as_object_mut()
+        .unwrap()
+        .extend(cursor::binding(&db.run)?.as_object().unwrap().clone());
+    files::atomic_json(
+        &db.options.state_dir.join("durable_progress.json"),
+        &progress,
+        true,
+    )?;
+    let mut prefix: Value =
+        serde_json::from_slice(&fs::read(db.options.state_dir.join("bootstrap.json"))?)?;
+    prefix["binding"] = cursor::binding(&db.run)?;
+    files::atomic_json(&db.options.state_dir.join("bootstrap.json"), &prefix, true)?;
+    db.client.execute("ALTER TABLE bootstrap_generations UPDATE manifest={manifest:String} WHERE generation={id:String} SETTINGS mutations_sync=2",&params(json!({"id":prefix["generation"],"manifest":files::canonical_json(&prefix)?}))?)?;
+    let mut binding = control.record;
+    binding["host"] = json!("legacy-host");
+    files::atomic_json(&control.path.join("binding.json"), &binding, true)?;
+    db.target.execute("ALTER TABLE _evm_checkpoint_control UPDATE binding={binding:String} WHERE control_id={id:String} SETTINGS mutations_sync=2",&params(json!({"id":binding["control_id"],"binding":files::canonical_json(&binding)?}))?)?;
+    Ok(control.path)
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn legacy_host_recovery_preserves_exact_state_and_resumes_a_partial_attestation() -> Result<()> {
+    let mut db = Native::new()?;
+    let control = legacy(&mut db)?;
+    let names = [
+        "run.json",
+        "bootstrap.json",
+        "durable_progress.json",
+        "cursor.txt",
+    ];
+    let original = names
+        .iter()
+        .map(|name| fs::read(db.options.state_dir.join(name)))
+        .collect::<std::io::Result<Vec<_>>>()?;
+    assert!(db.compact().is_err());
+    let _lock = files::file_lock(&db.options.state_dir.join("run.lock"), true, false)?;
+    assert!(
+        evm_state::host_recovery::rebind(&db.client, &db.options.state_dir, "legacy-host").is_err()
+    );
+    drop(_lock);
+    let partial = evm_state::host::recovery_record_for(
+        &db.run["identity"],
+        &db.options.state_dir,
+        &evm_state::host::machine_id()?,
+    )?;
+    files::atomic_json(
+        &db.options.state_dir.join("host-rebinding.json"),
+        &partial,
+        false,
+    )?;
+    let first = evm_state::host_recovery::rebind(&db.client, &db.options.state_dir, "legacy-host")?;
+    assert_eq!(first["rebound"], true);
+    assert!(control.join("host-rebinding.json").is_file());
+    assert_eq!(
+        evm_state::host_recovery::rebind(&db.client, &db.options.state_dir, "legacy-host")?,
+        first
+    );
+    for (name, bytes) in names.iter().zip(original) {
+        assert_eq!(fs::read(db.options.state_dir.join(name))?, bytes);
+    }
+    assert_eq!(db.compact()?["already_compacted"], true);
+    let mut wrong = partial;
+    wrong["machine_id"] = json!(format!("machine-sha256:{}", "d".repeat(64)));
+    files::atomic_json(
+        &db.options.state_dir.join("host-rebinding.json"),
+        &wrong,
+        true,
+    )?;
+    assert!(db.compact().is_err());
+    assert!(
+        evm_state::host_recovery::rebind(&db.client, &db.options.state_dir, "legacy-host").is_err()
+    );
+    Ok(())
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn legacy_host_recovery_rejects_mismatched_state_before_writing_sidecars() -> Result<()> {
+    for defect in ["wrong_host", "package", "prefix", "controller"] {
+        let mut db = Native::new()?;
+        let control = legacy(&mut db)?;
+        match defect {
+            "package" => fs::write(db.options.state_dir.join("package.spkg"), "changed")?,
+            "prefix" => {
+                let path = db.options.state_dir.join("bootstrap.json");
+                let mut p: Value = serde_json::from_slice(&fs::read(&path)?)?;
+                p["nonzero_slots"] = json!(99);
+                files::atomic_json(&path, &p, true)?;
+            }
+            "controller" => fs::write(control.join("initialized"), "wrong-owner")?,
+            _ => {}
+        }
+        assert!(
+            evm_state::host_recovery::rebind(
+                &db.client,
+                &db.options.state_dir,
+                if defect == "wrong_host" {
+                    "wrong-host"
+                } else {
+                    "legacy-host"
+                }
+            )
+            .is_err(),
+            "{defect}"
+        );
+        assert!(!db.options.state_dir.join("host-rebinding.json").exists());
+        assert!(!control.join("host-rebinding.json").exists());
+    }
+    Ok(())
+}

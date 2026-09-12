@@ -29,5 +29,6 @@ uuid = { version = "1", features = ["v4"] }
 libc = "0.2"
 signal-hook = "0.3"
 flate2 = "1"
+tar = "0.4"
 
 [dev-dependencies]

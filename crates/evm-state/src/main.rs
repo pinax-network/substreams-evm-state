@@ -15,6 +15,20 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Install the checksummed Substreams 1.22.0 native CLI for this platform.
+    InstallSubstreams {
+        #[arg(long, default_value = "localdata/toolchain/bin")]
+        destination: PathBuf,
+    },
+    /// Attest an original-machine hostname change without altering source identity.
+    RebindLocalHost {
+        #[arg(long)]
+        state_dir: PathBuf,
+        #[arg(long)]
+        previous_host: String,
+        #[arg(long, required = true)]
+        confirm_original_machine: bool,
+    },
     /// Compact a verified durable source interval into a private initial state.
     CompactBootstrap {
         #[arg(long)]
@@ -229,6 +243,20 @@ fn run() -> Result<()> {
     let args = Cli::parse();
     let client = ClickHouse::new(&args.database)?;
     let result = match args.command {
+        Commands::InstallSubstreams { destination } => {
+            json!({"version":evm_state::installer::VERSION,"path":evm_state::installer::install(&destination)?})
+        }
+        Commands::RebindLocalHost {
+            state_dir,
+            previous_host,
+            confirm_original_machine,
+        } => {
+            anyhow::ensure!(
+                confirm_original_machine,
+                "confirm this is the original machine before host recovery"
+            );
+            evm_state::host_recovery::rebind(&client, &state_dir, &previous_host)?
+        }
         Commands::CompactBootstrap {
             state_dir,
             end_block,

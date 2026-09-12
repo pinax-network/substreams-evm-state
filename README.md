@@ -49,7 +49,7 @@ use Go 1.26.5 for a local transport adapter. Linux/WSL and macOS are supported.
 
 ```bash
 make python-deps
-python3 scripts/install_substreams.py
+cargo run --locked -p evm-state -- install-substreams
 export PATH="$PWD/localdata/toolchain/bin:$PATH"
 export SUBSTREAMS_API_KEY=...  # use your environment; do not commit credentials
 

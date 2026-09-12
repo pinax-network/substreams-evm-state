@@ -30,8 +30,8 @@ Older prototype records used the hostname. If it changes on the **confirmed
 original machine**, stop its writers and use the explicit local recovery tool:
 
 ```bash
-EVM_STATE_HOME=/original/controller/root .venv/bin/python scripts/rebind_local_host.py \
-  --database original_source --state-dir /original/native/run \
+EVM_STATE_HOME=/original/controller/root target/release/evm-state \
+  --database original_source rebind-local-host --state-dir /original/native/run \
   --previous-host exact-old-hostname --confirm-original-machine
 ```
 

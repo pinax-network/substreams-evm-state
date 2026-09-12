@@ -101,5 +101,19 @@ Normal lock destruction now explicitly unlocks; a killed wrapper still leaves th
 native child's inherited descriptor locked. Both paths have subprocess coverage.
 The pure native test count is now 49; the ClickHouse suite has 30 test functions,
 alongside 43 mapper tests. Test helpers run only as subprocess fixtures and are
-excluded from these totals. Full native streaming fault injection, host recovery,
+excluded from these totals.
+
+Host recovery now has Rust coverage for original-state preservation, idempotency,
+partial sidecar recovery, writer exclusion and rejection of mismatched machines,
+packages, prefixes and controllers. The pinned CLI installer also runs in Rust;
+archive checksums, gzip integrity and layout are validated before atomically
+replacing the executable. Their Python script entry points have been removed.
+These add four standalone tests and two ClickHouse test functions (53 native,
+32 ClickHouse and 43 mapper tests). Full native streaming fault injection,
 PostgreSQL tools and the remaining operational workloads still need Rust parity.
+
+The real restored BSC checkpoint also passed complete returned-page verification
+in Rust: two scans of 46 slots, ten page calls, p50 44.0 ms and p95/max 67.1 ms.
+The capacity run admitted five periodic samples and four internal guards without
+rejection. See [read evidence](evidence/bsc-read-rust-2026-09-12.json). This was a
+shared-server run, not a comparison of language overhead or a hot-account SLA.
