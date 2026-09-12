@@ -15,6 +15,7 @@ from .reader import page, pin, unpin, list_pins
 from .retention import plan as retention_plan, prune
 from .importer import import_checkpoint
 from .history import cleanup as cleanup_history
+from .bootstrap import compact as compact_bootstrap, replay as bootstrap_replay
 
 
 def main(argv=None):
@@ -24,6 +25,7 @@ def main(argv=None):
     commands.add_parser("init", help="create checkpoint tables (native block tables use substreams sink clickhouse setup)")
     for name, help_text in [("prepare", "bind a native sink to an isolated database and durable state directory"),
                             ("ingest", "run or resume the guarded finalized native sink"),
+                            ("bootstrap-replay", "replay new accounts in chunks with private state compaction"),
                             ("recover-cursor", "restore a damaged native cursor from verified durable progress")]:
         native = commands.add_parser(name, help=help_text)
         native.add_argument("--package", type=Path, required=True)
@@ -32,10 +34,17 @@ def main(argv=None):
         native.add_argument("--start-block", type=int, required=True)
         native.add_argument("--state-dir", type=Path, required=True)
         native.add_argument("--checkpoint-database", help="sole checkpoint destination for this source (default: source database)")
-        if name == "ingest":
-            native.add_argument("--stop-block", type=int)
+        if name in {"ingest", "bootstrap-replay"}:
+            native.add_argument("--stop-block", type=int, required=name == "bootstrap-replay")
             native.add_argument("--max-retries", type=int, default=3)
             native.add_argument("--decode-batch-size", type=int, default=32)
+        if name == "bootstrap-replay":
+            native.add_argument("--chunk-blocks", type=int, default=100000)
+            native.add_argument("--budget-bytes", type=int, default=100_000_000_000)
+    compact = commands.add_parser("compact-bootstrap", help="compact initial replay history without publishing ready state")
+    compact.add_argument("--state-dir", type=Path, required=True)
+    compact.add_argument("--end-block", type=int, help="inclusive end (default: durable cursor)")
+    compact.add_argument("--budget-bytes", type=int, default=100_000_000_000)
     capture = commands.add_parser("capture-proofs", help="capture a finalized header, account proofs and code before replay")
     capture.add_argument("--accounts", required=True)
     capture.add_argument("--block", default="finalized")
@@ -91,14 +100,21 @@ def main(argv=None):
         if args.command == "init":
             setup(client)
             result = {"database": client.database, "checkpoint_schema": "ready"}
-        elif args.command in {"prepare", "ingest", "recover-cursor"}:
+        elif args.command in {"prepare", "ingest", "recover-cursor", "bootstrap-replay"}:
             dsn = os.environ.get("SUBSTREAMS_SINK_DSN")
             if not dsn:
                 raise ValueError("set SUBSTREAMS_SINK_DSN to the native ClickHouse connection string")
             values = (client, args.package, args.endpoint, args.accounts, args.start_block, args.state_dir, dsn)
-            result = (ingest(*values, args.stop_block, args.max_retries, args.checkpoint_database, args.decode_batch_size)
-                      if args.command == "ingest" else {"prepare": prepare, "recover-cursor": recover_cursor}[args.command](
-                          *values, checkpoint_database=args.checkpoint_database))
+            if args.command == "bootstrap-replay":
+                result = bootstrap_replay(*values, args.stop_block, args.chunk_blocks, args.budget_bytes,
+                                          args.max_retries, args.checkpoint_database, args.decode_batch_size)
+            elif args.command == "ingest":
+                result = ingest(*values, args.stop_block, args.max_retries, args.checkpoint_database, args.decode_batch_size)
+            else:
+                result = {"prepare": prepare, "recover-cursor": recover_cursor}[args.command](
+                    *values, checkpoint_database=args.checkpoint_database)
+        elif args.command == "compact-bootstrap":
+            result = compact_bootstrap(client, args.state_dir, args.end_block, args.budget_bytes)
         elif args.command == "capture-proofs":
             if args.output.exists():
                 raise ValueError("proof output already exists; choose a new capture file")

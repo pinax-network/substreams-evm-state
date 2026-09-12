@@ -10,6 +10,7 @@ from conftest import SPKG, native_dsn, native_env
 from evm_state.checkpoint import build
 from evm_state.cursor import load_progress, observe, save_progress
 from evm_state.ingest import ingest, prepare, recover_cursor
+from evm_state.files import exclusive_lock
 from evm_state.proof import VerificationError
 from native_stream import CURSORS, NativeStream, wait_until
 from state_fixtures import A, CODE, block, insert_blocks, proof_bundle, state, word
@@ -89,6 +90,7 @@ def test_kill_torn_cursor_recovery_and_native_resume_publish_complete_state(data
         "--stop-block", "104", "--state-dir", str(tmp_path), "--max-retries", "0",
         "--checkpoint-database", target.database, "--decode-batch-size", "1"]
     process = None
+    group_killed = False
     try:
         with (tmp_path / "crash.log").open("w") as log:
             process = subprocess.Popen(command, env=native_env(client.database), start_new_session=True,
@@ -98,7 +100,17 @@ def test_kill_torn_cursor_recovery_and_native_resume_publish_complete_state(data
                 return path.exists() and json.loads(path.read_text())["position"]["block"]["number"] == 101
             wait_until(saved, process)
             os.killpg(process.pid, signal.SIGKILL)
+            group_killed = True
             process.wait(timeout=10)
+            # Reaping the wrapper does not reap its native child. Wait for the
+            # inherited writer lock to close before attempting cursor recovery.
+            def stopped():
+                try:
+                    with exclusive_lock(tmp_path / "run.lock"):
+                        return True
+                except ValueError:
+                    return False
+            wait_until(stopped)
             (tmp_path / "cursor.txt").write_text("truncated after process crash")
             expected = CURSORS["17" if backfill else "1"]["101"]
             recover_cursor(*args, checkpoint_database=target.database)
@@ -117,7 +129,8 @@ def test_kill_torn_cursor_recovery_and_native_resume_publish_complete_state(data
             assert load_progress(client, run, tmp_path)["position"]["block"]["number"] == 103
     finally:
         if process is not None:
-            try: os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError: pass
+            if not group_killed:
+                try: os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError: pass
             process.wait(timeout=10)
         stream.close()

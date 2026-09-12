@@ -17,6 +17,18 @@ from .source import verified_source
 PARTITIONS = {"state_blocks": "toDate(_block_timestamp_)", "_blocks_": "toYYYYMM(timestamp)"}
 
 
+def partitions_before(client, before):
+    schemas = {r["name"]: r["partition_key"] for r in client.rows(
+        "SELECT name,partition_key FROM system.tables WHERE database={db:String} "
+        "AND name IN ('state_blocks','_blocks_')", {"db": client.database})}
+    if schemas != PARTITIONS:
+        raise VerificationError("native history schema does not match the qualified partition layout")
+    return {table: list(client.rows(
+        f"SELECT _partition_id AS id,min(number) AS first,max(number) AS last FROM {table} "
+        "GROUP BY _partition_id HAVING last < {before:UInt64} ORDER BY first", {"before": max(0, before)}))
+        for table in PARTITIONS}
+
+
 def _plan(client, checkpoints, run, checked, snapshot_id, directory, keep_blocks):
     if isinstance(keep_blocks, bool) or not isinstance(keep_blocks, int) or keep_blocks < 1:
         raise ValueError("keep_blocks must be at least one")
@@ -49,16 +61,7 @@ def _plan(client, checkpoints, run, checked, snapshot_id, directory, keep_blocks
             floor = min(floor, int(record["header"]["number"]))
             protected.append(record["snapshot_id"])
     remove_before = min(floor + 1, tip["number"] - keep_blocks + 1)
-    schemas = {r["name"]: r["partition_key"] for r in client.rows(
-        "SELECT name,partition_key FROM system.tables WHERE database={db:String} "
-        "AND name IN ('state_blocks','_blocks_')", {"db": client.database})}
-    if schemas != PARTITIONS:
-        raise VerificationError("native history schema does not match the qualified partition layout")
-    tables = {}
-    for table in PARTITIONS:
-        tables[table] = list(client.rows(f"SELECT _partition_id AS id,min(number) AS first,max(number) AS last "
-            f"FROM {table} GROUP BY _partition_id HAVING last < {{before:UInt64}} ORDER BY first",
-            {"before": max(0, remove_before)}))
+    tables = partitions_before(client, remove_before)
     return {"source": checked, "checkpoint": snapshot_id, "protected_checkpoints": sorted(protected),
             "remove_before": max(0, remove_before), "keep_blocks": keep_blocks,
             "durable_block": tip, "partitions": tables}

@@ -62,6 +62,15 @@ def validate_interval(client, source, header):
     accounts = ",".join(canonical_accounts(source["accounts"]))
     previous_hash = None
     count = 0
+    prefix = source.get("bootstrap")
+    if prefix:
+        if expected != prefix["start_block"] or prefix["header"]["number"] > end:
+            raise VerificationError("checkpoint range cannot use this compacted bootstrap prefix")
+        previous_hash = prefix["header"]["hash"]
+        expected = prefix["header"]["number"] + 1
+        count = expected - source["start_block"]
+        if expected == end + 1 and (previous_hash != header["hash"] or prefix["header"]["state_root"] != header["state_root"]):
+            raise VerificationError("bootstrap checkpoint differs from proof header")
     for row in client.rows(
         "SELECT number, hash, parent_hash, state_root, accounts, schema_version, producer_version "
         "FROM state_blocks FINAL WHERE number >= {start:UInt64} AND number <= {end:UInt64} ORDER BY number, hash",
@@ -95,7 +104,12 @@ def _union_storage(sources, base, client, params):
     resets = []
     for i, source in enumerate(sources):
         database = identifier(source["database"])
-        params[f"start{i}"] = source["start_block"]
+        params[f"start{i}"] = source.get("delta_start", source["start_block"])
+        if source.get("bootstrap"):
+            params[f"prefix{i}"] = source["bootstrap"]["generation"]
+            params[f"prefix_number{i}"] = source["bootstrap"]["header"]["number"]
+            queries.append(f"SELECT address,slot,value,tuple({{prefix_number{i}:UInt64}},toUInt64(0)) AS position "
+                           f"FROM {database}.bootstrap_storage WHERE generation={{prefix{i}:String}}")
         queries.append(
             f"SELECT storage.address AS address, storage.slot AS slot, storage.value AS value, "
             f"tuple(number, storage.ordinal) AS position FROM {database}.state_blocks FINAL ARRAY JOIN storage "
@@ -134,6 +148,9 @@ def _observed_fields(client, sources, base, params):
                 "code_hash": row["code_hash"], "code": row["code"]}
     for i, source in enumerate(sources):
         database = identifier(source["database"])
+        if source.get("bootstrap"):
+            for account, fields in source["bootstrap"]["fields"].items():
+                result.setdefault(account, {}).update(fields)
         for group, fields in [("balances", ["value"]), ("nonces", ["value"]), ("codes", ["hash", "code"])]:
             selection = ", ".join(f"argMax({group}.{field}, tuple(number, {group}.ordinal)) AS {field}" for field in fields)
             for row in client.rows(
@@ -182,7 +199,8 @@ def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, 
         raise VerificationError("checkpoint must advance its base and preserve all base accounts")
     seen = set()
     source_bytes = 0
-    sources = [dict(source) for source in sources]
+    from .bootstrap import select_prefix
+    sources = [select_prefix(connect_like(client, source["database"]), source) for source in sources]
     for source in sources:
         selected = set(canonical_accounts(source["accounts"]))
         if selected & seen:

@@ -1,0 +1,111 @@
+{
+  "start_block": 121114203,
+  "end_block": 121309258,
+  "replay_seconds": 182.37417108286172,
+  "checkpoint_seconds": 0.13504979200661182,
+  "snapshot_id": "1713c612daf94b2b9f250e6d663d5e06",
+  "header": {
+    "hash": "0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28",
+    "number": 121309258,
+    "parent_hash": "0xa332fea9971fbf90fd73d1beb85b40e6399241e59c4cd21f4469e273b1cd9059",
+    "state_root": "0x5b7c64587627f60b4f2904ff274349ac5805e2010edf3e055351339d2cec78e8",
+    "timestamp": 1789150993
+  },
+  "state_sha256": "388627901da595ca5d1719fbfe5263674aaa6b94c68aa5544680518ef45ef330",
+  "nonzero_slots": 46,
+  "source_parts_bytes": 74597702,
+  "checkpoint_parts_bytes": 17273,
+  "compactions": [
+    {
+      "block": 121164202,
+      "seconds": 0.6869777906686068,
+      "parts_bytes_before": 14725118,
+      "parts_bytes_after": 4297811,
+      "native_rows_before": 50000,
+      "native_rows_after": 1908,
+      "nonzero_slots": 46,
+      "removed_partitions": {
+        "state_blocks": [
+          {
+            "id": "20260910",
+            "first": 121114203,
+            "last": 121162294
+          }
+        ],
+        "_blocks_": []
+      }
+    },
+    {
+      "block": 121214202,
+      "seconds": 0.6265653744339943,
+      "parts_bytes_before": 24058897,
+      "parts_bytes_after": 24059226,
+      "native_rows_before": 51908,
+      "native_rows_after": 51908,
+      "nonzero_slots": 46,
+      "removed_partitions": {
+        "state_blocks": [],
+        "_blocks_": []
+      }
+    },
+    {
+      "block": 121264202,
+      "seconds": 1.3088999167084694,
+      "parts_bytes_before": 59191445,
+      "parts_bytes_after": 59191777,
+      "native_rows_before": 101908,
+      "native_rows_after": 101908,
+      "nonzero_slots": 46,
+      "removed_partitions": {
+        "state_blocks": [],
+        "_blocks_": []
+      }
+    },
+    {
+      "block": 121309258,
+      "seconds": 0.5976948337629437,
+      "parts_bytes_before": 74597371,
+      "parts_bytes_after": 74597702,
+      "native_rows_before": 146964,
+      "native_rows_after": 146964,
+      "nonzero_slots": 46,
+      "removed_partitions": {
+        "state_blocks": [],
+        "_blocks_": []
+      }
+    }
+  ],
+  "cache_status": "unknown; overlapping range replayed previously using another module hash",
+  "limitation": "quiet public account; sampled database parts only, not peak total disk or customer qualification",
+  "format_version": 1,
+  "measured_on": "2026-09-12",
+  "chain_id": 56,
+  "accounts": [
+    "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+  ],
+  "block_count": 195056,
+  "chunk_blocks": 50000,
+  "native_cli": "1.22.0",
+  "clickhouse": "26.3.33.24",
+  "source_database": "evm_compacted_bootstrap",
+  "checkpoint_database": "evm_compacted_checkpoints",
+  "run_id": "226f86f0c67749c88c21275c4fc21ba8",
+  "database_uuid": "940539c5-1602-443d-94e5-08f80ed8fe37",
+  "package_sha256": "b56c391a9ad8e2838864a61168e8c83807f8ca59c0852ab0a1171cc7d1c75d3d",
+  "module_hash": "46eb3c28d4a5ea711c77aedc0eafb98d54a45120",
+  "schema_hash": "56803b78ed5c7c4e",
+  "final_bootstrap_generation": "5e3101f28d294e959e1830f1a752e9c4",
+  "native_rows_retained": 146964,
+  "max_sampled_parts_bytes": 74597702,
+  "header_trust": "provider-finalized-header",
+  "final_account_proof": "verified",
+  "final_storage_root": "verified",
+  "account_metadata_and_code": "verified",
+  "checksum_matches_prior_uncompacted_checkpoint": "994e979872e647999e6c61431cc10b1f",
+  "implementation_sha256": {
+    "python/evm_state/bootstrap.py": "3f92ed3538183b4f8ce163ae2b5df510c18a2c939ee4d3b78decfdab5f50db3d",
+    "python/evm_state/bootstrap.sql": "71006a01dc7f4d66876d2a313133f5c8b95ff1620bc5ed260e7101098a9f134e",
+    "python/evm_state/checkpoint.py": "abb61c685c4643c96d4eb65c5fe41d22c944d2e4c5c01ad359f0c4dc4e0f0792",
+    "python/evm_state/history.py": "28ec0de13b4668b1c17615ef1c6c5e80aa69dfdf5ff87b80f826f0559166ecfb"
+  }
+}

@@ -9,7 +9,7 @@ make an entire deliverable complete.
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication | Sustained follow and agreed read/publication latency; storage must honor sync writes (physical host power loss is not emulated) |
 | Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage | Exercise representative multi-account onboarding and interrupted operational cutover |
 | Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; BSC fork-aware SELFDESTRUCT and delegated execution; deletion/recreation across native patches and inherited checkpoint storage | Captured producer/fork fixtures and full 7702 matrix, historical CREATE/CREATE2 parity, representative lifecycle replay; repair legacy verifier false-positive behavior |
-| Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate cleanup preserving readers and latest account state; native history partition cleanup preserving every retained checkpoint's continuation and the durable cursor; pinned toolchain; package-producing `make build`; CI integration job | Bounded initial-history replay, peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
+| Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate cleanup preserving readers and latest account state; native history partition cleanup preserving every retained checkpoint's continuation and the durable cursor; initial replay compaction between bounded chunks; pinned toolchain; package-producing `make build`; CI integration job | Peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
 
@@ -18,13 +18,15 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 159 tests (54 offline, 105 integration).
+The Python suite currently contains 180 tests (54 offline, 126 integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. All 159 Python tests passed locally in 69.42
-seconds, and all 19 Rust tests passed. The earlier 153-test recovery baseline
-also passed on GitHub CI at `eceb7ad`.
+configured development database. All 180 Python tests passed locally in 82.09
+seconds, and all 19 Rust tests passed. A process-kill test now waits for the killed
+native child to release its inherited writer lock before recovery; reaping its
+wrapper alone was a timing race. The earlier 159-test lifecycle baseline also
+passed on GitHub CI at `41bc101`.
 The native fixtures serve real packaged protobuf types over local gRPC. The test
 transport adapter translates the CLI's S2 request compression using its upstream
 library. These tests cover sink behavior; they do not execute the WASM mapper.
@@ -95,7 +97,13 @@ preserve a pinned older checkpoint and its continuation, build a newer checkpoin
 after cleanup, then rotate the old checkpoint and reclaim more history. Active
 source writers/readers exclude cleanup. A failure between data and marker
 partition drops can resume without deleting the durable cursor's own rows.
-This does not yet bound an initial replay before its first verified checkpoint.
+Initial replay now has a separate private-compaction path. Twenty-one tests cover
+repeated compaction and exact state-checksum parity with a full replay, zero
+clears, deletion/recreation, proof rejection, damaged/missing prefixes, interrupted
+pointer/partition writes, candidate-budget failure, broken suffixes, locks and
+disjoint-cohort onboarding. A real native-sink test replays three bounded chunks,
+resumes from compacted cursors and publishes only after final root verification.
+These tests do not establish a peak 100 GB operating cap.
 
 The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
 account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps
@@ -115,6 +123,24 @@ transaction changed code; this does not complete the broader authorization or
 historical lifecycle matrix, and the parity check is not a complete storage proof.
 
 ## BSC evidence
+
+The [compacted bootstrap record](evidence/bsc-compacted-bootstrap-2026-09-12.json)
+replays the quiet public account below from creation through **121309258**:
+195,056 blocks in four native chunks of at most 50,000 blocks. Each chunk's
+private state retained 46 nonzero slots. The final checkpoint independently
+verified all storage, account metadata/code and the account proof, with the exact
+same state checksum as the earlier uncompacted replay at that block.
+
+Replay plus four compactions took 182.37 seconds; final checkpoint verification
+took 0.135 seconds. Cache warmth was not established, so this is not a cold or
+sustained-live throughput claim. The first compaction removed 48,092 old daily
+block envelopes, reducing sampled source parts from 14,725,118 to 4,297,811 bytes.
+Later chunks remained in the same daily partition and retained 146,964 native
+rows at the end. Final source parts were 74,597,702 bytes, including inactive
+parts at that instant; checkpoint parts were 17,273 bytes. These measurements
+illustrate partition granularity and background merge variability, not a hot
+contract bound or total peak disk usage. No ready state existed before the final
+proof verification.
 
 The [machine-readable record](evidence/bsc-bootstrap-2026-09-11.json) describes
 the small public contract `0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff` replayed

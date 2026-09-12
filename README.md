@@ -7,8 +7,8 @@ verify the result, and publish an immutable checkpoint for local execution.
 **Prototype; v0.1.0 is not released yet.** Native ingestion, isolated checkpoint
 construction, proof verification, portable exports/restores, reader pins,
 cursor recovery and checkpoint/native-history cleanup are implemented and tested.
-Lifecycle qualification, bounded initial-history replay and peak disk accounting
-remain unfinished.
+Lifecycle qualification and peak disk accounting remain unfinished. Initial
+replay supports private compaction between bounded native chunks.
 The customer's actual 19/64-account lists have not been supplied, so their
 capacity, latency and cost are not qualified. See [scope](docs/SCOPE.md) and
 [current evidence](docs/QUALIFICATION.md).
@@ -231,6 +231,13 @@ recent block window and the update interval after every retained checkpoint for
 the source's accounts. Pinned older checkpoints can therefore retain more history.
 See [native history cleanup](docs/CHECKPOINTS.md#native-history-cleanup).
 
+For a new account cohort, `bootstrap-replay` runs bounded native chunks and folds
+each completed interval into a private current-state generation before continuing.
+It reclaims older history partitions without publishing unverified state. The
+normal `checkpoint` command still requires complete storage/account proofs at the
+final target. See [initial replay compaction](docs/CHECKPOINTS.md#initial-replay-compaction)
+for the command, recovery behavior and capacity limits.
+
 ## Verification and limits
 
 The verifier reconstructs the trie from **all nonzero slots**, verifies the
@@ -255,10 +262,11 @@ evidence](docs/LIFECYCLE.md). A mismatch leaves the candidate unpublished.
 The default checkpoint budget is 100,000,000,000 bytes. Current checks reject an
 already exhausted database budget and check again during verification; they do
 **not yet bound peak merges, pending spool, temporary trie files or all future
-growth**. Source cleanup requires a verified checkpoint and does not bound the
-initial replay before that checkpoint. Export files also require separate space.
-This prototype has no proven 100 GB operating limit. Bounded initial replay and
-peak-space accounting are release requirements.
+growth**. Bootstrap compaction limits replay history to a chunk plus partition
+granularity and private state generations; the complete current state can still
+grow. Export files require separate space. This prototype has no proven 100 GB
+operating limit. Peak-space accounting and representative capacity measurements
+remain release requirements.
 
 ## Tests and release
 

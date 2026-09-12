@@ -219,7 +219,69 @@ height precedes the cutoff are removed, so actual retained history can be larger
 than the requested minimum. Interrupted cleanup can be repeated; it recomputes
 the plan and verifies the cursor still has its data and marker afterward.
 
-This operation bounds already-checkpointed history at partition granularity; it
-does **not** bound the initial bootstrap before its first verified checkpoint.
-Spool, exports, temporary verification files and peak merge space need separate
+This operation bounds already-checkpointed history at partition granularity.
+Use the initial replay path below before the first verified checkpoint. Spool,
+exports, temporary verification files and peak merge space need separate
 accounting. A proven 100 GB operating cap remains an open release gate.
+
+## Initial replay compaction
+
+For new accounts with a long history, capture the final target's proofs first,
+then use a fresh guarded source with the intended checkpoint destination:
+
+```bash
+export SUBSTREAMS_SINK_DSN='clickhouse://<user>:<password>@<host>:9000/new_accounts'
+.venv/bin/evm-state --database new_accounts bootstrap-replay \
+  --package spkg/evm-state-v0.1.0.spkg --accounts '<account-list>' \
+  --start-block <history-start> --stop-block <target-plus-one> \
+  --state-dir /absolute/persistent/path/new-accounts \
+  --checkpoint-database checkpoints --chunk-blocks 100000 \
+  --budget-bytes 100000000000
+```
+
+The stop is exclusive. The result contains a `source` record for the normal
+`checkpoint --sources` JSON array. It has status `unverified-bootstrap`, which
+must never be served as ready state. Run `checkpoint` with the captured proof
+bundle to verify and publish at the final target. Native stream finality and the
+existing header trust policy still apply.
+
+After each chunk, the controller checks every block's continuity, filter and
+schema. It folds nonzero storage and independently observed account fields into
+an immutable generation in `bootstrap_storage`. Unknown fields stay unknown;
+zero clears and account-wide storage resets remove older values. It checksums
+the stored generation and writes its synced database manifest before atomically
+replacing the durable `bootstrap.json` pointer. Only after reading that committed
+generation back does it remove covered native history and older private state.
+Final checkpoint verification still reconstructs every complete storage trie
+and verifies all metadata/code against the target's account proofs.
+
+Repeat the same command to resume. Use the frozen `<state-dir>/package.spkg` if
+the repository package has changed. The original start, account list, endpoint
+and checkpoint destination remain bound to the run. If interrupted after the
+pointer commit, retry finishes cleanup before replaying the next chunk. If
+interrupted before the pointer commit, the old prefix and raw input remain the
+recovery source. A damaged native cursor requires `recover-cursor`; a missing or
+corrupt prefix is an error, not permission to treat pruned history as empty.
+Back up the private tables and the matching run/controller directories together.
+
+An already ingested initial range can also be compacted while its writer is
+stopped:
+
+```bash
+.venv/bin/evm-state --database new_accounts compact-bootstrap \
+  --state-dir /absolute/persistent/path/new-accounts
+```
+
+The default inclusive end is the durable cursor; `--end-block` can choose an
+earlier retained block. A proof target inside a compacted prefix cannot be
+reconstructed. These commands reject accounts that already appear in a ready
+checkpoint in the bound destination. For those accounts, continue from a ready
+base and use `prune-source`. A disjoint new cohort can compact while an existing
+cohort's checkpoint remains available, then join it at a common cutover block.
+
+Compaction keeps the final native block and removes only whole daily data and
+monthly marker partitions. Space includes that retained partition history, the
+next chunk, the complete current state, and temporarily both old and new private
+generations. The database budget is checked before and after candidate creation;
+it is **not a hard allocation limit**. Pending spool, merge headroom, trie work,
+exports and external backups still need capacity planning and measurement.
