@@ -60,6 +60,35 @@ does establish that the guarded native path passes the request to the provider
 and verifies the resulting complete update interval. Full initial storage and
 customer-set throughput remain separate qualifications.
 
+## Historical chunk size
+
+The two long bootstrap runs now use the existing `--chunk-blocks 1000000`
+option, with 100 requested workers and the same 1 GiB spool limit and capacity
+policy. Their first completed million-block chunks are recorded in
+[the chunk-size evidence](evidence/bsc-million-block-chunks-2026-09-12.json):
+
+| Cohort | Historical range | Start to next chunk start | Resulting private nonzero slots | Compaction query memory |
+|---|---|---|---|---|
+| WBNB | 11110982–12110981 | 544.14 s | 1,517,479 | 2,790,047,576 bytes |
+| Supplied customer example | 51813968–52813967 | 534.77 s | 1,172 | 83,067,709 bytes |
+
+These timings include ingestion, compaction, cleanup and the next session's
+setup. The previous four 100,000-block chunks had median start-to-start times
+of 117.92 seconds for WBNB and 120.17 seconds for the customer example. Longer
+chunks amortize that repeated work, but these are different historical ranges
+under uncontrolled shared load; the comparison does not establish a universal
+speedup or completion estimate.
+
+The largest periodic disk sample through those first chunks was 8,088,326,144
+allocated bytes across the shared server and declared local roots. A further
+1,742,835,712 bytes is reserved for the retained original volume, within the
+100 GB operating budget. No periodic sample failed in those intervals. The
+previous runs were intentionally stopped before changing chunk size, and their
+capacity reports and checked cursors were retained. These are checksummed private
+prefixes, not complete account-root proofs or ready checkpoints. The WBNB query
+memory measurement also needs qualification as retained slot count grows; chunk
+size alone does not bound aggregation memory.
+
 ## Cache comparison
 
 Both runs cover **121300000–121309999**, inclusive, and use a fresh local source

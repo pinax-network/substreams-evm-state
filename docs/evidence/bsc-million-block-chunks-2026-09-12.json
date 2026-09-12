@@ -1,0 +1,176 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "measurements": [
+    {
+      "cohort": "wbnb-bootstrap",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "accounts": [
+        "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+      ],
+      "old_phase": "host-disk-retry3",
+      "old_phase_summary_sha256": "118594bd7aff891ffd463f106a9abb37f1d47f17a17d8a7513426540389d354a",
+      "old_phase_outcome": {
+        "status": "stopped",
+        "command_exit_code": 1,
+        "failed_samples": 0,
+        "failed_guard_samples": 0,
+        "stop_reasons": []
+      },
+      "old_100000_block_intervals_seconds": [
+        146.149,
+        153.584,
+        149.63,
+        160.393,
+        128.271,
+        114.604,
+        115.441,
+        120.396
+      ],
+      "old_last_four_median_seconds": 117.9185,
+      "new_phase": "host-disk-retry4",
+      "new_chunk_blocks": 1000000,
+      "sessions": [
+        {
+          "time": "2026-09-12T13:58:25.685-0400",
+          "max_parallel_workers": 100,
+          "resolved_start_block": 11110982,
+          "linear_handoff_block": 12111000
+        },
+        {
+          "time": "2026-09-12T14:07:29.828-0400",
+          "max_parallel_workers": 100,
+          "resolved_start_block": 12110982,
+          "linear_handoff_block": 13111000
+        }
+      ],
+      "new_start_to_next_start_seconds": 544.143,
+      "first_million_block_prefix": {
+        "header": {
+          "hash": "0xe8e5bb7c328ea75b8535f50d21561336d9cab01542855ebe60c17c86a449f8cc",
+          "number": 12110981,
+          "parent_hash": "0x3069814f1ecd4dd14a01074b26d4b43cc3d50159d0f45e5fa752cfd1760b70ec",
+          "state_root": "0x9211886920bc027d9a4141befa389e3861f57c2fe512bf745e8f27805106a0f1",
+          "timestamp": 1635263584
+        },
+        "generation": "2faebd6fd22147ad9ffd197072384521",
+        "nonzero_slots": 1517479,
+        "state_sha256": "9fa6249f081fc6c68c138336723eb914efd5dd6a105e1f62d294532e09f60d93",
+        "status": "unverified-bootstrap"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-12 18:06:49",
+        "query_duration_ms": 8416,
+        "read_rows": 3328932,
+        "written_rows": 1517479,
+        "memory_usage": 2790047576,
+        "exception_code": 0
+      },
+      "periodic_samples_through_next_start": 65,
+      "failed_periodic_samples_through_next_start": 0,
+      "peak_periodic_allocated_bytes_through_next_start": 8088326144
+    },
+    {
+      "cohort": "customer-example",
+      "run_id": "241fa830acd249b595cb53ccdaecd8b8",
+      "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+      "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+      "accounts": [
+        "0x32c59d556b16db81dfc32525efb3cb257f7e493d"
+      ],
+      "old_phase": "host-disk-retry2",
+      "old_phase_summary_sha256": "6056792f64cb49eba18ba7d9165b0bfe3f9d7eec67d12ac2e1aca10700544c04",
+      "old_phase_outcome": {
+        "status": "stopped",
+        "command_exit_code": 1,
+        "failed_samples": 0,
+        "failed_guard_samples": 0,
+        "stop_reasons": []
+      },
+      "old_100000_block_intervals_seconds": [
+        146.798,
+        180.387,
+        150.787,
+        131.688,
+        121.21,
+        129.981,
+        119.127,
+        114.895
+      ],
+      "old_last_four_median_seconds": 120.1685,
+      "new_phase": "host-disk-retry3",
+      "new_chunk_blocks": 1000000,
+      "sessions": [
+        {
+          "time": "2026-09-12T13:57:53.417-0400",
+          "max_parallel_workers": 100,
+          "resolved_start_block": 51813968,
+          "linear_handoff_block": 52814000
+        },
+        {
+          "time": "2026-09-12T14:06:48.188-0400",
+          "max_parallel_workers": 100,
+          "resolved_start_block": 52813968,
+          "linear_handoff_block": 53814000
+        }
+      ],
+      "new_start_to_next_start_seconds": 534.771,
+      "first_million_block_prefix": {
+        "header": {
+          "hash": "0x372e460dc3632101635dc57446e118bcc5576db62909199dd3b38c4107d65001",
+          "number": 52813967,
+          "parent_hash": "0x16d0714a9b9f19518aa5407dff66c99f78fc0fea4092e6a4cf4f9510cfa13ca8",
+          "state_root": "0xc9dff5d0daa0fa83141afb467946a11326acdd8466d0f7185b76ba4edf0f9440",
+          "timestamp": 1751608278
+        },
+        "generation": "669ae88222164c66bd3740ab228afaa0",
+        "nonzero_slots": 1172,
+        "state_sha256": "455f3e916f842c43a463864fe5198ca3c0a88969ede2e84cff6ad8c41a1211f0",
+        "status": "unverified-bootstrap"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-12 18:06:30",
+        "query_duration_ms": 620,
+        "read_rows": 2000874,
+        "written_rows": 1172,
+        "memory_usage": 83067709,
+        "exception_code": 0
+      },
+      "periodic_samples_through_next_start": 62,
+      "failed_periodic_samples_through_next_start": 0,
+      "peak_periodic_allocated_bytes_through_next_start": 8088326144
+    }
+  ],
+  "operator_stop": [
+    {
+      "cohort": "wbnb-bootstrap",
+      "phase": "host-disk-retry3",
+      "root_pid": 88329,
+      "native_pid": 97354,
+      "signal": "SIGTERM",
+      "requested_ns": 1789235677986233000,
+      "previous_chunk_blocks": 100000,
+      "next_chunk_blocks": 1000000,
+      "reason": "Measure longer bounded chunks with the same source identity, worker request, spool and capacity policy."
+    },
+    {
+      "cohort": "customer-example",
+      "phase": "host-disk-retry2",
+      "root_pid": 88343,
+      "native_pid": 97107,
+      "signal": "SIGTERM",
+      "requested_ns": 1789235678274084000,
+      "previous_chunk_blocks": 100000,
+      "next_chunk_blocks": 1000000,
+      "reason": "Measure longer bounded chunks with the same source identity, worker request, spool and capacity policy."
+    }
+  ],
+  "overall_budget_bytes": 100000000000,
+  "live_policy_budget_bytes": 98257164288,
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "spool_limit_bytes_per_source": 1073741824,
+  "requested_workers_per_source": 100,
+  "qualification": "Start-to-next-start timing includes native ingestion, compaction, cleanup and following session setup. Adjacent historical intervals and shared load are uncontrolled; this is not a universal scaling or SLA claim. Prefixes are checksummed private generations, not full account-root proofs or ready checkpoints. Periodic disk peaks include concurrent shared workloads and are not a hard quota."
+}

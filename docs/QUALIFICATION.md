@@ -23,9 +23,10 @@ integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. The previous 276-test Python baseline passed
-on GitHub CI at `c7baf89` in 139.40 seconds. Current local checks pass 143 offline
-Python tests and 43 Rust tests. CI also runs the complete integration suite. The
+configured development database. The complete 286-test Python suite passed
+on GitHub CI at `5f1abba` in 90.78 seconds, along with 43 Rust tests; CI also
+passed for the subsequent draft-notes commit `8a91804`. Current local checks
+pass 143 offline Python tests and 43 Rust tests. The
 seven focused capacity integration tests pass locally, and `make build` produces
 the same package SHA-256 used by the latest lifecycle replays:
 `7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2`. The
@@ -179,6 +180,13 @@ not per-account storage bounds. No sample exceeded the operating thresholds, but
 sampling cannot prove an absolute disk ceiling between observations. Hard limits
 require storage quotas. The customer's absent account set, acceptable publication
 latency and long-term growth remain unqualified.
+
+The ongoing WBNB and supplied-example bootstraps also completed their first
+million-block chunks, with 1,517,479 and 1,172 private nonzero slots respectively.
+Their [chunk timings and measured compaction memory](THROUGHPUT.md#historical-chunk-size)
+remain interim evidence: neither prefix has reached its saved full-state proof
+target, and the WBNB compaction's reported 2.79 GB memory use makes growing-state
+aggregation a further operating qualification.
 
 The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
 account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps
