@@ -157,3 +157,14 @@ A real native test verifies timeout, durable progress, child reaping and a
 successful restart, plus the complete timed collection path. Proof capture also
 requires the RPC header to match an explicitly requested block number. This phase
 passes 73 standalone native tests, 37 ClickHouse tests and 43 mapper tests.
+
+Lifecycle diagnostics and captured-evidence tests now run in Rust. All 26
+producer fixtures retain their file/header/bytecode provenance checks. The Rust
+diagnostics reproduce the previous observed-field proof checks, authorization
+clear/reinstall comparisons and surviving SELFDESTRUCT comparison exactly. A
+fresh 145-block recreation replay through the Rust wrapper and rebuilt package
+also matches all five captured comparisons, including the storage reset. See
+[lifecycle parity evidence](evidence/bsc-lifecycle-rust-2026-09-12.json).
+Their four Python scripts and old evidence tests are removed. Six Rust test
+functions preserve the existing assertions and add corruption cases, bringing
+the standalone native count to 79.

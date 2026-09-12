@@ -116,7 +116,7 @@ including nonce one and the installed code for both authorities. There are no
 storage patches for this filter. This also remains an observed-update check,
 not complete initial-state qualification.
 
-`scripts/qualify_lifecycle_updates.py --database NAME --state-dir DIR --proofs
+`target/release/evm-state-qualify lifecycle-updates --database NAME --state-dir DIR --proofs
 FILE --output FILE` repeats the diagnostic against a completed guarded native
 run. Capture the proof bundle before historical replay. The verifier checks all
 observed metadata and final touched slots, and refuses mismatched source/filter,
@@ -188,7 +188,7 @@ new code version. A nonzero slot written at 37741154 disappears at destruction
 ownership, all block/header/cursor continuity, metadata and both tracked slots
 against archive RPC. These are pre-Cancun cases.
 
-Reproduce the comparison with `scripts/qualify_captured_recreation.py --database
+Reproduce the comparison with `target/release/evm-state-qualify captured-lifecycle --kind recreation --database
 NAME --state-dir DIR --output FILE`. The provider rejected an account-proof
 request at this historical target with `distance to target block exceeds maximum
 proof window`. This result therefore establishes observed metadata and tracked
@@ -223,10 +223,10 @@ write is excluded. The exact native block-end nonce/code and sender metadata
 match archive RPC. This historical comparison does not claim an account-root
 proof or untouched-slot completeness.
 
-Reproduce these comparisons with `scripts/qualify_captured_selfdestruct.py` and
-`scripts/qualify_captured_clears.py`; each accepts the native database, owned
+Reproduce these comparisons with `target/release/evm-state-qualify captured-lifecycle
+--kind selfdestruct` or `--kind clears`; each accepts the native database, owned
 state directory, captured fixture name and an output path. Final observed-field
-proof checks use `scripts/qualify_lifecycle_updates.py` as above.
+proof checks use `target/release/evm-state-qualify lifecycle-updates` as above.
 
 The formerly missing captured failed-clear and existing-account SELFDESTRUCT
 cases now pass their specific native comparisons. SELFDESTRUCT in system

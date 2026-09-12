@@ -10,6 +10,32 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Commands {
+    /// Compare observed native updates with saved account proofs and archive RPC.
+    LifecycleUpdates {
+        #[arg(long)]
+        database: String,
+        #[arg(long)]
+        state_dir: PathBuf,
+        #[arg(long)]
+        proofs: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+    },
+    /// Check exact captured clear, recreation or surviving SELFDESTRUCT blocks.
+    CapturedLifecycle {
+        #[arg(long)]
+        database: String,
+        #[arg(long)]
+        state_dir: PathBuf,
+        #[arg(long, value_enum)]
+        kind: evm_state::lifecycle_qualification::CapturedKind,
+        #[arg(long)]
+        fixture: Vec<String>,
+        #[arg(long, default_value = "tests/fixtures/lifecycle")]
+        fixture_dir: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Run bounded native ingestion while measuring RPC finality lag.
     Throughput(evm_state::throughput_qualification::ThroughputOptions),
     /// Verify complete native rows and measure their logical protobuf output.
@@ -76,6 +102,48 @@ enum Commands {
 }
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::LifecycleUpdates {
+            database,
+            state_dir,
+            proofs,
+            output,
+        } => {
+            let result = evm_state::lifecycle_qualification::updates(
+                &evm_state::ch::ClickHouse::new(&database)?,
+                &evm_state::rpc::Rpc::new(None, None)?,
+                &state_dir,
+                &proofs,
+                &output,
+            )?;
+            println!(
+                "{}",
+                serde_json::json!({"output":output,"blocks":result["blocks"]})
+            );
+            Ok(())
+        }
+        Commands::CapturedLifecycle {
+            database,
+            state_dir,
+            kind,
+            fixture,
+            fixture_dir,
+            output,
+        } => {
+            let result = evm_state::lifecycle_qualification::captured(
+                &evm_state::ch::ClickHouse::new(&database)?,
+                &evm_state::rpc::Rpc::new(None, None)?,
+                &state_dir,
+                &fixture_dir,
+                kind,
+                &fixture,
+                &output,
+            )?;
+            println!(
+                "{}",
+                serde_json::json!({"output":output,"blocks":result["blocks"]})
+            );
+            Ok(())
+        }
         Commands::Throughput(options) => {
             anyhow::ensure!(
                 std::env::var_os("EVM_STATE_CAPACITY_CONFIG").is_some(),
