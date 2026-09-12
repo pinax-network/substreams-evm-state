@@ -125,8 +125,8 @@ def storage_root(slots, database=None) -> tuple[bytes, int]:
     return tree.root_hash, count
 
 
-def verify_complete(account: Account, slots, code: str, metadata: dict, database=None) -> int:
-    """Fail on a missing field, wrong account state, incomplete storage or wrong code."""
+def verify_metadata(account: Account, code: str, metadata: dict):
+    """Require every account field and actual bytecode to match its proven leaf."""
     try:
         nonce = metadata["nonce"]
         balance = metadata["balance"]
@@ -142,6 +142,11 @@ def verify_complete(account: Account, slots, code: str, metadata: dict, database
         raise VerificationError("missing required account metadata") from error
     if keccak256(unhex(code)) != account.code_hash:
         raise VerificationError("bytecode does not match the proven code hash")
+
+
+def verify_complete(account: Account, slots, code: str, metadata: dict, database=None) -> int:
+    """Fail on a missing field, wrong account state, incomplete storage or wrong code."""
+    verify_metadata(account, code, metadata)
     root, count = storage_root(slots, database)
     if root != account.storage_root:
         raise VerificationError("storage root mismatch: incomplete, stale or incorrect account storage")

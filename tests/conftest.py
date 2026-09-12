@@ -17,9 +17,14 @@ SPKG = ROOT / "spkg/evm-state-v0.1.0.spkg"
 def pytest_addoption(parser):
     parser.addoption("--run-clickhouse", action="store_true", help="run local ClickHouse/native sink integration tests")
     parser.addoption("--run-database-crash", action="store_true", help="hard-restart a separate disposable ClickHouse container")
+    parser.addoption("--run-postgres", action="store_true", help="test legacy verifiers in disposable PostgreSQL schemas")
 
 
 def pytest_collection_modifyitems(config, items):
+    if not config.getoption("--run-postgres"):
+        for item in items:
+            if "postgres" in item.keywords:
+                item.add_marker(pytest.mark.skip(reason="use --run-postgres with local PostgreSQL running"))
     if not config.getoption("--run-database-crash"):
         for item in items:
             if "database_crash" in item.keywords:

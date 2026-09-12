@@ -46,6 +46,10 @@ test:
 test-integration: pack
 	$(PYTHON) -m pytest --run-clickhouse --run-database-crash -q
 
+.PHONY: test-postgres
+test-postgres:
+	$(PYTHON) -m pytest -m postgres --run-postgres -q
+
 python-deps:
 	python3 -m venv .venv
 	$(PYTHON) -m pip install -r requirements-test.lock
@@ -125,8 +129,8 @@ sink: setup
 # Verify Postgres state against JSON-RPC (RPC_API_KEY / RPC_URL from env).
 .PHONY: verify
 verify:
-	PG_DSN="$(PG_URL)" python3 scripts/verify_rpc.py
+	PG_DSN="$(PG_URL)" $(PYTHON) scripts/verify_rpc.py
 
 .PHONY: verify-root
 verify-root:
-	PG_DSN="$(PG_URL)" python3 scripts/verify_storage_root.py $(ADDRESS)
+	PG_DSN="$(PG_URL)" $(PYTHON) scripts/verify_storage_root.py $(ADDRESS)

@@ -28,6 +28,12 @@ The revised delivery plan is [SCOPE.md](SCOPE.md).
 
 ### 1. Root comparison is not the complete verification contract
 
+**Resolved 2026-09-12:** the legacy scripts now use one coherent SQL snapshot and
+the shared account/storage proof verifier. Unknown or wrong metadata fails,
+`--block` must equal the current head, and sampled results cannot claim complete
+storage. The finding below records the reviewed prototype's original behavior;
+see [current verification commands](POSTGRES.md#verification).
+
 [`verify_storage_root.py`](../scripts/verify_storage_root.py) recomputes a storage
 trie and compares it with `eth_getProof.storageHash`. It never validates
 `accountProof` against the exact block header's state root. Its separate SQL

@@ -24,4 +24,5 @@ evm_state = ["*.sql"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["clickhouse: integration tests requiring a disposable local ClickHouse server and Substreams CLI",
+           "postgres: legacy verifier integration tests in disposable PostgreSQL schemas",
            "database_crash: destructive fault injection confined to its own disposable Docker container"]

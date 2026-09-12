@@ -8,7 +8,7 @@ make an entire deliverable complete.
 |---|---|---|
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication | Sustained follow and agreed read/publication latency; storage must honor sync writes (physical host power loss is not emulated) |
 | Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage | Exercise representative multi-account onboarding and interrupted operational cutover |
-| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; BSC fork-aware SELFDESTRUCT and delegated execution; deletion/recreation across native patches and inherited checkpoint storage | Captured producer/fork fixtures and full 7702 matrix, historical CREATE/CREATE2 parity, representative lifecycle replay; repair legacy verifier false-positive behavior |
+| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; BSC fork-aware SELFDESTRUCT and delegated execution; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers use consistent snapshots and fail on unknown/wrong metadata | Captured producer/fork fixtures and full 7702 matrix, historical CREATE/CREATE2 parity, representative lifecycle replay |
 | Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate cleanup preserving readers and latest account state; native history partition cleanup preserving every retained checkpoint's continuation and the durable cursor; initial replay compaction between bounded chunks; pinned toolchain; package-producing `make build`; CI integration job | Peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
@@ -18,11 +18,12 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 180 tests (54 offline, 126 integration).
+The Python suite currently contains 209 tests (81 offline, 126 ClickHouse
+integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. All 180 Python tests passed locally in 82.09
+configured development database. The 208-test baseline passed locally in 84.84
 seconds, and all 19 Rust tests passed. A process-kill test now waits for the killed
 native child to release its inherited writer lock before recovery; reaping its
 wrapper alone was a timing race. The earlier 159-test lifecycle baseline also
@@ -104,6 +105,17 @@ pointer/partition writes, candidate-budget failure, broken suffixes, locks and
 disjoint-cohort onboarding. A real native-sink test replays three bounded chunks,
 resumes from compacted cursors and publishes only after final root verification.
 These tests do not establish a peak 100 GB operating cap.
+
+The legacy PostgreSQL diagnostics now use one consistent SQL snapshot and shared
+account/storage proof verification. Twenty-seven offline regressions reject unknown
+or mismatched metadata, incomplete storage, invalid proofs, inconsistent heads,
+unsafe SQL inputs and misleading historical `--block` requests; query timeouts
+never print database credentials. Two PostgreSQL
+tests use disposable schemas: one verifies complete state and rejects a wrong
+nonce, while the other checks coherent reads during concurrent committed updates.
+The sampled RPC command labels its result as incomplete storage coverage; neither
+legacy command publishes a ready checkpoint. The old custom trie implementation
+and success-on-metadata-mismatch behavior have been removed.
 
 The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
 account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps

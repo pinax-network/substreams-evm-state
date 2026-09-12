@@ -180,22 +180,31 @@ rejection still require qualification; see [the review](REVIEW.md).
 
 ## Verification
 
-`scripts/verify_rpc.py` compares up to 1,000 `storage` slots by default (override
-with `--limit`) and observed `accounts`
-fields (balance, nonce, code) with `eth_getStorageAt` / `eth_getBalance` /
-`eth_getTransactionCount` / `eth_getCode` at the DB head block, plus the block
-hash and `state_root` against `eth_getBlockByNumber`.
+Both scripts now read the head, account metadata/bytecode and storage using one
+PostgreSQL statement, so every row belongs to the same database snapshot even
+while the sink writes. `--block` must equal that captured head; these current
+tables cannot provide a historical state view. The RPC must serve finalized
+proofs at that block. Both checks verify the encoded header, compare its hash and
+state root to the database marker, and verify the account proofs and metadata/code
+using the same proof library as the ClickHouse checkpoint path.
 
-`scripts/verify_storage_root.py 0x<addr>` recomputes the account's storage
-trie root (secure Merkle Patricia Trie over `storage_nonzero`) and compares it
-with `eth_getProof(addr, [], block).storageHash`. A match checks completeness
-relative to the **RPC-reported root**; the script does not verify `accountProof`
-against the header's state root. It can also exit successfully despite metadata
-mismatches. Neither script reads a consistent database snapshot while writes run,
-and `--block` does not provide historical DB state. Pause ingestion at the target
-for diagnostic checks; these scripts are not a production readiness gate.
-The previously tested endpoint had a short recent-proof window. Full fixed-block
-proof verification is part of the [remaining scope](SCOPE.md).
+`scripts/verify_rpc.py` compares up to 1,000 `storage` slots by default (override
+with `--limit`). Its result is explicitly `sample-parity-only`; it cannot establish
+complete storage. `scripts/verify_storage_root.py 0x<addr>` hashes every nonzero
+slot and verifies the complete storage root against the proven account leaf. A
+successful result is `root-verified-diagnostic`, with the exact block/hash and
+provider-finalized header trust recorded. Neither command publishes a checkpoint
+or independently verifies BSC consensus.
+
+Missing nonce, balance, code hash or bytecode is a failure, as are metadata
+mismatches, missing/extra storage, invalid proofs and state newer than its marker.
+Failures exit nonzero. An unchanged, unknown account field must be initialized
+and verified before the legacy account can pass; it is never silently skipped.
+Use the installed project environment (`make python-deps`, then `make verify`
+or `make verify-root ADDRESS=0x...`) and the current BYTEA code schema. The snapshot
+is materialized in memory; use the streaming ClickHouse checkpoint path for large
+accounts. `make test-postgres` exercises disposable schemas, including a writer
+updating state concurrently with snapshot reads. Existing tables remain intact.
 
 Results reported by the prior prototype run on BSC (2026-09-10,
 `bsc.rpc.pinax.network`; not re-run during the 2026-09-11 review):
