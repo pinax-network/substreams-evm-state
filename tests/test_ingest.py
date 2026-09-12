@@ -126,9 +126,21 @@ def test_copied_run_directory_cannot_create_another_writer(databases, tmp_path):
 
 def test_run_cannot_be_resumed_from_a_different_host(databases, tmp_path, monkeypatch):
     _, args, _ = prepared(databases, tmp_path)
-    monkeypatch.setattr("evm_state.ingest.socket.gethostname", lambda: "another-host")
+    monkeypatch.setattr("evm_state.host.machine_id", lambda: "machine-sha256:" + "a" * 64)
     with pytest.raises(VerificationError, match="identity changed"):
         prepare(*args)
+
+
+def test_network_hostname_change_preserves_native_and_controller_ownership(databases, tmp_path, monkeypatch):
+    from evm_state.control import control
+    client, args, first = prepared(databases, tmp_path)
+    owner = control(client).record
+    monkeypatch.setattr("evm_state.host.socket.gethostname", lambda: "renamed-by-dhcp")
+    assert prepare(*args) == first
+    assert control(client).record == owner
+    monkeypatch.setattr("evm_state.host.machine_id", lambda: "machine-sha256:" + "b" * 64)
+    with pytest.raises(VerificationError, match="another database, directory or host"):
+        control(client)
 
 
 def test_native_child_retains_writer_lock_when_wrapper_is_killed(databases, tmp_path, native_proxy):

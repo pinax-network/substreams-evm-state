@@ -4,11 +4,11 @@ import hashlib
 import json
 from pathlib import Path
 import re
-import socket
 
 from .files import file_lock
 from .proof import VerificationError, address
 from .cursor import load_progress
+from . import host
 
 
 def _selected(values):
@@ -18,7 +18,7 @@ def _selected(values):
 
 
 def _validate(client, source, identity, run_id, directory):
-    if (identity.get("format_version") != 3 or identity.get("host") != socket.gethostname()
+    if (identity.get("format_version") != 3 or not host.matches(identity, directory)
             or identity.get("state_directory") != str(directory)):
         raise VerificationError("source run has no matching host/directory binding; use a fresh guarded continuation")
     if (identity.get("database") != client.database or identity.get("http_url") != client.url
@@ -67,7 +67,7 @@ def verified_source(client, source, checkpoint_client=None, end_block=None):
             raise VerificationError("source is bound to a different checkpoint database")
         directory = Path(identity["state_directory"]).resolve()
         if (identity["state_directory"] != str(directory) or not directory.is_dir()
-                or identity.get("host") != socket.gethostname()):
+                or not host.matches(identity, directory)):
             raise VerificationError("source run has no matching host/directory binding")
     except (KeyError, TypeError, OSError, AttributeError) as error:
         raise VerificationError("source run metadata is missing or invalid") from error

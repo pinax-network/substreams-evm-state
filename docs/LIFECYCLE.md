@@ -42,7 +42,7 @@ unmodified BSC v5 TransactionTrace messages are also committed as
 transaction at 121114122 and one FAILED transaction at 121114153. Both retain
 sender and accepted-authority nonce changes before root execution; neither
 changes code. Their block hashes and failure status were cross-checked with RPC.
-Ten further unmodified transactions and their original headers now cover
+Fifteen further unmodified transactions and their original headers now cover
 producer versions 3, 4 and 5; see the [capture manifest](../tests/fixtures/lifecycle/manifest.json).
 The v5 cases include self-authorization with both nonce increments, three accepted
 authorities, discarded authorization with a reverted slot write, and explicit
@@ -122,6 +122,7 @@ producer coverage. The captured historical additions now prove these specific ca
 | v3 / 149268 | WBNB CREATE: initial nonce, code hash/length and all three constructor-written slots |
 | v3 / 10000000 | CREATE2 confirmed by RPC `callTracer`; proxy bytecode, nonce and three final storage slots after delegated initialization |
 | v3 / 10000001 | Three pre-Cancun SELFDESTRUCT accounts have nonce/code before the block and zero nonce/empty code afterward; no explicit code/nonce clear records are present |
+| v3 / 37741077–37741220 | Two same-address destruction/recreation cycles, with different replacement code and a nonzero storage write between cycles; destruction removes that value |
 | v3 / 40000033 | Post-Cancun CREATE and SELFDESTRUCT in the same transaction: an intermediate nonce of one must become zero at transaction end |
 
 The original v3 root call has no begin ordinal, but its state-change and
@@ -130,8 +131,24 @@ each original transaction and header into a partial block; they do not claim the
 fixture is a complete unmodified block. Historical before/after values are archive
 RPC comparisons, distinct from the recent eight-account proof verification.
 
-Captured post-Cancun SELFDESTRUCT of a previously existing account, same-address
-deletion/recreation, and failed multiple-authority/code-clear combinations remain
-open. SELFDESTRUCT in system execution is explicitly unsupported until its
+The [145-block native replay](evidence/bsc-recreation-2026-09-12.json) at
+37741076–37741220 covers two destruction/recreation cycles for
+`0xe82c715e37f2f2e190dd2ca86fb796cafaf0beff`. Five original transaction/header
+pairs cover the two destructions, both recreations and a storage-writing call
+between them. Each destruction resets nonce/code; each recreation installs the
+new code version. A nonzero slot written at 37741154 disappears at destruction
+37741218 and remains zero after recreation 37741220. The diagnostic checks native
+ownership, all block/header/cursor continuity, metadata and both tracked slots
+against archive RPC. These are pre-Cancun cases.
+
+Reproduce the comparison with `scripts/qualify_captured_recreation.py --database
+NAME --state-dir DIR --output FILE`. The provider rejected an account-proof
+request at this historical target with `distance to target block exceeds maximum
+proof window`. This result therefore establishes observed metadata and tracked
+slot/reset parity, not a complete storage trie or account-root proof. Untouched
+slots remain outside this sample's coverage.
+
+Captured post-Cancun SELFDESTRUCT of a previously existing account and failed
+multiple-authority/code-clear combinations remain open. SELFDESTRUCT in system execution is explicitly unsupported until its
 execution boundary is qualified. Representative-account replay and the full
 lifecycle acceptance matrix remain release requirements.

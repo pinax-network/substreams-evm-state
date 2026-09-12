@@ -21,6 +21,31 @@ losing metadata or copying it to a different host does not establish a new owner
 operations fail closed. Portable export/import into a fresh database is the
 supported way to move a verified checkpoint to another host.
 
+New runs/controllers use a hashed persistent OS identity (`/etc/machine-id` on
+Linux, platform UUID on macOS), so DHCP or hostname changes do not interrupt
+replay. Provision cloned machines with distinct OS identities. An unavailable OS
+identity fails closed rather than falling back to a network name.
+
+Older prototype records used the hostname. If it changes on the **confirmed
+original machine**, stop its writers and use the explicit local recovery tool:
+
+```bash
+EVM_STATE_HOME=/original/controller/root .venv/bin/python scripts/rebind_local_host.py \
+  --database original_source --state-dir /original/native/run \
+  --previous-host exact-old-hostname --confirm-original-machine
+```
+
+This is an operator attestation of physical continuity, not automatic proof that
+two hostnames identify one machine. Do not use it to adopt a copied/remote run.
+The tool excludes local writers/readers, compares both database ownership records
+with their original local metadata, and verifies the frozen package, schema,
+cursor and any compacted prefix. It writes two durable `host-rebinding.json`
+sidecars tied to the original records, paths and current OS identity. Original
+SQL ownership, package, cursor and state remain unchanged. Interrupted sidecar
+writes can be retried. Keep the sidecars in backups; copying them to another
+machine does not authorize that machine. This recovery requires a prepared run,
+valid durable progress and its initialized checkpoint controller.
+
 For a read spanning multiple requests, first protect the selected checkpoint:
 
 ```bash

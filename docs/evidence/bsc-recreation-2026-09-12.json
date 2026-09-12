@@ -1,0 +1,149 @@
+{
+  "account": "0xe82c715e37f2f2e190dd2ca86fb796cafaf0beff",
+  "blocks": 145,
+  "chain_id": 56,
+  "comparisons": [
+    {
+      "block": 37741077,
+      "block_hash": "0x198c4d896b32672a630c7875b032237e0610b6ee9ddd49dc3cad50b056016c4d",
+      "code_bytes": 0,
+      "fixture": "v3-metamorphic-destroy-1.pb",
+      "fixture_sha256": "fc38fcaefa528d76d438eb54d506550405198c90c92cd5c4f6e9026e66a4289c",
+      "lifecycle": [
+        {
+          "kind": "selfdestruct",
+          "ordinal": 15877
+        },
+        {
+          "kind": "storage_reset",
+          "ordinal": 15880
+        }
+      ],
+      "native_metadata": {
+        "balance": "0",
+        "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "nonce": 0
+      },
+      "storage_patches": 0,
+      "tracked_slot_values": {
+        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0xb82207f487d5f82a808c4a79eaef2903fd056d9256cb1af55d518291f0176329": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "transaction_hash": "0xfc32d88c25d91d9c84c5c55a0ac9b0813832df9d9043b2f31a7842bc209b7a98"
+    },
+    {
+      "block": 37741078,
+      "block_hash": "0x7b3c8cc039f65fa02178f80556b24a06fef2bd6326736e81522405d195165148",
+      "code_bytes": 8227,
+      "fixture": "v3-metamorphic-create-1.pb",
+      "fixture_sha256": "7f22ecd7ee501323d815e23fab438b0b3ea3549dc402dbde2381c1212022aa69",
+      "lifecycle": [],
+      "native_metadata": {
+        "balance": "0",
+        "code_hash": "0xbb292f84e213053852c8011d016195f296785d8fd9e29c010bff2550bb681df9",
+        "nonce": 1
+      },
+      "storage_patches": 0,
+      "tracked_slot_values": {
+        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0xb82207f487d5f82a808c4a79eaef2903fd056d9256cb1af55d518291f0176329": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "transaction_hash": "0x448cfb6a0121b9afd9bdf0a4b30aef224ff32654c3cf3a8850b6cf37718aeb33"
+    },
+    {
+      "block": 37741154,
+      "block_hash": "0x2013f44ccd2aa5e6574af531aeebbda8ecf84cc00a43744692ef4f1ae7caa897",
+      "code_bytes": 8227,
+      "fixture": "v3-metamorphic-storage.pb",
+      "fixture_sha256": "8bfe994d76dd1148b4439b799a3eae167a21cb8ad682d50e01c01507bb5bb47f",
+      "lifecycle": [],
+      "native_metadata": {
+        "balance": "0",
+        "code_hash": "0xbb292f84e213053852c8011d016195f296785d8fd9e29c010bff2550bb681df9",
+        "nonce": 1
+      },
+      "storage_patches": 2,
+      "tracked_slot_values": {
+        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0xb82207f487d5f82a808c4a79eaef2903fd056d9256cb1af55d518291f0176329": "0x0000000000000000000000000000000000000000000000000080000000000000"
+      },
+      "transaction_hash": "0xcd757259d073221c8d74f80ff1652bb05cf0cc36ecdbe473719d048da15ebb35"
+    },
+    {
+      "block": 37741218,
+      "block_hash": "0x042446748bb82f5688ddf786134bc97ba52ce0a896bcc7106797d281dcd6ae49",
+      "code_bytes": 0,
+      "fixture": "v3-metamorphic-destroy-2.pb",
+      "fixture_sha256": "2924d67121dc3b31e9453b2c46d0a8ac6475c067ffabd38f96bf26933e1f94a2",
+      "lifecycle": [
+        {
+          "kind": "selfdestruct",
+          "ordinal": 7704
+        },
+        {
+          "kind": "storage_reset",
+          "ordinal": 7707
+        }
+      ],
+      "native_metadata": {
+        "balance": "0",
+        "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "nonce": 0
+      },
+      "storage_patches": 0,
+      "tracked_slot_values": {
+        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0xb82207f487d5f82a808c4a79eaef2903fd056d9256cb1af55d518291f0176329": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "transaction_hash": "0xa2b9c8aa59315a55e9742cb66d81fad7753dd1ad82d1d9ce0eef50d493268d7a"
+    },
+    {
+      "block": 37741220,
+      "block_hash": "0xfb6a5f998ec8306ca0bdccec1213bf41ff01171c4b3f96e3e80e5fbcde711135",
+      "code_bytes": 8226,
+      "fixture": "v3-metamorphic-create-2.pb",
+      "fixture_sha256": "949a1e3a093443af8377d56141afbc772718a3a62c1b18df7991b2ad3331b3bb",
+      "lifecycle": [],
+      "native_metadata": {
+        "balance": "0",
+        "code_hash": "0xf5d397bbb27d1f4304f0bcdad0bfa2d9d2bfece7bed8769cc198093b9890c215",
+        "nonce": 1
+      },
+      "storage_patches": 0,
+      "tracked_slot_values": {
+        "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0xb82207f487d5f82a808c4a79eaef2903fd056d9256cb1af55d518291f0176329": "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "transaction_hash": "0xdefb63182ffc488726e21bdb090e91cdcc999cf8d6b8a751849860f073c09dcf"
+    }
+  ],
+  "database": "evm_metamorphic_bsc",
+  "format_version": 1,
+  "header": {
+    "hash": "0xfb6a5f998ec8306ca0bdccec1213bf41ff01171c4b3f96e3e80e5fbcde711135",
+    "number": 37741220,
+    "parent_hash": "0xf5f4ac7ab407f4368a8e8c2f08d87fb3f077f41447e45eb46840372c435ae666",
+    "state_root": "0x6cb9dbaffa1d73fb75f82ecf4b51df102a040ae28d2649b1a6519702da340198",
+    "timestamp": 1712762982
+  },
+  "module_hash": "14868c6d2a95bf0ce36fc56bc460a10f50dbdaef",
+  "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+  "qualification": "Native metadata and lifecycle parity against captured archive RPC values; no account/storage root verification, untouched-slot coverage or ready checkpoint.",
+  "run_id": "cf16a96bcc6940b2bb73bf92ed8a1306",
+  "start_block": 37741076,
+  "storage_patches_in_interval": 2,
+  "capacity": {
+    "status": "completed",
+    "command_exit_code": 0,
+    "samples": 28,
+    "guard_samples": 26,
+    "failed_samples": 0,
+    "peak_observed_allocated_bytes": 2467237888,
+    "maximum_sample_gap_ns": 1288589000,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report"
+  },
+  "historical_account_proof": {
+    "status": "unavailable",
+    "provider_error": "distance to target block exceeds maximum proof window"
+  }
+}

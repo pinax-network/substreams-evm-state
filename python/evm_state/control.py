@@ -8,11 +8,11 @@ import json
 import os
 from pathlib import Path
 import re
-import socket
 import uuid
 
 from .files import atomic_json, atomic_write, file_lock
 from .proof import VerificationError
+from . import host
 
 
 def object_id(value):
@@ -41,9 +41,9 @@ class Control:
                 if exists:
                     raise VerificationError("checkpoint control metadata is missing; restore the bound EVM_STATE_HOME")
                 record = {"format_version": 1, "control_id": uuid.uuid4().hex,
-                    "database_uuid": database_uuid, "directory": str(self.path), "host": socket.gethostname()}
+                    "database_uuid": database_uuid, "directory": str(self.path), "host": host.machine_id()}
                 atomic_json(self.binding, record)
-            if record.get("database_uuid") != database_uuid or record.get("directory") != str(self.path) or record.get("host") != socket.gethostname():
+            if record.get("database_uuid") != database_uuid or record.get("directory") != str(self.path) or not host.matches(record, self.path):
                 raise VerificationError("checkpoint controller belongs to another database, directory or host")
             if not exists:
                 if initialized.exists():

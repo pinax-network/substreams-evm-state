@@ -199,3 +199,58 @@ fn captured_v3_post_cancun_same_transaction_creation_is_deleted() {
     assert_eq!(out.codes[0].hash, EMPTY_CODE_HASH);
     assert!(out.lifecycle.iter().any(|v| v.kind == "storage_reset" && v.ordinal == 3589));
 }
+
+#[test]
+fn captured_v3_same_address_destructions_reset_metadata_at_transaction_end() {
+    let address = "0xe82c715e37f2f2e190dd2ca86fb796cafaf0beff";
+    for (block, ordinal) in [
+        (sample!("v3-metamorphic-destroy-1", 3, 37741077), 15880),
+        (sample!("v3-metamorphic-destroy-2", 3, 37741218), 7707),
+    ] {
+        let tx = &block.transaction_traces[0];
+        assert!(tx.calls[0].suicide && !tx.calls[0].state_reverted);
+        // These producer messages omit explicit code and nonce clears. The
+        // lifecycle marker must still make the block-end account empty.
+        assert!(tx.calls.iter().all(|call| call.code_changes.is_empty()));
+        let out = project(address, &block).unwrap();
+        assert_eq!(out.nonces.len(), 1);
+        assert_eq!((out.nonces[0].value, out.nonces[0].ordinal), (0, ordinal));
+        assert_eq!(out.codes[0].code, "0x");
+        assert_eq!(out.codes[0].hash, EMPTY_CODE_HASH);
+        assert_eq!(out.balances[0].value, "0");
+        assert!(out.lifecycle.iter().any(|v| v.kind == "storage_reset" && v.ordinal == ordinal));
+        assert!(out.storage.is_empty());
+    }
+}
+
+#[test]
+fn captured_v3_recreation_installs_each_new_code_version() {
+    let address = "0xe82c715e37f2f2e190dd2ca86fb796cafaf0beff";
+    for (block, bytes, code_hash) in [
+        (sample!("v3-metamorphic-create-1", 3, 37741078), 8227,
+         "0xbb292f84e213053852c8011d016195f296785d8fd9e29c010bff2550bb681df9"),
+        (sample!("v3-metamorphic-create-2", 3, 37741220), 8226,
+         "0xf5d397bbb27d1f4304f0bcdad0bfa2d9d2bfece7bed8769cc198093b9890c215"),
+    ] {
+        let out = project(address, &block).unwrap();
+        assert_eq!(out.nonces.len(), 1);
+        assert_eq!(out.nonces[0].value, 1);
+        assert_eq!(out.codes[0].hash, code_hash);
+        assert_eq!((out.codes[0].code.len() - 2) / 2, bytes);
+        assert!(out.storage.is_empty() && out.lifecycle.is_empty());
+    }
+}
+
+#[test]
+fn captured_v3_storage_between_recreation_cycles_keeps_last_committed_write() {
+    let block = sample!("v3-metamorphic-storage", 3, 37741154);
+    let out = project("0xe82c715e37f2f2e190dd2ca86fb796cafaf0beff", &block).unwrap();
+    assert_eq!(out.storage.len(), 2);
+    assert_eq!(out.storage[0].slot, format!("0x{:064x}", 0));
+    assert_eq!(out.storage[0].value, format!("0x{:064x}", 0));
+    assert_eq!(out.storage[0].ordinal, 3225);
+    assert_eq!(out.storage[1].slot, "0xb82207f487d5f82a808c4a79eaef2903fd056d9256cb1af55d518291f0176329");
+    assert_eq!(out.storage[1].value, "0x0000000000000000000000000000000000000000000000000080000000000000");
+    assert_eq!(out.storage[1].ordinal, 3234);
+    assert!(out.lifecycle.is_empty());
+}

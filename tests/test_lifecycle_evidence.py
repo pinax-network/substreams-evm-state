@@ -13,7 +13,7 @@ FIXTURES = ROOT / "tests/fixtures/lifecycle"
 def test_captured_lifecycle_messages_and_headers_match_provenance():
     evidence = json.loads((FIXTURES / "manifest.json").read_text())
     assert evidence["chain_id"] == 56
-    assert len(evidence["records"]) == 10
+    assert len(evidence["records"]) == 15
     assert {record["producer_version"] for record in evidence["records"]} == {3, 4, 5}
     for record in evidence["records"]:
         raw = (FIXTURES / record["filename"]).read_bytes()
@@ -49,3 +49,23 @@ def test_real_native_lifecycle_metadata_matches_saved_account_proofs():
         assert keccak256(unhex(value["code"])) == account.code_hash
         expected = {**account.json(), "code": value["code"]}
         assert all(expected[key] == actual for key, actual in fields[address].items())
+
+
+def test_native_recreation_parity_matches_captured_fields_and_slot_reset():
+    evidence = json.loads((ROOT / "docs/evidence/bsc-recreation-2026-09-12.json").read_text())
+    records = {record["filename"]: record for record in json.loads((FIXTURES / "manifest.json").read_text())["records"]}
+    assert evidence["blocks"] == 145 and evidence["storage_patches_in_interval"] == 2
+    assert len(evidence["comparisons"]) == 5
+    slot = "0xb82207f487d5f82a808c4a79eaef2903fd056d9256cb1af55d518291f0176329"
+    for comparison in evidence["comparisons"]:
+        record = records[comparison["fixture"]]
+        assert record["sha256"] == comparison["fixture_sha256"]
+        assert record["block_hash"] == comparison["block_hash"]
+        expected = record["rpc_block_end_state"][evidence["account"]]["after"]
+        assert all(expected[k] == v for k, v in comparison["native_metadata"].items())
+        assert comparison["code_bytes"] == len(unhex(expected["code"]))
+        expected_value = 2**55 if comparison["block"] == 37741154 else 0
+        assert int(comparison["tracked_slot_values"][slot], 16) == expected_value
+        if comparison["block"] in {37741077, 37741218}:
+            assert any(v["kind"] == "storage_reset" and v["ordinal"] == record["tx_end_ordinal"]
+                       for v in comparison["lifecycle"])

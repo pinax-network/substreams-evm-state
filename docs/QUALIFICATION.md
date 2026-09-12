@@ -6,9 +6,9 @@ make an entire deliverable complete.
 
 | Deliverable | Evidence in this prototype | Remaining acceptance work |
 |---|---|---|
-| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication; 15-minute finalized follow; measured complete pinned reads; fixed finalized decode/spool latency | Customer latency targets and deployment conditions; storage must honor sync writes (physical host power loss is not emulated) |
+| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication; 15-minute finalized follow; measured complete pinned reads; fixed finalized decode/spool latency; persistent OS host identity and explicit legacy hostname recovery | Customer latency targets and deployment conditions; storage must honor sync writes (physical host power loss is not emulated) |
 | Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage; real three-account cutover with a killed publisher, unchanged old reader and combined-filter continuation | Broader nonempty hot-account bootstrap and customer account qualification |
-| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; ten additional captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases, including failed self-delegation with persistent code, with RPC parity; eight-account native interval verifies 24 observed fields against saved proofs; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers fail on unknown/wrong metadata | Captured repeated/failed multiple-authority/code-clear combinations, post-Cancun existing-account destruction and deletion/recreation, broader representative lifecycle replay |
+| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; fifteen additional captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases, including failed self-delegation with persistent code, with RPC parity; eight-account native interval verifies 24 observed fields against saved proofs; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers fail on unknown/wrong metadata | Captured repeated/failed multiple-authority/code-clear combinations, post-Cancun existing-account destruction, broader representative lifecycle replay |
 | Retention/cost qualification and release | Whole-directory capacity monitoring, sampled headroom enforcement and publication/trie guards; measured 64-account synthetic checkpoint/export/restore/churn/retention; observed active merge space and real BSC spool; checkpoint/candidate cleanup preserving readers; native history cleanup and bounded bootstrap chunks; pinned toolchain and package-producing build; separated cold/cached/live results, current price model and old-contract cohort addition | Nonempty hot-account initial state and sustained-growth qualification, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
@@ -18,15 +18,16 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 244 tests (108 offline, 134 ClickHouse
+The Python suite currently contains 258 tests (115 offline, 141 ClickHouse
 integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. All 244 tests passed locally in 93.53 seconds,
-all 29 Rust tests passed, and `make build` produced the package. A process-kill
-test now waits for the killed
-native child to release its inherited writer lock before recovery; reaping its
+configured development database. All 258 Python tests passed locally in 113.65
+seconds, all 32 Rust tests passed, and `make build` produced the package. The
+current suite covers stable host identity/recovery and captured recreation with
+storage clearing. A process-kill
+test waits for the killed native child to release its inherited writer lock before recovery; reaping its
 wrapper alone was a timing race. The earlier 159-test lifecycle baseline also
 passed on GitHub CI at `41bc101`.
 The native fixtures serve real packaged protobuf types over local gRPC. The test
@@ -192,10 +193,10 @@ transaction changed code; this does not complete the broader authorization or
 historical lifecycle matrix, and the parity check is not a complete storage proof.
 
 The [expanded captured matrix](../tests/fixtures/lifecycle/manifest.json) now adds
-ten original transaction/header pairs: v3 WBNB creation, CREATE2 with delegated
-initialization, pre-Cancun account deletion, post-Cancun same-transaction
-creation/destruction, v4 delegation installation and failed self-delegation, and v5 self/multiple/discarded/cleared
-authorizations. Literal Rust expectations are cross-checked with before/after
+fifteen original transaction/header pairs: v3 WBNB creation, CREATE2 with
+delegated initialization, pre-Cancun deletion/recreation and storage clearing,
+post-Cancun same-transaction creation/destruction, v4 delegation installation and
+failed self-delegation, and v5 self/multiple/discarded/cleared authorizations. Literal Rust expectations are cross-checked with before/after
 archive RPC metadata and touched slots. RPC `callTracer` independently identifies
 the CREATE2 opcode; the Firehose model uses CREATE for both creation opcodes.
 
@@ -203,7 +204,10 @@ A new [eight-account native interval](evidence/bsc-lifecycle-matrix-2026-09-12.j
 covers 121464944–121467555: all 2,612 block envelopes and cursor continuity pass,
 24 observed account fields match saved account proofs, and the one final touched
 slot matches archive RPC. Offline CI rechecks those proofs and fixture hashes.
-This is update parity, not a complete bootstrap of all eight accounts. Capture
+This is update parity, not a complete bootstrap of all eight accounts. A separate [145-block replay](evidence/bsc-recreation-2026-09-12.json) verifies two
+same-address destruction/recreation cycles, replacement bytecode and clearing a
+nonzero slot written between cycles. This historical diagnostic uses archive RPC
+field/slot comparisons because account proofs exceed the provider's proof window. Capture
 limitations and the remaining matrix are detailed in [LIFECYCLE.md](LIFECYCLE.md).
 
 ## BSC evidence
@@ -378,3 +382,25 @@ independent local qualification without substituting sample results for theirs.
 `make build` must produce the final `.spkg`, and the first GitHub release must be
 `v0.1.0` with detailed notes and package asset. Release remains gated by the open
 acceptance items above; do not call the goal complete based only on these tests.
+
+## Long replay host recovery
+
+A real WBNB bootstrap exposed a hostname change on the running macOS host:
+`MacBookPro` became `Deniss-MacBook-Pro.local`. The legacy ownership check stopped
+before the next compaction, preserving the private prefix through 6849267
+(306,507 nonzero slots) and the later native cursor. Its capacity report recorded
+441 periodic and 1,796 in-operation samples, zero rejected samples and a
+2,803,269,632-byte observed peak. The stop was an ownership mismatch, not a
+capacity threshold breach.
+
+New runs/controllers now use a hashed persistent OS machine identity. Recovery
+of this known original machine checked the original database/controller records,
+frozen package/schema, durable/native cursor and compacted state under exclusive
+locks, then wrote matching host recovery sidecars. The original identities,
+package, cursors and prefix were preserved, and the same bounded replay resumed.
+Tests cover network-name changes, another machine, copied/changed recovery
+records, damaged state, writer exclusion and interruption between the two
+sidecar writes. The [operations guide](CHECKPOINTS.md) explains this explicit
+operator attestation and its limits. WBNB remains unverified until its complete
+storage matches the saved final account proof; this recovery is not completion
+of the hot-account qualification.

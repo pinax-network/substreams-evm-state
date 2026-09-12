@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import socket
 import subprocess
 import urllib.parse
 import uuid
@@ -18,6 +17,7 @@ from .proof import VerificationError
 from .ch import identifier
 from .cursor import load_progress, observe, save_progress
 from .capacity import check as capacity_check
+from . import host
 
 MODULE = "map_block_state"
 
@@ -36,8 +36,8 @@ def _identity(client, spkg, endpoint, accounts, start_block, directory, dsn, che
         raise ValueError("start block must be an absolute nonnegative integer")
     parsed = urllib.parse.urlsplit(dsn)
     http = urllib.parse.urlsplit(client.url)
-    host = lambda value: "127.0.0.1" if value == "localhost" else value
-    if parsed.scheme != "clickhouse" or parsed.path != "/" + client.database or host(parsed.hostname) != host(http.hostname):
+    normalize_host = lambda value: "127.0.0.1" if value == "localhost" else value
+    if parsed.scheme != "clickhouse" or parsed.path != "/" + client.database or normalize_host(parsed.hostname) != normalize_host(http.hostname):
         raise ValueError("native DSN and HTTP client must name the same ClickHouse host and database")
     if http.username or http.password or http.query or http.fragment:
         raise ValueError("use CH_USER/CH_PASSWORD for HTTP credentials")
@@ -49,9 +49,15 @@ def _identity(client, spkg, endpoint, accounts, start_block, directory, dsn, che
     module = next((v for v in info["modules"] if v["name"] == MODULE), {})
     if info.get("network") != "bsc" or module.get("output_type") != "proto:evm.state.v1.BlockState":
         raise VerificationError("expected the BSC native block-state package")
+    local_host = host.machine_id()
+    previous = directory / "run.json"
+    if previous.exists():
+        previous_identity = json.loads(previous.read_text())["identity"]
+        if host.matches(previous_identity, directory):
+            local_host = previous_identity["host"]
     return {"format_version": 3, "database": client.database, "http_url": client.url,
         "checkpoint_database": identifier(checkpoint_database or client.database),
-        "state_directory": str(directory), "host": socket.gethostname(),
+        "state_directory": str(directory), "host": local_host,
         "native_target": f"{parsed.hostname}:{parsed.port or 9000}/{client.database}",
         "endpoint": endpoint, "accounts": selected, "start_block": start_block,
         "module": MODULE, "module_hash": module["hash"], "package_sha256": hashlib.sha256(package).hexdigest(),
