@@ -168,3 +168,13 @@ also matches all five captured comparisons, including the storage reset. See
 Their four Python scripts and old evidence tests are removed. Six Rust test
 functions preserve the existing assertions and add corruption cases, bringing
 the standalone native count to 79.
+
+The Rust aggregation qualifier copies a checksummed private prefix and durable
+suffix, releases source coordination, then compares complete ordered state under
+default and external-aggregation settings. Its integration test preserves the
+source and rejects a spill claim when no external aggregation occurred. The
+capacity workload now generates synthetic trie proofs in Rust, checked against
+the independent golden account root. Real ClickHouse tests exercise slot churn,
+portable restore, pins, retention and an eight-part merge. Their two Python
+scripts are removed; the native suite now has 81 standalone tests and 40
+ClickHouse tests. Full-size measurements remain separate from the small tests.

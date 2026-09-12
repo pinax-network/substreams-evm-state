@@ -1121,3 +1121,63 @@ fn throughput_runner_samples_real_native_progress_and_bounded_timeout_resumes() 
     assert!(stream.errors().is_empty(), "{:?}", stream.errors());
     Ok(())
 }
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn aggregation_copy_preserves_source_and_cannot_claim_unexercised_spilling() -> Result<()> {
+    let db = Native::new()?;
+    db.insert(vec![block(100, &slots()?)?])?;
+    let prefix = bootstrap::compact(&db.client, &db.options.state_dir, Some(100), BUDGET)?;
+    db.insert(vec![
+        block(101, &[(word(9), word(3), 1)])?,
+        block(102, &[])?,
+        block(103, &[])?,
+    ])?;
+    let before = fs::read(db.options.state_dir.join("bootstrap.json"))?;
+    let target = db
+        .client
+        .with_database(&format!("evm_test_rust_{}", new_id()))?;
+    let output = db.root.path().join("aggregation");
+    let result = (|| -> Result<()> {
+        let error = evm_state::aggregation_qualification::measure(
+            &target,
+            &db.options.state_dir,
+            &output,
+            3,
+        )
+        .unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains("did not exercise external aggregation"),
+            "{error:#}"
+        );
+        assert!(output.join("default.json").is_file());
+        assert!(!output.join("result.json").exists());
+        let measured: Value = serde_json::from_slice(&fs::read(output.join("default.json"))?)?;
+        assert_eq!(measured["nonzero_slots"], 3);
+        assert_eq!(
+            before,
+            fs::read(db.options.state_dir.join("bootstrap.json"))?
+        );
+        assert_eq!(
+            prefix["generation"],
+            bootstrap::load_prefix(&db.client, &db.options.state_dir, Some(&db.run))?.unwrap()
+                ["generation"]
+        );
+        assert_eq!(db.numbers("state_blocks")?, vec![100, 101, 102, 103]);
+        assert!(evm_state::aggregation_qualification::measure(
+            &target,
+            &db.options.state_dir,
+            &output,
+            3
+        )
+        .is_err());
+        Ok(())
+    })();
+    target.execute(
+        &format!("DROP DATABASE IF EXISTS {}", target.database),
+        &Default::default(),
+    )?;
+    result
+}

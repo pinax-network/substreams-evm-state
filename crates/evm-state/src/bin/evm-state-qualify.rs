@@ -10,6 +10,19 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Commands {
+    /// Exercise synthetic state, checkpoint pins/rotation and portable restore.
+    CapacityStress(evm_state::capacity_qualification::StressOptions),
+    /// Copy a private prefix/suffix and compare default and external aggregation.
+    Aggregation {
+        #[arg(long)]
+        database: String,
+        #[arg(long)]
+        state_dir: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+        #[arg(long, default_value_t = 10000)]
+        delta_blocks: u64,
+    },
     /// Compare observed native updates with saved account proofs and archive RPC.
     LifecycleUpdates {
         #[arg(long)]
@@ -102,6 +115,42 @@ enum Commands {
 }
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::CapacityStress(options) => {
+            anyhow::ensure!(
+                std::env::var_os("EVM_STATE_CAPACITY_CONFIG").is_some(),
+                "run this workload under capacity-run"
+            );
+            let template = if options.merge_only_mib > 0 {
+                String::new()
+            } else {
+                std::env::var("NATIVE_DSN_TEMPLATE")?
+            };
+            let result = evm_state::capacity_qualification::measure(
+                &evm_state::ch::ClickHouse::new("default")?,
+                &options,
+                &template,
+            )?;
+            println!("{}", serde_json::to_string_pretty(&result)?);
+            Ok(())
+        }
+        Commands::Aggregation {
+            database,
+            state_dir,
+            output,
+            delta_blocks,
+        } => {
+            anyhow::ensure!(
+                std::env::var_os("EVM_STATE_CAPACITY_CONFIG").is_some(),
+                "run this workload under capacity-run"
+            );
+            evm_state::aggregation_qualification::measure(
+                &evm_state::ch::ClickHouse::new(&database)?,
+                &state_dir,
+                &output,
+                delta_blocks,
+            )?;
+            Ok(())
+        }
         Commands::LifecycleUpdates {
             database,
             state_dir,

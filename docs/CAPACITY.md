@@ -230,14 +230,14 @@ durable subsequent blocks, select a fresh comparison database and workload path
 inside the declared roots:
 
 ```bash
-.venv/bin/evm-state --database <fresh-comparison-db> capacity-run \
+target/release/evm-state --database <fresh-comparison-db> capacity-run \
   --config <runtime>/capacity.json --output <runtime>/aggregation-capacity -- \
-  .venv/bin/python scripts/qualify_aggregation.py \
+  target/release/evm-state-qualify aggregation \
     --state-dir <runtime>/source/native --database <fresh-comparison-db> \
     --output <runtime>/aggregation-work --delta-blocks 10000
 ```
 
-The script briefly holds the source's cleanup lock to copy a fixed prefix/suffix,
+The qualifier briefly holds the source's cleanup lock to copy a fixed prefix/suffix,
 then verifies the isolated copy and compares complete ordered results. Insufficient
 durable suffix data fails the attempt. It preserves all comparison data and never
 publishes a checkpoint. Query-log completion is awaited because it can become
@@ -333,13 +333,14 @@ duplicate, zero and interrupted input cannot return an accepted root.
 
 ## Reproduce the state/retention stress fixture
 
-With the pinned CLI, Python test dependencies and local ClickHouse running, use a
+With the native Rust tools, pinned CLI and local ClickHouse running, use a
 fresh prefix and a new output path under the declared runtime root:
 
 ```bash
-.venv/bin/evm-state capacity-run --config <runtime>/capacity.json \
+# Set NATIVE_DSN_TEMPLATE to the local native DSN containing {database}.
+target/release/evm-state capacity-run --config <runtime>/capacity.json \
   --output <runtime>/measurements/stress-1 -- \
-  .venv/bin/python scripts/qualify_capacity.py --prefix evm_capacity_sample \
+  target/release/evm-state-qualify capacity-stress --prefix evm_capacity_sample \
     --output <runtime>/stress-1 --accounts 64 --hot-slots 100000 --quiet-slots 64
 ```
 
