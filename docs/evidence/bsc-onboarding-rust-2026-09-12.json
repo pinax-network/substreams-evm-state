@@ -1,0 +1,215 @@
+{
+  "format_version": 1,
+  "qualification": "Rust isolated onboarding from a complete customer-example snapshot, interrupted publication and combined continuation",
+  "result": {
+    "base": {
+      "header": {
+        "hash": "0xda92d18bbd091cdc9f12181e536289469d542ff43e8a8dd74b9203bda9b1e4df",
+        "number": 121535905,
+        "parent_hash": "0x368a1875b265f452f7efc935ce8020fadc848092d3385a5c95154bb00ed25c5c",
+        "state_root": "0xda235364aaf4c9466624e16a5a59051073dfe5933fb78361307be48496b07aec",
+        "timestamp": 1789253025
+      },
+      "nonzero_slots": 8157,
+      "snapshot_id": "b029f673dacd4aa59536957d5e8ee376",
+      "state_sha256": "585c8456b2587219a011d80c3f1749c1b0e335822bd2c237e0baaf00f3c98b8c"
+    },
+    "continuation": {
+      "header": {
+        "hash": "0x1c0c49d59cc0395786b89a38445b16eac94f9aa56c5f26dbbc28bd1fd028a8a2",
+        "number": 121542817,
+        "parent_hash": "0x3ea1da02401801d7640986a46e93acafc945bee65a3ab187a06dc66c46979c6e",
+        "state_root": "0x39b18d5072c39e502c9e01e11d176e3dcd0fafe81a915a3abac2d3dde790cbd9",
+        "timestamp": 1789256136
+      },
+      "nonzero_slots": 8157,
+      "snapshot_id": "e0a4d4104d4c4d11af0b796db78e2c1d",
+      "sources": [
+        {
+          "accounts": [
+            "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+            "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+            "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+          ],
+          "database": "evm_rust_onboard_combined",
+          "database_uuid": "01f8e9aa-655f-46f8-88a6-42273ee671b9",
+          "durable_position": {
+            "hash": "0x1c0c49d59cc0395786b89a38445b16eac94f9aa56c5f26dbbc28bd1fd028a8a2",
+            "number": 121542817
+          },
+          "final_blocks_only": true,
+          "module_hash": "a0384db7a1f537788ae61461b4a80ae9c7330e4f",
+          "package_sha256": "ec683cd342f2d1c90ca5e12acd9bb589cdbcde4053827a3aab70f1865ea1f61c",
+          "parent_hash": "0x78c4334d3f1f56fec45d22e430d926ebf6b1bdaba3b04bfc10d3011154de6afe",
+          "run_id": "c4120fa2df8f4f48ac51ee4084b9c3da",
+          "schema_hash": "3bc17348dcddfa35",
+          "start_block": 121542435,
+          "state_directory": "/Users/denis/Github/substreams-evm-state/localdata/qualification/customer-example/onboarding-rust/combined"
+        }
+      ],
+      "state_sha256": "6b1b98bdd61a2f7863303e9bfb7b55bf4195408db1ef8b89d8537df081a80ae4"
+    },
+    "cutover": {
+      "header": {
+        "hash": "0x78c4334d3f1f56fec45d22e430d926ebf6b1bdaba3b04bfc10d3011154de6afe",
+        "number": 121542434,
+        "parent_hash": "0xfdeec1b65bf54c9023ddad4fa16cfed49fe2d18baac6ca136538073e98a82cdc",
+        "state_root": "0xcfff505041c4e3d330f9616b5549768b88051dbafcc4350b78f1a7657d056e82",
+        "timestamp": 1789255964
+      },
+      "nonzero_slots": 8157,
+      "snapshot_id": "f98f01e3695847f3a19b3042fbfac0d0",
+      "sources": [
+        {
+          "accounts": [
+            "0x32c59d556b16db81dfc32525efb3cb257f7e493d"
+          ],
+          "database": "evm_rust_onboard_old",
+          "database_uuid": "cb08cafa-c442-4ddf-86bf-e24166d81a34",
+          "durable_position": {
+            "hash": "0x78c4334d3f1f56fec45d22e430d926ebf6b1bdaba3b04bfc10d3011154de6afe",
+            "number": 121542434
+          },
+          "final_blocks_only": true,
+          "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+          "package_sha256": "ec683cd342f2d1c90ca5e12acd9bb589cdbcde4053827a3aab70f1865ea1f61c",
+          "parent_hash": "0xda92d18bbd091cdc9f12181e536289469d542ff43e8a8dd74b9203bda9b1e4df",
+          "run_id": "3ded7675608444a480f054187f091c3c",
+          "schema_hash": "4a2d805ee0901591",
+          "start_block": 121535906,
+          "state_directory": "/Users/denis/Github/substreams-evm-state/localdata/qualification/customer-example/onboarding-rust/old"
+        },
+        {
+          "accounts": [
+            "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+            "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+          ],
+          "database": "evm_rust_onboard_new",
+          "database_uuid": "8aea1426-7606-4e10-b63c-99b8c959da51",
+          "durable_position": {
+            "hash": "0x78c4334d3f1f56fec45d22e430d926ebf6b1bdaba3b04bfc10d3011154de6afe",
+            "number": 121542434
+          },
+          "final_blocks_only": true,
+          "module_hash": "26e8951675e16f69b96cd67d8c8998323df7e4a8",
+          "package_sha256": "ec683cd342f2d1c90ca5e12acd9bb589cdbcde4053827a3aab70f1865ea1f61c",
+          "run_id": "04976cf154444e2181b9c50ba0c98f24",
+          "schema_hash": "f1bcebbecd26a5d8",
+          "start_block": 121541934,
+          "state_directory": "/Users/denis/Github/substreams-evm-state/localdata/qualification/customer-example/onboarding-rust/new"
+        }
+      ],
+      "state_sha256": "400d4b53a6bdd14d5794cf075316f0ec816fc961424e3aacf40cb7bf0c8d4fd8"
+    },
+    "databases": [
+      "evm_rust_onboard_checkpoints",
+      "evm_rust_onboard_old",
+      "evm_rust_onboard_new",
+      "evm_rust_onboard_combined"
+    ],
+    "export_manifest_sha256": "64a895986439c8de57b31d432fafa38c959f244c6bc647fe8884f21166d184c3",
+    "format_version": 1,
+    "interrupted_publication_exit_code": -9,
+    "limitations": [
+      "public cohort qualification; customer account list unavailable",
+      "new accounts have proven empty storage, so recent enumeration can prove completeness",
+      "this does not qualify arbitrary recent bootstrap of a nonempty hot contract",
+      "process SIGKILL before ready manifest; no physical host power-loss emulation",
+      "provider-finalized encoded headers, not independent BSC consensus verification"
+    ],
+    "native_sources": [
+      {
+        "accounts": [
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d"
+        ],
+        "database": "evm_rust_onboard_old",
+        "final_blocks_only": true,
+        "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+        "start_block": 121535906
+      },
+      {
+        "accounts": [
+          "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+          "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+        ],
+        "database": "evm_rust_onboard_new",
+        "final_blocks_only": true,
+        "module_hash": "26e8951675e16f69b96cd67d8c8998323df7e4a8",
+        "start_block": 121541934
+      },
+      {
+        "accounts": [
+          "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+        ],
+        "database": "evm_rust_onboard_combined",
+        "final_blocks_only": true,
+        "module_hash": "a0384db7a1f537788ae61461b4a80ae9c7330e4f",
+        "start_block": 121542435
+      }
+    ],
+    "new_accounts": [
+      "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+      "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+    ],
+    "old_accounts": [
+      "0x32c59d556b16db81dfc32525efb3cb257f7e493d"
+    ],
+    "old_reader_unchanged": true,
+    "phases": [
+      {
+        "phase": "export-existing-checkpoint",
+        "seconds": 31.255345209
+      },
+      {
+        "phase": "restore-isolated-destination",
+        "seconds": 37.839071417
+      },
+      {
+        "phase": "existing-cohort-catch-up",
+        "seconds": 48.056732042
+      },
+      {
+        "phase": "new-empty-storage-cohort-bootstrap",
+        "seconds": 47.231973
+      },
+      {
+        "phase": "publication-child-sigkill",
+        "seconds": 42.719726333
+      },
+      {
+        "phase": "retry-and-publish-cutover",
+        "seconds": 33.3193775
+      },
+      {
+        "phase": "new-combined-filter-continuation",
+        "seconds": 11.684236958
+      },
+      {
+        "phase": "verify-combined-continuation",
+        "seconds": 86.576736041
+      }
+    ],
+    "runtime_binary_sha256": "eb0db45ed2c07b1f7bc74fb1e1fcc93e2a9a50f4305d79551f2c6ae556956597"
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "e8961e0ae60d6583dc1ebe6af2923ba180de7c3eea30044ec78e326907c1f704",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789256250576930000,
+    "format_version": 1,
+    "guard_samples": 44,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 46214706000,
+    "peak_observed_allocated_bytes": 9567350784,
+    "rejected_guard_stages": [],
+    "samples": 28,
+    "started_ns": 1789255887489075000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "source_implementation": "onboarding_qualification.rs; executable copied before launch and SHA256SUMS rechecked after completion"
+}

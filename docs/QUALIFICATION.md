@@ -13,39 +13,26 @@ make an entire deliverable complete.
 
 ## Reproducible local checks
 
-`make test` runs the Rust tests and offline Python tests. With local ClickHouse
+`make test` runs the Rust workspace tests. With local ClickHouse
 running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 286 tests (143 offline, 141 ClickHouse
-integration and two PostgreSQL integration).
-Integration databases have random `evm_test_` names and are deleted afterward.
-One fault test creates its own `evm-crash-` Docker container, kills/restarts that
-database process and removes the container afterward. It never restarts the
-configured development database. The complete 286-test Python suite passed
-on GitHub CI at `5f1abba` in 90.78 seconds, along with 43 Rust tests; CI also
-passed for the subsequent draft-notes commit `8a91804`. Current local checks
-pass 143 offline Python tests and 43 Rust tests. The
-seven focused capacity integration tests pass locally, and `make build` produces
-the same package SHA-256 used by the latest lifecycle replays:
-`7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2`. The
-current suite includes stable host identity/recovery, captured recreation/storage
-clearing, repeated authorization proofs, failed delegation clears and surviving
-post-Cancun accounts. A process-kill
-test waits for the killed native child to release its inherited writer lock before recovery; reaping its
-wrapper alone was a timing race. The earlier 159-test lifecycle baseline also
-passed on GitHub CI at `41bc101`.
-The native fixtures serve real packaged protobuf types over local gRPC. The test
-transport adapter translates the CLI's S2 request compression using its upstream
-library. These tests cover sink behavior; they do not execute the WASM mapper.
-Rust projection tests and the separately measured BSC replay cover that path.
+Rust integration databases have random `evm_test_rust_` names and are deleted
+afterward. The hard-restart test creates its own `evm-rust-crash-` container and
+removes only that container and its anonymous volumes. The native fixtures serve
+packaged protobuf types over local gRPC and decode S2 requests directly in Rust.
+These tests exercise the real sink; mapper tests and captured BSC replay cover
+WASM execution. See [migration evidence](RUST_MIGRATION.md) for the recorded
+test phases and remaining gates.
 
-CI installs the Python package as a regular wheel and checks its dependency
-consistency before running the suite. A separate fresh virtual environment also
-installed the wheel and verified the real 46-slot BSC export with provider and
-database credentials removed. This exercises the packaged proof code without
-relying on an editable checkout or database access.
+Earlier Python measurements remain historical evidence. The 286-test baseline
+passed at `5f1abba`; its package checksum was
+`7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2`.
+The rebuilt package used by the latest Rust continuation and lifecycle replay is
+`ec683cd342f2d1c90ca5e12acd9bb589cdbcde4053827a3aab70f1865ea1f61c`.
+Rust independently exported, verified and restored the retained BSC checkpoints;
+those results are linked below with executable provenance.
 
 Native failure tests prove:
 
@@ -424,7 +411,7 @@ publishes another fully verified checkpoint in **2.382 seconds**. The combined
 filter has its own new native identity; neither old run is silently retargeted.
 The two new generations have the same state checksum, with 46 total nonzero slots.
 
-`scripts/qualify_onboarding.py` reproduces this path from an existing ready
+`evm-state-qualify onboarding` reproduces this path from an existing ready
 checkpoint into fresh databases. Run it under `capacity-run`, cover the source
 controller and new work root, and set `NATIVE_DSN_TEMPLATE` in the environment
 with a `{database}` placeholder. Supply `--prefix`, `--root`, `--package`,

@@ -93,7 +93,7 @@ The exporter holds a reader lock and verifies all written data before writing
 without a manifest and fails verification; retry into a new directory. Remove
 an incomplete directory only after confirming its exporter has stopped.
 
-Offline verification requires only the exported files and the Python tool. It
+Offline verification requires only the exported files and the Rust binary. It
 checks file structure and checksums, recomputes every complete storage root,
 verifies account inclusion/non-inclusion and metadata/code against the state
 root, and hashes the encoded header. Missing or altered state is rejected even

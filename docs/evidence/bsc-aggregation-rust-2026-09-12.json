@@ -1,0 +1,213 @@
+{
+  "format_version": 1,
+  "qualification": "Rust aggregation over an isolated copy of the WBNB private prefix",
+  "result": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "database": "evm_rust_aggregation",
+    "default_settings": [
+      {
+        "name": "max_bytes_before_external_group_by",
+        "value": "0"
+      },
+      {
+        "name": "max_bytes_before_external_sort",
+        "value": "0"
+      },
+      {
+        "name": "max_bytes_ratio_before_external_group_by",
+        "value": "0.5"
+      },
+      {
+        "name": "max_bytes_ratio_before_external_sort",
+        "value": "0.5"
+      },
+      {
+        "name": "max_memory_usage",
+        "value": "0"
+      },
+      {
+        "name": "max_threads",
+        "value": "'auto(10)'"
+      }
+    ],
+    "durable_source_block": {
+      "hash": "0x855eeb652122e560dc6ac2993bf2bd0ff92d6cedb72d8ccf349e2e2b509d6b39",
+      "number": 56974989
+    },
+    "format_version": 1,
+    "limitations": [
+      "private input is checksummed but not a complete account-root proof or ready checkpoint",
+      "sequential SQL comparison on shared infrastructure; not a capacity or latency guarantee",
+      "query memory is ClickHouse-reported accounting, not whole-process resident memory",
+      "query settings affect only these comparison queries; native replay configuration is unchanged"
+    ],
+    "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+    "ordered_state_matches": true,
+    "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+    "prefix_generation": "1ae8bdc7b283471a91992c1128882782",
+    "prefix_header": {
+      "hash": "0xe0e478810461949d9ec6a0eeb5d445fea9d6d6133655b4345480b348be470a70",
+      "number": 56645978,
+      "parent_hash": "0xfe55f10b68ff270ddc6c5f0cc6ab3e0e7690f437ad425cbfa07d86a2194292ea",
+      "state_root": "0xbfd45a56dacb2588784621450e59e0c44734b7d1968a3056a8c7c9ad46582ce2",
+      "timestamp": 1754482543
+    },
+    "prefix_json_sha256": "393b7b44aa5919b8b0282489c3a7e8fe167cc2408ed01e93b999d6e201cd514b",
+    "prefix_nonzero_slots": 5696587,
+    "prefix_state_sha256": "e5af3360e9e84bf141bdfb199aff9c5e2c8dfd638a17328477636f097d77acac",
+    "run_id": "62b4938ec1554bc093644232ef4b469d",
+    "server_settings": [
+      {
+        "name": "max_server_memory_usage",
+        "value": "7395353395"
+      },
+      {
+        "name": "tmp_path",
+        "value": "/var/lib/clickhouse/tmp/"
+      }
+    ],
+    "server_version": "26.3.33.24",
+    "source_copy_wait_and_lock_seconds": 3.992988458,
+    "suffix_blocks": 1,
+    "target_header": {
+      "hash": "0xd391aa9c3987d0ef0be33b392ac54dd8c275f11b3155c5995dab0179099d5806",
+      "number": 56645979,
+      "parent_hash": "0xe0e478810461949d9ec6a0eeb5d445fea9d6d6133655b4345480b348be470a70",
+      "state_root": "0xf6eddd1702d5dbe6721599063aaeb00153c3f1e11636096d75b694efd8708781",
+      "timestamp": 1754482543
+    },
+    "variants": [
+      {
+        "elapsed_seconds": 11.299189708,
+        "generation": "42710655ca3e47b8a310db5a29201f44",
+        "name": "default",
+        "nonzero_slots": 5696588,
+        "query": {
+          "event_time": "2026-09-12 23:17:10",
+          "exception_code": 0,
+          "external_events": {
+            "ExternalAggregationCompressedBytes": 446583441,
+            "ExternalAggregationMerge": 1,
+            "ExternalAggregationUncompressedBytes": 1129159376,
+            "ExternalAggregationWritePart": 30,
+            "ExternalProcessingCompressedBytesTotal": 446583441,
+            "ExternalProcessingFilesTotal": 30,
+            "ExternalProcessingUncompressedBytesTotal": 1129159376
+          },
+          "memory_usage": 3448869452,
+          "query_duration_ms": 11333,
+          "query_id": "966b6d83-1940-4d95-a3c2-3a5a41490984",
+          "read_rows": 5696589,
+          "written_rows": 5696588
+        },
+        "settings": {
+          "max_execution_time": 120,
+          "max_temporary_data_on_disk_size_for_query": 10737418240
+        },
+        "state_sha256": "09082a258895224beb3dd62c091a2e6a5840454f47df0fd793a2e9719c502d0d"
+      },
+      {
+        "elapsed_seconds": 16.471584458,
+        "generation": "68b84e4ad4ea4ef29e499669d9757b25",
+        "name": "spill_256m",
+        "nonzero_slots": 5696588,
+        "query": {
+          "event_time": "2026-09-12 23:19:44",
+          "exception_code": 0,
+          "external_events": {
+            "ExternalAggregationCompressedBytes": 443140296,
+            "ExternalAggregationMerge": 1,
+            "ExternalAggregationUncompressedBytes": 1140400270,
+            "ExternalAggregationWritePart": 306,
+            "ExternalProcessingCompressedBytesTotal": 443140296,
+            "ExternalProcessingFilesTotal": 306,
+            "ExternalProcessingUncompressedBytesTotal": 1140400270
+          },
+          "memory_usage": 1914792770,
+          "query_duration_ms": 16797,
+          "query_id": "4f96b893-a433-45e4-9d1f-9bce6004729a",
+          "read_rows": 5696589,
+          "written_rows": 5696588
+        },
+        "settings": {
+          "max_bytes_before_external_group_by": 268435456,
+          "max_bytes_before_external_sort": 134217728,
+          "max_bytes_ratio_before_external_group_by": 0,
+          "max_bytes_ratio_before_external_sort": 0,
+          "max_execution_time": 120,
+          "max_memory_usage": 2147483648,
+          "max_temporary_data_on_disk_size_for_query": 10737418240
+        },
+        "state_sha256": "09082a258895224beb3dd62c091a2e6a5840454f47df0fd793a2e9719c502d0d"
+      }
+    ],
+    "workload": "real private prefix plus contiguous native update suffix"
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "91e345dc1f0875f966b9fee5e234513051766e0702287c56fb275b2071453197",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789255318458804000,
+    "format_version": 1,
+    "guard_samples": 5,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 35287586000,
+    "peak_observed_allocated_bytes": 10801311744,
+    "rejected_guard_stages": [],
+    "samples": 81,
+    "started_ns": 1789254872913497000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "failed_attempts": [
+    {
+      "reason": "Requested 10000-block contiguous suffix was unavailable; no comparison database was created",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "91e345dc1f0875f966b9fee5e234513051766e0702287c56fb275b2071453197",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789254359865194000,
+        "format_version": 1,
+        "guard_samples": 1,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 12087611000,
+        "peak_observed_allocated_bytes": 11236839424,
+        "rejected_guard_stages": [],
+        "samples": 13,
+        "started_ns": 1789254281606580000,
+        "status": "stopped",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "reason": "Initial full-directory measurement changed during traversal; child was not launched",
+      "capacity": {
+        "command_exit_code": null,
+        "config_sha256": "91e345dc1f0875f966b9fee5e234513051766e0702287c56fb275b2071453197",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789254456598542000,
+        "format_version": 1,
+        "guard_samples": 0,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 0,
+        "peak_observed_allocated_bytes": 0,
+        "rejected_guard_stages": [],
+        "samples": 0,
+        "started_ns": 1789254425652915000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    }
+  ],
+  "provenance_limit": "Executable hash was not captured before this debug-binary run; subsequent builds changed the executable path. Source implementation is aggregation_qualification.rs introduced in 9f95722."
+}

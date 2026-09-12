@@ -74,8 +74,10 @@ jobs:
       - name: Verify Rust publication, native preparation and cursor recovery
         env:
           PG_DSN: postgresql://evm_test:local-development-only@127.0.0.1:15432/evm_test
-        run: cargo test --locked -p evm-state --test clickhouse_state --test native_prepare --test portable_database --test bootstrap_database --test capacity_workload --test postgres_database -- --ignored
+        run: cargo test --locked -p evm-state --test clickhouse_state --test native_prepare --test portable_database --test bootstrap_database --test capacity_workload --test publication_parity --test postgres_database -- --ignored
       - name: Verify proofs, publication, ownership and real sink recovery
         env:
           PG_DSN: postgresql://evm_test:local-development-only@127.0.0.1:15432/evm_test
         run: python -m pytest --run-clickhouse --run-database-crash --run-postgres -q
+      - name: Verify Rust hard database restart in its own disposable container
+        run: cargo test --locked -p evm-state --test database_crash -- --ignored

@@ -178,3 +178,36 @@ the independent golden account root. Real ClickHouse tests exercise slot churn,
 portable restore, pins, retention and an eight-part merge. Their two Python
 scripts are removed; the native suite now has 81 standalone tests and 40
 ClickHouse tests. Full-size measurements remain separate from the small tests.
+
+The final operational script is now `evm-state-qualify onboarding`. Its real
+Rust run imported the proven 8,157-slot customer-example snapshot at block
+121535905, added two disjoint accounts with proven empty storage at 121542434,
+and continued the combined filter to 121542817. Killing the publisher after
+candidate account insertion returned SIGKILL (-9), exposed no ready manifest and
+left the old reader unchanged. Retry and continuation both passed full proofs.
+The [record](evidence/bsc-onboarding-rust-2026-09-12.json) includes the retained
+executable checksum and capacity measurements; the script entry point is removed.
+
+The [Rust aggregation run](evidence/bsc-aggregation-rust-2026-09-12.json) compares
+5,696,588 slots from an isolated WBNB prefix plus one contiguous update block.
+Both variants produced the same ordered checksum. The explicit spill variant
+used 1.91 GB of ClickHouse query memory in 16.5 seconds; observed defaults used
+3.45 GB in 11.3 seconds. The first attempt lacked the requested 10,000-block
+suffix; the second failed its initial directory scan. Both failures remain in
+the record. This is private-prefix qualification, not complete-account proof.
+
+The remaining assertion audit adds deterministic capacity-stop boundaries,
+candidate/export/restore publication rejection, raw-bootstrap preservation,
+post-insert restore verification, successful deletion/recreation, compacted
+nonempty-account onboarding, and exact large nonce export/restore. Twenty frozen
+independent trie-oracle cases preserve branch, inline-reference, random-keyspace
+and committed SQLite boundary expectations. Tests no longer depend on a second
+language to generate their expected roots. The Docker hard-restart test now has
+a Rust implementation that creates and removes only its own container.
+
+`make setup`, `make dev`, `make sink`, `make test` and `make test-integration`
+now use Rust. The retained Python runtime and baseline tests will be removed
+after the stopped WBNB run has been safely resumed in Rust and exact-head CI has
+qualified the remaining fault boundaries. The WBNB stop record shows an
+incomplete directory scan, not exhaustion of the retained-data budget; its
+cursor is at 56,974,989 and its private prefix at 56,645,978.

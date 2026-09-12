@@ -6,10 +6,12 @@ use std::{
     env,
     io::{BufRead, BufReader, Lines, Read},
     path::PathBuf,
+    sync::Arc,
     time::Duration,
 };
 
 pub type Params = Map<String, Value>;
+pub type AdditionalCapacityGuard = Arc<dyn Fn(&str) -> Result<()> + Send + Sync>;
 
 pub fn params(value: Value) -> Result<Params> {
     value
@@ -50,6 +52,7 @@ pub struct ClickHouse {
     user: String,
     password: String,
     http: Client,
+    pub(crate) additional_capacity_guard: Option<AdditionalCapacityGuard>,
 }
 
 impl ClickHouse {
@@ -75,6 +78,7 @@ impl ClickHouse {
             url: url.into(),
             user: user.into(),
             password: password.into(),
+            additional_capacity_guard: None,
             control_home: env::var_os("EVM_STATE_HOME")
                 .map(PathBuf::from)
                 .unwrap_or_else(|| "localdata/control".into()),
@@ -94,6 +98,14 @@ impl ClickHouse {
 
     pub fn with_control_home(mut self, home: impl Into<PathBuf>) -> Self {
         self.control_home = home.into();
+        self
+    }
+
+    /// Add a scoped admission restriction for embedded controllers and fault
+    /// qualification. Success still runs the configured capacity policy; this
+    /// cannot override or disable it. Cloned clients retain the restriction.
+    pub fn with_additional_capacity_guard(mut self, guard: AdditionalCapacityGuard) -> Self {
+        self.additional_capacity_guard = Some(guard);
         self
     }
 

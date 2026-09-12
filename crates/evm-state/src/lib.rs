@@ -18,6 +18,7 @@ pub mod ingest;
 pub mod installer;
 pub mod lifecycle_qualification;
 pub mod native_stream;
+pub mod onboarding_qualification;
 pub mod output_qualification;
 pub mod postgres;
 pub mod process;

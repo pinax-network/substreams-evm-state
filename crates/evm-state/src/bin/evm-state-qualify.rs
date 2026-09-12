@@ -10,6 +10,8 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Commands {
+    /// Qualify isolated cohort cutover, killed publication and combined follow.
+    Onboarding(evm_state::onboarding_qualification::OnboardingOptions),
     /// Exercise synthetic state, checkpoint pins/rotation and portable restore.
     CapacityStress(evm_state::capacity_qualification::StressOptions),
     /// Copy a private prefix/suffix and compare default and external aggregation.
@@ -115,6 +117,25 @@ enum Commands {
 }
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::Onboarding(options) => {
+            let admin = evm_state::ch::ClickHouse::new("default")?;
+            let result = if options.interrupted_child {
+                evm_state::onboarding_qualification::interrupted_child(&admin, &options)?
+            } else {
+                anyhow::ensure!(
+                    std::env::var_os("EVM_STATE_CAPACITY_CONFIG").is_some(),
+                    "run this workload under capacity-run"
+                );
+                evm_state::onboarding_qualification::measure(
+                    &admin,
+                    &evm_state::rpc::Rpc::new(None, None)?,
+                    &options,
+                    &std::env::var("NATIVE_DSN_TEMPLATE")?,
+                )?
+            };
+            println!("{}", serde_json::to_string_pretty(&result)?);
+            Ok(())
+        }
         Commands::CapacityStress(options) => {
             anyhow::ensure!(
                 std::env::var_os("EVM_STATE_CAPACITY_CONFIG").is_some(),

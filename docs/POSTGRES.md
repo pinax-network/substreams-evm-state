@@ -102,8 +102,8 @@ blocks; `TIMESTAMP` (UTC).
 
 Prerequisites: Rust 1.88 + `wasm32-unknown-unknown` (via `rust-toolchain.toml`),
 [`substreams`](https://github.com/streamingfast/substreams/releases) CLI
-≥ v1.20.2 (ships `substreams sink postgres`), Docker, `psql`, Python 3 with
-`pycryptodome` for the storage-root check.
+v1.22.0 (ships `substreams sink postgres`), Docker and `psql`. The Rust
+`evm-state postgres-verify` command performs metadata and storage-root checks.
 
 Generated Rust protobuf bindings are committed so a fresh checkout builds
 directly. Run `make protogen` when changing the protobuf schema.

@@ -44,13 +44,12 @@ Zero storage clears are applied **before** filtering the final nonzero state.
 ## Local setup
 
 Requirements: Rust 1.88 with the WASM target (see `rust-toolchain.toml`),
-Python 3.10+, Docker, and Substreams **1.22.0**. Native recovery tests additionally
-use Go 1.26.5 for a local transport adapter. Linux/WSL and macOS are supported.
+Docker, and Substreams **1.22.0**. Linux/WSL and macOS are supported.
 
 ```bash
-make python-deps
 cargo run --locked -p evm-state -- install-substreams
-export PATH="$PWD/localdata/toolchain/bin:$PATH"
+make native
+export PATH="$PWD/target/release:$PWD/localdata/toolchain/bin:$PATH"
 export SUBSTREAMS_API_KEY=...  # use your environment; do not commit credentials
 
 make ch-up
@@ -82,13 +81,13 @@ before changing an existing database's mount.
 **This short sample is an update interval, not a complete initial account state.**
 Use the bootstrap workflow below to establish completeness.
 
-The Python HTTP client accepts `CH_HTTP_URL`, `CH_USER`, and `CH_PASSWORD`.
+The Rust HTTP client accepts `CH_HTTP_URL`, `CH_USER`, and `CH_PASSWORD`.
 The native CLI receives its connection through `SUBSTREAMS_SINK_DSN`; the Makefile
 sets that from `CH_DSN`. Custom connections must point to the same host/database.
 
 ## Run identity and restarts
 
-`make setup`, `make dev` and `make sink` use the guarded Python runner. It binds
+`make setup`, `make dev` and `make sink` use the guarded Rust runner. It binds
 the normalized account list, package checksum, module hash, endpoint, starting
 block and database identity to a durable state directory and host. A database ownership
 record and local process lock reject competing runs, including copied directories.
@@ -288,7 +287,7 @@ qualified. See [capacity methodology](docs/CAPACITY.md) and [evidence](docs/QUAL
 ## Tests and release
 
 ```bash
-make test                  # Rust and offline Python tests
+make test                  # Rust workspace tests
 make test-integration      # local ClickHouse, published CLI, fault injection
 ```
 
@@ -300,8 +299,8 @@ interrupted checkpoint/native-history cleanup. A separate disposable ClickHouse
 container is killed and restarted before and after publication to test database
 recovery; the configured development database is never restarted by that test.
 The suite makes no provider requests and needs no API keys.
-The Go adapter only translates the native CLI's S2 gRPC compression for the local
-Python test server; it is not part of the production data path.
+The Rust test server directly accepts the native CLI's S2 gRPC requests using
+the packaged protobuf schema.
 
 CI builds the package from a clean checkout and runs the same local integration
 suite. The first GitHub release will be **v0.1.0**, with the `.spkg` and detailed

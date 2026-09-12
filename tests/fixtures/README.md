@@ -19,3 +19,10 @@ cmp tests/fixtures/cursors.json localdata/cursors-rust.json
 encoded header cases used to qualify the Rust proof and trie implementation.
 The captured BSC lifecycle fixtures retain their provenance and proof bundles in
 `lifecycle/manifest.json` and the adjacent evidence files.
+
+`trie-boundaries.json.gz` freezes 20 independent py-trie oracle cases before
+removal of the migration baseline: full branches at eight prefix depths,
+31/32/33-byte inline-child boundaries, six seeded random keyspaces and three
+committed sorting-workspace sizes (including 4,097 slots). It records oracle
+versions and contains only data. Rust validates every root and independently
+opens each completed SQLite workspace to check committed rows.

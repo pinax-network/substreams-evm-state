@@ -134,6 +134,14 @@ impl CapacitySampler for FakeMeter {
     }
     fn sample(&mut self) -> Result<Value> {
         self.calls += 1;
+        if self.mode == "docker-failure" {
+            return Err(DockerCapacityError {
+                operation: "data-directory scan",
+                timed_out: false,
+                directory_changed: true,
+            }
+            .into());
+        }
         if self.mode == "incomplete" && self.calls > 1 {
             anyhow::bail!("unreadable capacity directory");
         }
@@ -309,6 +317,81 @@ fn internal_guard_failure_cannot_be_overridden_by_zero_child_exit() -> Result<()
         json!(["bootstrap-compact"])
     );
     assert_eq!(result["peak_observed_allocated_bytes"], 123);
+    Ok(())
+}
+
+#[test]
+fn guard_checks_declared_roots_and_retains_honest_failed_measurements() -> Result<()> {
+    let root = tempfile::tempdir()?;
+    let mut meter = FakeMeter::new(root.path(), "accept")?;
+    let events = root.path().join("guards");
+    assert!(capacity::guard(
+        &mut meter,
+        &[root.path().join("../untracked")],
+        "test",
+        Some(&events)
+    )
+    .is_err());
+    assert!(capacity::guard(
+        &mut meter,
+        &[],
+        "test",
+        Some(&root.path().join("../outside-events"))
+    )
+    .is_err());
+    assert_eq!(meter.calls, 0);
+    capacity::guard(
+        &mut meter,
+        &[root.path().join("future-work")],
+        "test-guard",
+        Some(&events),
+    )?;
+    let records = || -> Result<Vec<Value>> {
+        fs::read_dir(&events)?
+            .map(|e| Ok(serde_json::from_slice(&fs::read(e?.path())?)?))
+            .collect()
+    };
+    assert_eq!(records()?[0]["stage"], "test-guard");
+    assert_eq!(records()?[0]["accounted_allocated_bytes"], 123);
+    meter.mode = "incomplete";
+    assert!(capacity::guard(&mut meter, &[], "bootstrap-compact", Some(&events)).is_err());
+    let values = records()?;
+    let failed = values
+        .iter()
+        .find(|v| v["stage"] == "bootstrap-compact")
+        .unwrap();
+    assert_eq!(failed["admitted"], false);
+    assert_eq!(failed["reasons"], json!(["incomplete_capacity_sample"]));
+    assert!(failed.get("accounted_allocated_bytes").is_none());
+    meter.mode = "reject";
+    assert!(capacity::guard(&mut meter, &[], "publish", Some(&events)).is_err());
+    assert_eq!(records()?.len(), 3);
+    meter.mode = "docker-failure";
+    assert!(capacity::guard(&mut meter, &[], "scan-failed", Some(&events)).is_err());
+    let values = records()?;
+    let failed = values.iter().find(|v| v["stage"] == "scan-failed").unwrap();
+    assert_eq!(failed["error_type"], "DockerCapacityError");
+    assert_eq!(failed["inspection_operation"], "data-directory scan");
+    assert_eq!(failed["directory_changed"], true);
+    assert!(failed.get("accounted_allocated_bytes").is_none());
+    Ok(())
+}
+
+#[test]
+fn completed_child_cannot_override_a_rejected_final_sample() -> Result<()> {
+    let root = tempfile::tempdir()?;
+    let mut meter = FakeMeter::new(root.path(), "marker")?;
+    let command = vec![
+        "/usr/bin/touch".into(),
+        root.path().join("child-ready").to_str().unwrap().into(),
+    ];
+    let report = capacity::supervise(&mut meter, &command, &root.path().join("run"), 1.)?;
+    assert_eq!(report["status"], "stopped");
+    assert_eq!(report["command_exit_code"], 0);
+    // The sample completed and denied admission; failed_samples counts
+    // incomplete measurements, not complete measurements over the budget.
+    assert_eq!(report["failed_samples"], 0);
+    assert_eq!(report["stop_reasons"], json!(["budget_headroom_exhausted"]));
     Ok(())
 }
 

@@ -112,11 +112,20 @@ fn docker(arguments: &[String]) -> Result<Vec<u8>> {
     } else {
         "data-directory scan"
     };
-    let Some(output) = process::capture(
-        Command::new("docker").args(arguments),
-        Duration::from_secs(30),
-    )?
-    else {
+    decode_docker_output(
+        operation,
+        process::capture(
+            Command::new("docker").args(arguments),
+            Duration::from_secs(30),
+        )?,
+    )
+}
+
+fn decode_docker_output(
+    operation: &'static str,
+    output: Option<process::Output>,
+) -> Result<Vec<u8>> {
+    let Some(output) = output else {
         return Err(DockerCapacityError {
             operation,
             timed_out: true,
@@ -327,46 +336,7 @@ impl Meter {
         let started = now_ns()?;
         let info = self.inspect()?;
         let disks = self.client.rows("SELECT name,path,type,is_remote,total_space,free_space,unreserved_space FROM system.disks ORDER BY name",&Default::default())?.collect::<Result<Vec<_>>>()?;
-        ensure!(
-            !disks.is_empty(),
-            "complete capacity measurement requires local ClickHouse data disks"
-        );
-        let mut available = u64::MAX;
-        let mut disk_paths = Vec::new();
-        for disk in &disks {
-            ensure!(
-                disk["type"] == "Local" && uint(&disk["is_remote"])? == 0,
-                "complete capacity measurement requires local ClickHouse data disks"
-            );
-            let total = uint(&disk["total_space"])?;
-            let free = uint(&disk["free_space"])?;
-            let unreserved = uint(&disk["unreserved_space"])?;
-            ensure!(
-                total > 0 && free <= total && unreserved <= total,
-                "invalid ClickHouse disk capacity counters"
-            );
-            available = available.min(free).min(unreserved);
-            let path = PathBuf::from(string(disk, "path")?);
-            ensure!(
-                path.is_absolute() && !path.components().any(|c| c == Component::ParentDir),
-                "ClickHouse data disks must be on declared persistent container mounts"
-            );
-            disk_paths.push(path);
-        }
-        let disk_paths = roots(disk_paths);
-        let mounts: Vec<_> = info["Mounts"]
-            .as_array()
-            .context("invalid container mounts")?
-            .iter()
-            .filter(|m| matches!(m["Type"].as_str(), Some("bind" | "volume")))
-            .map(|m| string(m, "Destination").map(PathBuf::from))
-            .collect::<Result<_>>()?;
-        ensure!(
-            disk_paths
-                .iter()
-                .all(|p| mounts.iter().any(|m| p.starts_with(m))),
-            "ClickHouse data disks must be on declared persistent container mounts"
-        );
+        let (mut available, disk_paths) = data_disks(&info, &disks)?;
         let mut arguments = vec![
             "exec".into(),
             self.container_id.clone().unwrap(),
@@ -433,13 +403,7 @@ impl Meter {
             available = available.min(free);
             local_disks.push(json!({"path":path,"available_bytes":free}));
         }
-        let mut reasons = Vec::new();
-        if u128::from(used) + u128::from(self.headroom) >= u128::from(self.budget) {
-            reasons.push("budget_headroom_exhausted");
-        }
-        if available < self.min_free {
-            reasons.push("filesystem_free_space_below_floor");
-        }
+        let reasons = admission_reasons(used, self.headroom, self.budget, available, self.min_free);
         Ok(
             json!({"format_version":1,"sample_started_ns":started,"sample_finished_ns":now_ns()?,"container_id":self.container_id,
             "server_data_roots":disk_paths,"server_data_allocated_bytes":server_bytes,"local_roots":self.paths,
@@ -449,6 +413,153 @@ impl Meter {
             "selected_database_merges":merges,"admitted":reasons.is_empty(),"reasons":reasons,
             "coverage":"entire local ClickHouse data disks plus declared local roots; shared data may overcount","limit_kind":"sampled operating guard, not a filesystem quota"}),
         )
+    }
+}
+
+fn data_disks(info: &Value, disks: &[Value]) -> Result<(u64, Vec<PathBuf>)> {
+    ensure!(
+        !disks.is_empty(),
+        "complete capacity measurement requires local ClickHouse data disks"
+    );
+    let mut available = u64::MAX;
+    let mut disk_paths = Vec::new();
+    for disk in disks {
+        ensure!(
+            disk["type"] == "Local" && uint(&disk["is_remote"])? == 0,
+            "complete capacity measurement requires local ClickHouse data disks"
+        );
+        let total = uint(&disk["total_space"])?;
+        let free = uint(&disk["free_space"])?;
+        let unreserved = uint(&disk["unreserved_space"])?;
+        ensure!(
+            total > 0 && free <= total && unreserved <= total,
+            "invalid ClickHouse disk capacity counters"
+        );
+        available = available.min(free).min(unreserved);
+        let path = PathBuf::from(string(disk, "path")?);
+        ensure!(
+            path.is_absolute() && !path.components().any(|c| c == Component::ParentDir),
+            "ClickHouse data disks must be on declared persistent container mounts"
+        );
+        disk_paths.push(path);
+    }
+    let disk_paths = roots(disk_paths);
+    let mounts: Vec<_> = info["Mounts"]
+        .as_array()
+        .context("invalid container mounts")?
+        .iter()
+        .filter(|m| matches!(m["Type"].as_str(), Some("bind" | "volume")))
+        .map(|m| string(m, "Destination").map(PathBuf::from))
+        .collect::<Result<_>>()?;
+    ensure!(
+        disk_paths
+            .iter()
+            .all(|p| mounts.iter().any(|m| p.starts_with(m))),
+        "ClickHouse data disks must be on declared persistent container mounts"
+    );
+    Ok((available, disk_paths))
+}
+
+fn admission_reasons(
+    used: u64,
+    headroom: u64,
+    budget: u64,
+    available: u64,
+    min_free: u64,
+) -> Vec<&'static str> {
+    let mut reasons = Vec::new();
+    if u128::from(used) + u128::from(headroom) >= u128::from(budget) {
+        reasons.push("budget_headroom_exhausted");
+    }
+    if available < min_free {
+        reasons.push("filesystem_free_space_below_floor");
+    }
+    reasons
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::os::unix::process::ExitStatusExt;
+    #[test]
+    fn local_disk_validation_and_skewed_counters_fail_closed() -> Result<()> {
+        let info = json!({"Mounts":[{"Type":"volume","Destination":"/var/lib/clickhouse"}]});
+        let disk = json!({"name":"default","path":"/var/lib/clickhouse/","type":"Local","is_remote":0,"total_space":1_000_000_000,"free_space":799_995_904,"unreserved_space":800_000_000});
+        let (available, paths) = data_disks(&info, &[disk.clone()])?;
+        assert_eq!(available, 799_995_904);
+        assert_eq!(paths, vec![PathBuf::from("/var/lib/clickhouse/")]);
+        assert_eq!(
+            admission_reasons(600, 100, 500, available, 800_000_000),
+            vec![
+                "budget_headroom_exhausted",
+                "filesystem_free_space_below_floor"
+            ]
+        );
+        assert_eq!(
+            admission_reasons(600, 100, 1_000_000_000, available, 800_000_000),
+            vec!["filesystem_free_space_below_floor"]
+        );
+        assert!(admission_reasons(600, 100, 1_000_000_000, available, available).is_empty());
+        assert_eq!(
+            admission_reasons(u64::MAX, 1, u64::MAX, 0, 0),
+            vec!["budget_headroom_exhausted"]
+        );
+        for (field, value) in [
+            ("total_space", json!(0)),
+            ("free_space", json!(1_000_000_001)),
+            ("unreserved_space", json!(-1)),
+            ("unreserved_space", json!(1_000_000_001)),
+            ("is_remote", json!(1)),
+            ("type", json!("S3")),
+            ("path", json!("/var/lib/clickhouse/../outside")),
+            ("path", json!("relative")),
+            ("path", json!("/unmounted")),
+        ] {
+            let mut bad = disk.clone();
+            bad[field] = value;
+            assert!(data_disks(&info, &[bad]).is_err(), "{field}");
+        }
+        assert!(data_disks(&json!({"Mounts":[]}), &[disk]).is_err());
+        assert!(data_disks(&info, &[]).is_err());
+        Ok(())
+    }
+    #[test]
+    fn docker_failures_discard_partial_output_and_only_retry_disappearing_files() {
+        for operation in ["container inspection", "data-directory scan"] {
+            for (stderr, expected) in [
+                ("du: No such file or directory", true),
+                ("du: Permission denied", false),
+                ("No such file or directory\nPermission denied", false),
+                ("dummy-secret", false),
+            ] {
+                for status in [1, 2] {
+                    let result = decode_docker_output(
+                        operation,
+                        Some(process::Output {
+                            status: std::process::ExitStatus::from_raw(status << 8),
+                            stdout: b"untrustworthy partial total".to_vec(),
+                            stderr: stderr.as_bytes().to_vec(),
+                        }),
+                    )
+                    .unwrap_err();
+                    let error = result.downcast_ref::<DockerCapacityError>().unwrap();
+                    assert_eq!(error.operation, operation);
+                    assert_eq!(
+                        error.directory_changed,
+                        expected && operation == "data-directory scan" && status == 1
+                    );
+                    assert!(!error.to_string().contains("dummy-secret"));
+                    assert!(!error.to_string().contains("partial total"));
+                }
+            }
+            assert!(
+                decode_docker_output(operation, None)
+                    .unwrap_err()
+                    .downcast_ref::<DockerCapacityError>()
+                    .unwrap()
+                    .timed_out
+            );
+        }
     }
 }
 
@@ -522,19 +633,33 @@ pub fn check(
     required_paths: &[PathBuf],
     stage: &str,
 ) -> Result<Option<Value>> {
+    if let Some(guard) = &client.additional_capacity_guard {
+        guard(stage)?;
+    }
     let Some(policy) = env::var_os("EVM_STATE_CAPACITY_CONFIG") else {
         return Ok(None);
     };
     let mut meter = Meter::new(client, serde_json::from_slice(&fs::read(policy)?)?)?;
+    let destination = env::var_os("EVM_STATE_CAPACITY_EVENTS")
+        .map(|path| resolve(Path::new(&path)))
+        .transpose()?;
+    guard(&mut meter, required_paths, stage, destination.as_deref()).map(Some)
+}
+
+/// Apply a complete sample at an operation boundary. Used by the configured
+/// Docker guard and embedders with another capacity sampler.
+pub fn guard(
+    meter: &mut impl CapacitySampler,
+    required_paths: &[PathBuf],
+    stage: &str,
+    destination: Option<&Path>,
+) -> Result<Value> {
     for path in required_paths {
         ensure!(
             meter.contains(path)?,
             "operation uses a directory outside the declared capacity roots"
         );
     }
-    let destination = env::var_os("EVM_STATE_CAPACITY_EVENTS")
-        .map(|path| resolve(Path::new(&path)))
-        .transpose()?;
     if let Some(destination) = &destination {
         ensure!(
             meter.contains(destination)?,
@@ -571,7 +696,7 @@ pub fn check(
         "capacity guard rejected operation: {}",
         measured["reasons"]
     );
-    Ok(Some(measured))
+    Ok(measured)
 }
 
 #[derive(Default)]

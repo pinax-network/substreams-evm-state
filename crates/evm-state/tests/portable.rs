@@ -43,6 +43,7 @@ fn altered_account_metadata_cannot_be_fixed_by_rehashing_the_file() -> Result<()
         ("exists", json!(false)),
         ("storage_root", json!(format!("0x{}", "0".repeat(64)))),
         ("nonzero_slots", json!(1)),
+        ("snapshot_id", json!("00000000000000000000000000000000")),
     ] {
         let root = tempfile::tempdir()?;
         let directory = root.path().join("export");

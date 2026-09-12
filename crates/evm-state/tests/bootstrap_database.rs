@@ -111,7 +111,7 @@ impl Native {
         let root = tempfile::tempdir()?;
         let client = ClickHouse::new(&format!("evm_test_rust_{}", new_id()))?
             .with_control_home(root.path().join("control"));
-        let target = client.with_database(&format!("evm_test_rust_{}", new_id()))?;
+        let target = client.with_database(&format!("evm_test_rust_{}_checkpoints", new_id()))?;
         let options = NativeOptions {
             package: PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .join("../../spkg/evm-state-v0.1.0.spkg"),
@@ -194,6 +194,225 @@ impl Drop for Native {
             }
         }
     }
+}
+
+fn reject_stage(client: &ClickHouse, rejected: &'static str) -> ClickHouse {
+    client
+        .clone()
+        .with_additional_capacity_guard(std::sync::Arc::new(move |stage| {
+            anyhow::ensure!(stage != rejected, "injected capacity exhaustion at {stage}");
+            Ok(())
+        }))
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn capacity_rejection_keeps_candidates_private_and_raw_bootstrap_retryable() -> Result<()> {
+    for stage in ["checkpoint-trie", "checkpoint-publish"] {
+        let db = Native::new()?;
+        db.initial()?;
+        let guarded = reject_stage(&db.target, stage);
+        let error = checkpoint::build(
+            &guarded,
+            &bundle(101)?,
+            &[db.source(100)],
+            None,
+            BUDGET,
+            &db.root.path().join("work"),
+        )
+        .unwrap_err();
+        assert!(error.to_string().contains("injected capacity exhaustion"));
+        assert_eq!(
+            uint(
+                &db.target
+                    .one("SELECT count() AS n FROM checkpoints", &Default::default())?["n"]
+            )?,
+            0
+        );
+        assert_eq!(
+            uint(
+                &db.target.one(
+                    "SELECT count() AS n FROM checkpoint_storage",
+                    &Default::default()
+                )?["n"]
+            )?,
+            2
+        );
+        assert_eq!(db.publish(101, 100, None)?["nonzero_slots"], 2);
+    }
+    let db = Native::new()?;
+    db.initial()?;
+    let error = bootstrap::compact(
+        &reject_stage(&db.client, "bootstrap-commit"),
+        &db.options.state_dir,
+        None,
+        BUDGET,
+    )
+    .unwrap_err();
+    assert!(error.to_string().contains("injected capacity exhaustion"));
+    assert!(!db.options.state_dir.join("bootstrap.json").exists());
+    assert_eq!(db.numbers("state_blocks")?, vec![100, 101]);
+    assert_eq!(
+        uint(
+            &db.target
+                .one("SELECT count() AS n FROM checkpoints", &Default::default())?["n"]
+        )?,
+        0
+    );
+    assert_eq!(db.compact()?["nonzero_slots"], 2);
+    assert_eq!(db.publish(101, 100, None)?["nonzero_slots"], 2);
+    Ok(())
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn capacity_rejection_prevents_export_manifest_and_restore_publication() -> Result<()> {
+    use evm_state::{export, importer};
+    let db = Native::new()?;
+    db.initial()?;
+    let ready = db.publish(101, 100, None)?;
+    let id = proof::string(&ready, "snapshot_id")?;
+    let work = db.root.path().join("work");
+    let incomplete = db.root.path().join("incomplete");
+    let error = export::export_checkpoint(
+        &reject_stage(&db.target, "export-publish"),
+        id,
+        &incomplete,
+        1,
+        &work,
+    )
+    .unwrap_err();
+    assert!(error.to_string().contains("injected capacity exhaustion"));
+    assert!(!incomplete.join("manifest.json").exists());
+    let complete = db.root.path().join("complete");
+    export::export_checkpoint(&db.target, id, &complete, 1, &work)?;
+    let restored = Native::new()?;
+    let error = importer::import_checkpoint(
+        &reject_stage(&restored.target, "import-publish"),
+        &complete,
+        None,
+        &work,
+        BUDGET,
+    )
+    .unwrap_err();
+    assert!(error.to_string().contains("injected capacity exhaustion"));
+    assert_eq!(
+        uint(
+            &restored
+                .target
+                .one("SELECT count() AS n FROM checkpoints", &Default::default())?["n"]
+        )?,
+        0
+    );
+    assert_eq!(
+        db.target
+            .one("SELECT snapshot_id FROM checkpoints", &Default::default())?["snapshot_id"],
+        id
+    );
+    assert_eq!(
+        importer::import_checkpoint(&restored.target, &complete, None, &work, BUDGET)?
+            ["state_sha256"],
+        ready["state_sha256"]
+    );
+    Ok(())
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn capacity_stops_real_native_sink_before_and_after_durable_progress_then_resumes() -> Result<()> {
+    use evm_state::native_stream::{NativeStream, StreamOptions};
+    use std::sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    };
+    for after_progress in [false, true] {
+        let held = Arc::new(AtomicBool::new(true));
+        let pause = held.clone();
+        let package =
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../spkg/evm-state-v0.1.0.spkg");
+        let stream = NativeStream::new(
+            &package,
+            &[
+                block(100, &slots()?)?,
+                block(101, &[])?,
+                block(102, &[])?,
+                block(103, &[])?,
+            ],
+            StreamOptions {
+                backfill: true,
+                before_block: Some(Arc::new(move |number, context| {
+                    // Make both boundaries deterministic. Killing during an
+                    // initial data write before its first cursor must fail
+                    // closed, so the first case stops before any block arrives.
+                    if number == (if after_progress { 102 } else { 100 })
+                        && pause.load(Ordering::Relaxed)
+                    {
+                        context.hold();
+                    }
+                    Ok(())
+                })),
+                ..Default::default()
+            },
+        )?;
+        let db = Native::at(&stream.endpoint)?;
+        let path = db.options.state_dir.join("durable_progress.json");
+        let restricted = db
+            .client
+            .clone()
+            .with_additional_capacity_guard(Arc::new(move |stage| {
+                let ready = if path.exists() {
+                    let value: Value = serde_json::from_slice(&fs::read(&path)?)?;
+                    value["position"]["block"]["number"] == 101
+                } else {
+                    false
+                };
+                anyhow::ensure!(
+                    stage != "native-progress" || (after_progress && !ready),
+                    "injected capacity exhaustion"
+                );
+                Ok(())
+            }));
+        let options = IngestOptions {
+            stop_block: Some(104),
+            decode_batch_size: 1,
+            spool_max_idle_ms: 100,
+            max_retries: 0,
+            prometheus_addr: Some("127.0.0.1:0".into()),
+            ..Default::default()
+        };
+        let error = ingest::ingest_bounded(
+            &restricted,
+            &db.options,
+            &options,
+            Some(std::time::Instant::now() + std::time::Duration::from_secs(20)),
+            None,
+        )
+        .unwrap_err();
+        assert!(
+            error.to_string().contains("injected capacity exhaustion"),
+            "{error:#}"
+        );
+        if after_progress {
+            assert_eq!(
+                cursor::load_progress(&db.client, &db.run, &db.options.state_dir)?["position"]
+                    ["block"]["number"],
+                101
+            );
+        } else {
+            assert!(db.numbers("state_blocks")?.is_empty());
+        }
+        {
+            let _lock = files::file_lock(&db.options.state_dir.join("run.lock"), true, false)?;
+        }
+        held.store(false, Ordering::Relaxed);
+        assert_eq!(
+            ingest::ingest(&db.client, &db.options, &options)?["position"]["block"]["number"],
+            103
+        );
+        assert_eq!(db.publish(103, 100, None)?["nonzero_slots"], 2);
+        assert!(stream.errors().is_empty(), "{:?}", stream.errors());
+    }
+    Ok(())
 }
 
 #[test]
@@ -1180,4 +1399,100 @@ fn aggregation_copy_preserves_source_and_cannot_claim_unexercised_spilling() -> 
         &Default::default(),
     )?;
     result
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn killed_onboarding_publisher_preserves_old_pin_and_ready_manifest_until_retry() -> Result<()> {
+    use std::{cell::Cell, process::Command, time::Duration};
+    let db = Native::new()?;
+    db.insert(vec![block(100, &slots()?)?])?;
+    let first = db.publish(100, 100, None)?;
+    let id = proof::string(&first, "snapshot_id")?;
+    let pin = reader::pin(&db.target, id, "onboarding-crash")?;
+    let pin = proof::string(&pin, "pin_id")?;
+    let before = reader::page(&db.target, pin, A, None, 1000)?;
+    db.insert(vec![block(101, &[])?, block(102, &[])?, block(103, &[])?])?;
+    let mut source = json!({});
+    for key in [
+        "database",
+        "accounts",
+        "start_block",
+        "module_hash",
+        "final_blocks_only",
+    ] {
+        source[key] = db.run["identity"][key].clone();
+    }
+    source["start_block"] = json!(101);
+    let called = Cell::new(false);
+    let mut bad = bundle(103)?;
+    bad["accounts"][A]["proof"]["storageHash"] = json!(word(0));
+    assert!(checkpoint::build_observed(
+        &db.target,
+        &bad,
+        &[source.clone()],
+        Some(id),
+        BUDGET,
+        &db.root.path().join("work"),
+        &|| {
+            called.set(true);
+            Ok(())
+        }
+    )
+    .is_err());
+    assert!(
+        !called.get(),
+        "observer ran before account-proof acceptance"
+    );
+    files::atomic_json(&db.root.path().join("base.json"), &first, false)?;
+    files::atomic_json(
+        &db.root.path().join("cutover-proofs.json"),
+        &bundle(103)?,
+        false,
+    )?;
+    files::atomic_json(
+        &db.root.path().join("sources.json"),
+        &json!([source]),
+        false,
+    )?;
+    let prefix = db.target.database.strip_suffix("_checkpoints").unwrap();
+    let mut command = Command::new(env!("CARGO_BIN_EXE_evm-state-qualify"));
+    command
+        .args(["onboarding", "--prefix", prefix, "--root"])
+        .arg(db.root.path())
+        .arg("--package")
+        .arg(&db.options.package)
+        .arg("--interrupted-child");
+    let child = evm_state::process::capture(&mut command, Duration::from_secs(30))?
+        .ok_or_else(|| anyhow::anyhow!("onboarding child timed out"))?;
+    assert_eq!(
+        evm_state::process::exit_code(child.status),
+        -libc::SIGKILL,
+        "{}",
+        String::from_utf8_lossy(&child.stderr)
+    );
+    assert_eq!(
+        uint(
+            &db.target.one(
+                "SELECT count() AS n FROM checkpoints FINAL",
+                &Default::default()
+            )?["n"]
+        )?,
+        1
+    );
+    assert_eq!(
+        uint(
+            &db.target.one(
+                "SELECT count(DISTINCT snapshot_id) AS n FROM checkpoint_accounts FINAL",
+                &Default::default()
+            )?["n"]
+        )?,
+        2
+    );
+    assert_eq!(reader::page(&db.target, pin, A, None, 1000)?, before);
+    let next = db.publish(103, 101, Some(id))?;
+    assert_eq!(next["nonzero_slots"], 2);
+    assert_eq!(reader::page(&db.target, pin, A, None, 1000)?, before);
+    reader::unpin(&db.target, pin)?;
+    Ok(())
 }

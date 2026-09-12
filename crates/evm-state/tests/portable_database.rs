@@ -191,3 +191,70 @@ fn corrupt_stored_state_cannot_publish_an_export_and_writer_lock_excludes_restor
     assert!(files::resolve(&output)?.is_dir());
     Ok(())
 }
+
+#[test]
+#[ignore = "requires ClickHouse"]
+fn restore_rechecks_inserted_state_and_changed_files_before_publication() -> Result<()> {
+    use std::sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    };
+    for defect in ["stored-slot", "changed-account-file"] {
+        let root = tempfile::tempdir()?;
+        let input = root.path().join("input");
+        let layout = portable::create(&input)?;
+        let db = Database::new(&root.path().join("control"))?;
+        let work = root.path().join("work");
+        let first = importer::import_checkpoint(&db.0, &input, None, &work, 100_000_000_000)?;
+        let first_id = first["snapshot_id"].as_str().unwrap().to_string();
+        let mutation_client = db.0.clone();
+        let account_file = input.join(layout["account_file"]["file"].as_str().unwrap());
+        let changed = Arc::new(AtomicBool::new(false));
+        let called = changed.clone();
+        let guarded = db.0.clone().with_additional_capacity_guard(Arc::new(move |stage| {
+            if stage == (if defect=="stored-slot" {"import-page"} else {"import-start"}) && !called.swap(true,Ordering::Relaxed) {
+                if defect=="stored-slot" {
+                    mutation_client.execute("ALTER TABLE checkpoint_storage UPDATE value={v:String} WHERE snapshot_id!={old:String} SETTINGS mutations_sync=2", &params(json!({"v":format!("0x{:064x}",42),"old":first_id}))?)?;
+                } else {
+                    let mut accounts: serde_json::Value = serde_json::from_slice(&fs::read(&account_file)?)?;
+                    accounts[0]["snapshot_id"] = json!(first_id);
+                    fs::write(&account_file, serde_json::to_vec(&accounts)?)?;
+                }
+            }
+            Ok(())
+        }));
+        let error = importer::import_checkpoint(&guarded, &input, None, &work, 100_000_000_000)
+            .unwrap_err();
+        assert!(changed.load(Ordering::Relaxed));
+        assert!(
+            error.to_string().contains(if defect == "stored-slot" {
+                "storage root"
+            } else {
+                "file"
+            }),
+            "{defect}: {error:#}"
+        );
+        assert_eq!(
+            uint(
+                &db.0.one(
+                    "SELECT count() AS n FROM checkpoints FINAL",
+                    &Default::default()
+                )?["n"]
+            )?,
+            1
+        );
+        assert_eq!(
+            evm_state::checkpoint::manifest(&db.0, first["snapshot_id"].as_str().unwrap())?,
+            first
+        );
+        assert_eq!(
+            evm_state::checkpoint::read_account(
+                &db.0,
+                first["snapshot_id"].as_str().unwrap(),
+                portable::A
+            )?["nonzero_slots"],
+            2
+        );
+    }
+    Ok(())
+}

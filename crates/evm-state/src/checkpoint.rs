@@ -263,6 +263,29 @@ pub fn build(
     budget_bytes: u64,
     work_dir: &Path,
 ) -> Result<Value> {
+    build_observed(
+        client,
+        bundle,
+        sources,
+        base_id,
+        budget_bytes,
+        work_dir,
+        &|| Ok(()),
+    )
+}
+
+/// Observe the acknowledged candidate account write before its ready manifest.
+/// Qualification uses this boundary for process/database crash injection. An
+/// observer failure leaves the candidate unpublished and preserves prior readers.
+pub fn build_observed(
+    client: &ClickHouse,
+    bundle: &Value,
+    sources: &[Value],
+    base_id: Option<&str>,
+    budget_bytes: u64,
+    work_dir: &Path,
+    after_accounts: &dyn Fn() -> Result<()>,
+) -> Result<Value> {
     setup(client)?;
     let owner = Control::open(client)?;
     let _publisher = owner.publisher()?;
@@ -288,6 +311,7 @@ pub fn build(
         budget_bytes,
         work_dir,
         &owner.path,
+        after_accounts,
     )
 }
 
@@ -299,6 +323,7 @@ fn build_unlocked(
     budget_bytes: u64,
     work_dir: &Path,
     control_path: &Path,
+    after_accounts: &dyn Fn() -> Result<()>,
 ) -> Result<Value> {
     ensure!(
         bundle["format_version"] == 1 && bundle["chain_id"] == 56,
@@ -462,6 +487,7 @@ fn build_unlocked(
         "stream contains account metadata outside its declared filter"
     );
     client.insert_values("checkpoint_accounts", account_rows)?;
+    after_accounts()?;
     let record = json!({"format_version":1,"snapshot_id":snapshot_id,"status":"ready","chain_id":bundle["chain_id"],"header":header,
         "header_trust":bundle["header_trust"],"accounts":accounts,"base_snapshot":base_id,"sources":sources,"verification":verification,
         "state_sha256":hex::encode(digest.finalize()),"proof_bundle":bundle,"created_at":crate::reader::now_ns()?,"retained_budget_bytes":budget_bytes,
