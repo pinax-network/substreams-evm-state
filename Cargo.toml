@@ -2,6 +2,7 @@
 name = "substreams-evm-state"
 description = "EVM account state projection Substreams with native ClickHouse and PostgreSQL outputs"
 edition = "2021"
+rust-version = "1.88"
 version = "0.1.0"
 license = "Apache-2.0"
 repository = "https://github.com/pinax-network/substreams-evm-state"
@@ -9,6 +10,11 @@ repository = "https://github.com/pinax-network/substreams-evm-state"
 [lib]
 name = "substreams_evm_state"
 crate-type = ["cdylib", "rlib"]
+
+[workspace]
+members = ["crates/evm-state"]
+default-members = ["."]
+resolver = "2"
 
 [dependencies]
 substreams = "0.7"

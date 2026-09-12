@@ -17,7 +17,7 @@ jobs:
       - name: Install pinned toolchain
         run: rustup show
       - name: Test from a clean checkout
-        run: cargo test --locked
+        run: cargo test --locked --workspace
       - name: Build Substreams module
         run: cargo build --locked --release --target wasm32-unknown-unknown
 
@@ -69,6 +69,8 @@ jobs:
           python -m pip check
       - name: Build the release package from source
         run: make build
+      - name: Verify Rust checkpoint reader and cursor compatibility
+        run: cargo test --locked -p evm-state --test clickhouse_state -- --include-ignored
       - name: Verify proofs, publication, ownership and real sink recovery
         env:
           PG_DSN: postgresql://evm_test:local-development-only@127.0.0.1:15432/evm_test

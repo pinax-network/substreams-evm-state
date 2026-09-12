@@ -1,0 +1,772 @@
+//! Whole-directory sampled operating guards. These are not filesystem quotas.
+use crate::{
+    ch::{identifier, uint, ClickHouse},
+    control::new_id,
+    files::{atomic_json, canonical_json, resolve, spaced_json},
+    process,
+    proof::string,
+    reader::now_ns,
+};
+use anyhow::{ensure, Context, Result};
+use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    env, fmt,
+    fs::{self, File},
+    io::Write,
+    os::unix::fs::MetadataExt,
+    path::{Component, Path, PathBuf},
+    process::Command,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+    time::Duration,
+};
+use wait_timeout::ChildExt;
+
+pub fn roots(mut paths: Vec<PathBuf>) -> Vec<PathBuf> {
+    paths.sort_by_key(|p| (p.components().count(), p.clone()));
+    paths.dedup();
+    let mut result = Vec::<PathBuf>::new();
+    for path in paths {
+        if !result.iter().any(|parent| path.starts_with(parent)) {
+            result.push(path);
+        }
+    }
+    result
+}
+
+pub fn local_usage(paths: &[PathBuf]) -> Result<Value> {
+    let mut seen = BTreeSet::new();
+    let mut allocated = 0_u64;
+    let mut logical = 0_u64;
+    let mut files = 0_u64;
+    for root in roots(
+        paths
+            .iter()
+            .map(fs::canonicalize)
+            .collect::<std::io::Result<_>>()?,
+    ) {
+        let mut pending = vec![root];
+        while let Some(path) = pending.pop() {
+            let metadata = fs::symlink_metadata(&path)?;
+            ensure!(
+                !metadata.is_symlink(),
+                "capacity roots contain a symlink; declare its target as a separate root"
+            );
+            if !seen.insert((metadata.dev(), metadata.ino())) {
+                continue;
+            }
+            allocated = allocated
+                .checked_add(
+                    metadata
+                        .blocks()
+                        .checked_mul(512)
+                        .context("allocated byte count overflow")?,
+                )
+                .context("allocated byte count overflow")?;
+            if metadata.is_dir() {
+                for entry in fs::read_dir(&path)? {
+                    pending.push(entry?.path());
+                }
+            } else if metadata.is_file() {
+                logical = logical
+                    .checked_add(metadata.len())
+                    .context("logical byte count overflow")?;
+                files += 1;
+            } else {
+                anyhow::bail!("capacity roots contain an unsupported special file");
+            }
+        }
+    }
+    Ok(json!({"allocated_bytes":allocated,"logical_bytes":logical,"files":files}))
+}
+
+#[derive(Debug)]
+pub struct DockerCapacityError {
+    pub operation: &'static str,
+    pub timed_out: bool,
+    pub directory_changed: bool,
+}
+impl fmt::Display for DockerCapacityError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Docker capacity {} {}; the sample is incomplete",
+            self.operation,
+            if self.timed_out {
+                "timed out"
+            } else {
+                "failed"
+            }
+        )
+    }
+}
+impl std::error::Error for DockerCapacityError {}
+
+fn docker(arguments: &[String]) -> Result<Vec<u8>> {
+    let operation = if arguments[0] == "inspect" {
+        "container inspection"
+    } else {
+        "data-directory scan"
+    };
+    let Some(output) = process::capture(
+        Command::new("docker").args(arguments),
+        Duration::from_secs(30),
+    )?
+    else {
+        return Err(DockerCapacityError {
+            operation,
+            timed_out: true,
+            directory_changed: false,
+        }
+        .into());
+    };
+    if !output.status.success() {
+        let error = String::from_utf8_lossy(&output.stderr);
+        let changed = operation == "data-directory scan"
+            && output.status.code() == Some(1)
+            && error.contains("No such file or directory")
+            && !error.contains("Permission denied");
+        return Err(DockerCapacityError {
+            operation,
+            timed_out: false,
+            directory_changed: changed,
+        }
+        .into());
+    }
+    Ok(output.stdout)
+}
+
+fn integer(config: &Value, key: &str, minimum: u64) -> Result<u64> {
+    let value = config[key]
+        .as_u64()
+        .with_context(|| format!("{key} must be an integer >= {minimum}"))?;
+    ensure!(value >= minimum, "{key} must be an integer >= {minimum}");
+    Ok(value)
+}
+
+pub struct Meter {
+    client: ClickHouse,
+    pub config: Value,
+    pub paths: Vec<PathBuf>,
+    budget: u64,
+    headroom: u64,
+    min_free: u64,
+    container: String,
+    container_id: Option<String>,
+    databases: BTreeSet<String>,
+    components: BTreeMap<String, Vec<PathBuf>>,
+}
+
+pub trait CapacitySampler {
+    fn config(&self) -> &Value;
+    fn contains(&self, path: &Path) -> Result<bool>;
+    fn sample(&mut self) -> Result<Value>;
+}
+impl CapacitySampler for Meter {
+    fn config(&self) -> &Value {
+        &self.config
+    }
+    fn contains(&self, path: &Path) -> Result<bool> {
+        Meter::contains(self, path)
+    }
+    fn sample(&mut self) -> Result<Value> {
+        Meter::sample(self)
+    }
+}
+
+impl Meter {
+    pub fn new(client: &ClickHouse, config: Value) -> Result<Self> {
+        ensure!(
+            config.is_object() && config["format_version"] == 1,
+            "unsupported capacity configuration"
+        );
+        let allowed = [
+            "format_version",
+            "clickhouse_container",
+            "local_paths",
+            "databases",
+            "components",
+            "budget_bytes",
+            "headroom_bytes",
+            "min_free_bytes",
+        ];
+        ensure!(
+            config
+                .as_object()
+                .unwrap()
+                .keys()
+                .all(|key| allowed.contains(&key.as_str())),
+            "unknown capacity configuration option"
+        );
+        let budget = integer(&config, "budget_bytes", 1)?;
+        let headroom = integer(&config, "headroom_bytes", 1)?;
+        let min_free = integer(&config, "min_free_bytes", 0)?;
+        ensure!(
+            headroom < budget,
+            "headroom must be smaller than the capacity budget"
+        );
+        let container = string(&config, "clickhouse_container")?.to_owned();
+        ensure!(
+            !container.is_empty()
+                && container
+                    .bytes()
+                    .enumerate()
+                    .all(|(i, b)| b.is_ascii_alphanumeric()
+                        || i > 0 && matches!(b, b'_' | b'.' | b'-')),
+            "invalid ClickHouse container name or ID"
+        );
+        let declared = config["local_paths"]
+            .as_array()
+            .context("declare the local run, control, verification and export directories")?;
+        ensure!(
+            !declared.is_empty(),
+            "declare the local run, control, verification and export directories"
+        );
+        let mut paths = Vec::new();
+        for value in declared {
+            let path = Path::new(value.as_str().context("invalid capacity path")?);
+            ensure!(path.is_absolute(), "capacity local paths must be absolute");
+            let path = fs::canonicalize(path)?;
+            ensure!(
+                path.is_dir(),
+                "capacity local paths must be existing directories"
+            );
+            paths.push(path);
+        }
+        let paths = roots(paths);
+        let databases = config
+            .get("databases")
+            .cloned()
+            .unwrap_or_else(|| json!([client.database]));
+        let databases = databases
+            .as_array()
+            .context("capacity databases must be a nonempty list")?;
+        ensure!(
+            !databases.is_empty(),
+            "capacity databases must be a nonempty list"
+        );
+        let databases = databases
+            .iter()
+            .map(|v| Ok(identifier(v.as_str().context("invalid capacity database")?)?.to_owned()))
+            .collect::<Result<_>>()?;
+        let mut components = BTreeMap::new();
+        if let Some(declared) = config.get("components") {
+            for (name, values) in declared
+                .as_object()
+                .context("capacity components must be an object")?
+            {
+                ensure!(
+                    !name.is_empty()
+                        && name.len() <= 31
+                        && name.bytes().enumerate().all(|(i, v)| v.is_ascii_lowercase()
+                            || i > 0 && (v.is_ascii_digit() || v == b'_' || v == b'-')),
+                    "invalid capacity component declaration"
+                );
+                let mut entries = Vec::new();
+                for value in values
+                    .as_array()
+                    .context("invalid capacity component declaration")?
+                {
+                    let path = Path::new(value.as_str().context("invalid component path")?);
+                    ensure!(
+                        path.is_absolute(),
+                        "capacity component paths must be absolute"
+                    );
+                    let path = resolve(path)?;
+                    ensure!(
+                        paths.iter().any(|root| path.starts_with(root)),
+                        "capacity component is outside declared local roots"
+                    );
+                    entries.push(path);
+                }
+                components.insert(name.clone(), entries);
+            }
+        }
+        let mut meter = Self {
+            client: client.with_database("default")?,
+            config,
+            paths,
+            budget,
+            headroom,
+            min_free,
+            container,
+            container_id: None,
+            databases,
+            components,
+        };
+        meter.inspect()?;
+        Ok(meter)
+    }
+
+    pub fn inspect(&mut self) -> Result<Value> {
+        let info: Value =
+            serde_json::from_slice(&docker(&["inspect".into(), self.container.clone()])?)?;
+        let info = info
+            .as_array()
+            .and_then(|a| a.first())
+            .context("invalid container inspection")?
+            .clone();
+        self.container_id = Some(verify_container(
+            &info,
+            &self.client.url,
+            self.container_id.as_deref(),
+        )?);
+        Ok(info)
+    }
+
+    pub fn contains(&self, path: &Path) -> Result<bool> {
+        let path = resolve(path)?;
+        Ok(self.paths.iter().any(|root| path.starts_with(root)))
+    }
+
+    pub fn sample(&mut self) -> Result<Value> {
+        let started = now_ns()?;
+        let info = self.inspect()?;
+        let disks = self.client.rows("SELECT name,path,type,is_remote,total_space,free_space,unreserved_space FROM system.disks ORDER BY name",&Default::default())?.collect::<Result<Vec<_>>>()?;
+        ensure!(
+            !disks.is_empty(),
+            "complete capacity measurement requires local ClickHouse data disks"
+        );
+        let mut available = u64::MAX;
+        let mut disk_paths = Vec::new();
+        for disk in &disks {
+            ensure!(
+                disk["type"] == "Local" && uint(&disk["is_remote"])? == 0,
+                "complete capacity measurement requires local ClickHouse data disks"
+            );
+            let total = uint(&disk["total_space"])?;
+            let free = uint(&disk["free_space"])?;
+            let unreserved = uint(&disk["unreserved_space"])?;
+            ensure!(
+                total > 0 && free <= total && unreserved <= total,
+                "invalid ClickHouse disk capacity counters"
+            );
+            available = available.min(free).min(unreserved);
+            let path = PathBuf::from(string(disk, "path")?);
+            ensure!(
+                path.is_absolute() && !path.components().any(|c| c == Component::ParentDir),
+                "ClickHouse data disks must be on declared persistent container mounts"
+            );
+            disk_paths.push(path);
+        }
+        let disk_paths = roots(disk_paths);
+        let mounts: Vec<_> = info["Mounts"]
+            .as_array()
+            .context("invalid container mounts")?
+            .iter()
+            .filter(|m| matches!(m["Type"].as_str(), Some("bind" | "volume")))
+            .map(|m| string(m, "Destination").map(PathBuf::from))
+            .collect::<Result<_>>()?;
+        ensure!(
+            disk_paths
+                .iter()
+                .all(|p| mounts.iter().any(|m| p.starts_with(m))),
+            "ClickHouse data disks must be on declared persistent container mounts"
+        );
+        let mut arguments = vec![
+            "exec".into(),
+            self.container_id.clone().unwrap(),
+            "du".into(),
+            "-s".into(),
+            "-c".into(),
+            "-B1".into(),
+            "--null".into(),
+            "--".into(),
+        ];
+        arguments.extend(
+            disk_paths
+                .iter()
+                .map(|p| {
+                    p.to_str()
+                        .context("invalid data disk path")
+                        .map(str::to_owned)
+                })
+                .collect::<Result<Vec<_>>>()?,
+        );
+        let output = retry_scan(|| docker(&arguments))?;
+        let server_bytes = du_total(&output)?;
+        let local = retry_local(|| local_usage(&self.paths))?;
+        let used = server_bytes
+            .checked_add(uint(&local["allocated_bytes"])?)
+            .context("accounted byte count overflow")?;
+        let mut components = BTreeMap::new();
+        for (name, paths) in &self.components {
+            components.insert(
+                name,
+                retry_local(|| {
+                    let mut existing = Vec::new();
+                    for path in paths {
+                        if path.try_exists()? {
+                            existing.push(path.clone());
+                        }
+                    }
+                    local_usage(&existing)
+                })?,
+            );
+        }
+        let selected = |sql: &str| -> Result<Vec<Value>> {
+            let rows = self
+                .client
+                .rows(sql, &Default::default())?
+                .collect::<Result<Vec<_>>>()?;
+            Ok(rows
+                .into_iter()
+                .filter(|row| {
+                    row["database"]
+                        .as_str()
+                        .is_some_and(|name| self.databases.contains(name))
+                })
+                .collect())
+        };
+        let parts = selected("SELECT database,active,sum(bytes_on_disk) AS bytes FROM system.parts GROUP BY database,active ORDER BY database,active")?;
+        let detached = selected("SELECT database,sum(bytes_on_disk) AS bytes FROM system.detached_parts GROUP BY database ORDER BY database")?;
+        let merges = selected(
+            "SELECT database,total_size_bytes_compressed AS input_bytes FROM system.merges",
+        )?;
+        let mut local_disks = Vec::new();
+        for path in &self.paths {
+            let free = fs2::available_space(path)?;
+            available = available.min(free);
+            local_disks.push(json!({"path":path,"available_bytes":free}));
+        }
+        let mut reasons = Vec::new();
+        if u128::from(used) + u128::from(self.headroom) >= u128::from(self.budget) {
+            reasons.push("budget_headroom_exhausted");
+        }
+        if available < self.min_free {
+            reasons.push("filesystem_free_space_below_floor");
+        }
+        Ok(
+            json!({"format_version":1,"sample_started_ns":started,"sample_finished_ns":now_ns()?,"container_id":self.container_id,
+            "server_data_roots":disk_paths,"server_data_allocated_bytes":server_bytes,"local_roots":self.paths,
+            "local":local,"local_components":components,"accounted_allocated_bytes":used,"budget_bytes":self.budget,"headroom_bytes":self.headroom,
+            "available_above_headroom_bytes":i128::from(self.budget)-i128::from(self.headroom)-i128::from(used),"min_free_bytes":self.min_free,
+            "server_disks":disks,"local_filesystems":local_disks,"selected_database_parts":parts,"selected_database_detached_parts":detached,
+            "selected_database_merges":merges,"admitted":reasons.is_empty(),"reasons":reasons,
+            "coverage":"entire local ClickHouse data disks plus declared local roots; shared data may overcount","limit_kind":"sampled operating guard, not a filesystem quota"}),
+        )
+    }
+}
+
+pub fn retry_scan(mut scan: impl FnMut() -> Result<Vec<u8>>) -> Result<Vec<u8>> {
+    for attempt in 0..5 {
+        match scan() {
+            Ok(output) => return Ok(output),
+            Err(error)
+                if attempt < 4
+                    && error
+                        .downcast_ref::<DockerCapacityError>()
+                        .is_some_and(|e| e.directory_changed) =>
+            {
+                std::thread::sleep(Duration::from_millis(100 << attempt))
+            }
+            Err(error) => return Err(error),
+        }
+    }
+    unreachable!()
+}
+
+fn retry_local<T>(mut sample: impl FnMut() -> Result<T>) -> Result<T> {
+    match sample() {
+        Err(error)
+            if error
+                .downcast_ref::<std::io::Error>()
+                .is_some_and(|e| e.kind() == std::io::ErrorKind::NotFound) =>
+        {
+            sample()
+        }
+        result => result,
+    }
+}
+
+pub fn du_total(output: &[u8]) -> Result<u64> {
+    let end = output
+        .iter()
+        .rposition(|b| *b != 0)
+        .map(|i| i + 1)
+        .unwrap_or(0);
+    let last = output[..end]
+        .rsplit(|b| *b == 0)
+        .next()
+        .context("invalid ClickHouse data-directory measurement")?;
+    let text = std::str::from_utf8(last)?;
+    let (bytes, label) = text
+        .split_once('\t')
+        .context("invalid ClickHouse data-directory measurement")?;
+    ensure!(
+        label == "total" && !bytes.is_empty() && bytes.bytes().all(|b| b.is_ascii_digit()),
+        "invalid ClickHouse data-directory measurement"
+    );
+    bytes
+        .parse()
+        .context("invalid ClickHouse data-directory measurement")
+}
+
+fn failure(error: &anyhow::Error, started: u64) -> Result<Value> {
+    let mut value = json!({"format_version":1,"sample_started_ns":started,"sample_finished_ns":now_ns()?,"admitted":false,
+        "reasons":["incomplete_capacity_sample"],"error_type":"CapacityError"});
+    if let Some(error) = error.downcast_ref::<DockerCapacityError>() {
+        value["error_type"] = json!("DockerCapacityError");
+        value["inspection_operation"] = json!(error.operation);
+        value["directory_changed"] = json!(error.directory_changed);
+    }
+    Ok(value)
+}
+
+pub fn check(
+    client: &ClickHouse,
+    required_paths: &[PathBuf],
+    stage: &str,
+) -> Result<Option<Value>> {
+    let Some(policy) = env::var_os("EVM_STATE_CAPACITY_CONFIG") else {
+        return Ok(None);
+    };
+    let mut meter = Meter::new(client, serde_json::from_slice(&fs::read(policy)?)?)?;
+    for path in required_paths {
+        ensure!(
+            meter.contains(path)?,
+            "operation uses a directory outside the declared capacity roots"
+        );
+    }
+    let destination = env::var_os("EVM_STATE_CAPACITY_EVENTS")
+        .map(|path| resolve(Path::new(&path)))
+        .transpose()?;
+    if let Some(destination) = &destination {
+        ensure!(
+            meter.contains(destination)?,
+            "capacity events directory is outside declared roots"
+        );
+    }
+    let started = now_ns()?;
+    let measured = match meter.sample() {
+        Ok(value) => value,
+        Err(error) => {
+            if let Some(destination) = &destination {
+                let mut value = failure(&error, started)?;
+                value["stage"] = json!(stage);
+                atomic_json(
+                    &destination.join(format!("{}.json", new_id())),
+                    &value,
+                    false,
+                )?;
+            }
+            return Err(error);
+        }
+    };
+    if let Some(destination) = &destination {
+        let mut value = measured.clone();
+        value["stage"] = json!(stage);
+        atomic_json(
+            &destination.join(format!("{}.json", new_id())),
+            &value,
+            false,
+        )?;
+    }
+    ensure!(
+        measured["admitted"] == true,
+        "capacity guard rejected operation: {}",
+        measured["reasons"]
+    );
+    Ok(Some(measured))
+}
+
+#[derive(Default)]
+struct Stats {
+    samples: u64,
+    failures: u64,
+    peak: u64,
+    max_gap: u64,
+    last: Option<u64>,
+}
+impl Stats {
+    fn record(&mut self, meter: &mut impl CapacitySampler, log: &mut File) -> Result<Value> {
+        let started = now_ns()?;
+        let value = match meter.sample() {
+            Ok(value) => {
+                self.samples += 1;
+                self.peak = self.peak.max(uint(&value["accounted_allocated_bytes"])?);
+                let now = uint(&value["sample_finished_ns"])?;
+                if let Some(last) = self.last {
+                    self.max_gap = self.max_gap.max(now.saturating_sub(last));
+                }
+                self.last = Some(now);
+                value
+            }
+            Err(error) => {
+                self.failures += 1;
+                failure(&error, started)?
+            }
+        };
+        writeln!(log, "{}", canonical_json(&value)?)?;
+        log.flush()?;
+        log.sync_all()?;
+        Ok(value)
+    }
+}
+
+pub fn supervise(
+    meter: &mut impl CapacitySampler,
+    command: &[String],
+    output: &Path,
+    interval: f64,
+) -> Result<Value> {
+    ensure!(
+        !command.is_empty(),
+        "capacity-run requires a command after --"
+    );
+    ensure!(
+        interval.is_finite() && (0.1..=60.0).contains(&interval),
+        "sample interval must be between 0.1 and 60 seconds"
+    );
+    let output = resolve(output)?;
+    ensure!(
+        meter.contains(&output)?,
+        "capacity report directory must be inside a declared local root"
+    );
+    fs::create_dir_all(output.parent().context("capacity output has no parent")?)?;
+    fs::create_dir(&output)?;
+    atomic_json(&output.join("config.json"), meter.config(), false)?;
+    fs::create_dir(output.join("guards"))?;
+    let started = now_ns()?;
+    let mut stats = Stats::default();
+    let mut result = None;
+    let mut reasons = BTreeSet::<String>::new();
+    let mut termination_error = None;
+    let config_hash = hex::encode(Sha256::digest(spaced_json(meter.config())?));
+    let mut log = File::create_new(output.join("samples.jsonl"))?;
+    let stopped = Arc::new(AtomicBool::new(false));
+    let signals = [signal_hook::consts::SIGINT, signal_hook::consts::SIGTERM]
+        .into_iter()
+        .map(|signal| signal_hook::flag::register(signal, stopped.clone()))
+        .collect::<std::io::Result<Vec<_>>>()?;
+    let execute = (|| -> Result<()> {
+        let first = stats.record(meter, &mut log)?;
+        if first["admitted"] != true {
+            for reason in first["reasons"]
+                .as_array()
+                .context("invalid sample reasons")?
+            {
+                reasons.insert(reason.as_str().context("invalid sample reason")?.into());
+            }
+            return Ok(());
+        }
+        let mut process = process::OwnedGroup::spawn(
+            Command::new(&command[0])
+                .args(&command[1..])
+                .env("EVM_STATE_CAPACITY_CONFIG", output.join("config.json"))
+                .env("EVM_STATE_CAPACITY_EVENTS", output.join("guards")),
+        )?;
+        let run = (|| -> Result<()> {
+            loop {
+                result = process
+                    .child
+                    .wait_timeout(Duration::from_secs_f64(interval))?
+                    .map(process::exit_code);
+                let current = stats.record(meter, &mut log)?;
+                if current["admitted"] != true {
+                    for reason in current["reasons"]
+                        .as_array()
+                        .context("invalid sample reasons")?
+                    {
+                        reasons.insert(reason.as_str().context("invalid sample reason")?.into());
+                    }
+                }
+                if stopped.load(Ordering::Relaxed) {
+                    reasons.insert("supervisor_interrupted".into());
+                }
+                if result.is_some() || !reasons.is_empty() {
+                    break;
+                }
+            }
+            Ok(())
+        })();
+        if result.is_none() || !reasons.is_empty() || run.is_err() {
+            match process.terminate() {
+                Ok(status) => result = Some(process::exit_code(status)),
+                Err(_) => termination_error = Some("could_not_confirm_process_group_termination"),
+            }
+        } else {
+            process.complete();
+        }
+        run
+    })();
+    for signal in signals {
+        signal_hook::low_level::unregister(signal);
+    }
+    if execute.is_err() {
+        reasons.insert("supervisor_error".into());
+    }
+    let mut guards = Vec::new();
+    for entry in fs::read_dir(output.join("guards"))? {
+        let path = entry?.path();
+        if path.extension().is_some_and(|v| v == "json") {
+            guards.push(serde_json::from_slice::<Value>(&fs::read(path)?)?);
+        }
+    }
+    let mut rejected = Vec::new();
+    let mut guard_failures = 0;
+    for guard in &guards {
+        if let Some(bytes) = guard.get("accounted_allocated_bytes") {
+            stats.peak = stats.peak.max(uint(bytes)?);
+        }
+        let causes = guard["reasons"]
+            .as_array()
+            .context("invalid capacity guard reasons")?;
+        if causes.contains(&json!("incomplete_capacity_sample")) {
+            guard_failures += 1;
+        }
+        if guard["admitted"] != true {
+            rejected.push(string(guard, "stage")?.to_owned());
+            for cause in causes {
+                reasons.insert(
+                    cause
+                        .as_str()
+                        .context("invalid capacity guard reason")?
+                        .into(),
+                );
+            }
+        }
+    }
+    let report = json!({"format_version":1,"started_ns":started,"finished_ns":now_ns()?,"config_sha256":config_hash,"config":meter.config(),
+        "samples":stats.samples,"failed_samples":stats.failures,"peak_observed_allocated_bytes":stats.peak,"maximum_sample_gap_ns":stats.max_gap,
+        "guard_samples":guards.len(),"failed_guard_samples":guard_failures,"rejected_guard_stages":rejected,"command_exit_code":result,
+        "stop_reasons":reasons,"termination_error":termination_error,
+        "status":if result==Some(0) && reasons.is_empty() && termination_error.is_none() {"completed"} else {"stopped"},
+        "limit_kind":"sampled operating guard; excursions between samples are not bounded by this report"});
+    atomic_json(&output.join("summary.json"), &report, false)?;
+    Ok(report)
+}
+
+pub fn verify_container(info: &Value, endpoint: &str, previous: Option<&str>) -> Result<String> {
+    let id = string(info, "Id")?;
+    ensure!(
+        previous.is_none_or(|previous| previous == id),
+        "ClickHouse capacity container was replaced"
+    );
+    let url = reqwest::Url::parse(endpoint)
+        .map_err(|_| anyhow::anyhow!("invalid local capacity endpoint"))?;
+    ensure!(
+        url.scheme() == "http"
+            && matches!(url.host_str(), Some("localhost" | "127.0.0.1"))
+            && url.username().is_empty()
+            && url.password().is_none(),
+        "Docker capacity measurement requires a local published HTTP endpoint"
+    );
+    let port = url.port().unwrap_or(80).to_string();
+    let bindings = info["NetworkSettings"]["Ports"]["8123/tcp"].as_array();
+    ensure!(
+        info["State"]["Running"] == true
+            && bindings.is_some_and(|entries| entries.iter().any(|binding| binding["HostPort"]
+                == port
+                && matches!(
+                    binding["HostIp"].as_str(),
+                    Some("127.0.0.1" | "0.0.0.0" | "")
+                ))),
+        "capacity container does not own the configured ClickHouse HTTP endpoint"
+    );
+    Ok(id.into())
+}

@@ -94,6 +94,9 @@ describes measured roots, reserves, incomplete-sample handling and recovery.
 
 ## Gates before publishing
 
+- [ ] Complete the [Rust migration](RUST_MIGRATION.md): native CLI, operations,
+  verification, qualification tools and test transport; remove first-party
+  Python/Go code and Python dependencies, with behavior and recovery parity.
 - [ ] Finish and prove the complete WBNB and supplied customer-example bootstraps;
   record their source/package identities, exact block/hash, slot counts and roots.
 - [ ] Advance complete state through a recent finalized continuation and record
