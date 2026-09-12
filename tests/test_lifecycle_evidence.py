@@ -15,7 +15,7 @@ FIXTURES = ROOT / "tests/fixtures/lifecycle"
 def test_captured_lifecycle_messages_and_headers_match_provenance():
     evidence = json.loads((FIXTURES / "manifest.json").read_text())
     assert evidence["chain_id"] == 56
-    assert len(evidence["records"]) == 24
+    assert len(evidence["records"]) == 26
     assert {record["producer_version"] for record in evidence["records"]} == {3, 4, 5}
     for record in evidence["records"]:
         raw = (FIXTURES / record["filename"]).read_bytes()
@@ -112,7 +112,7 @@ def test_failed_distinct_authority_native_updates_match_saved_account_proofs():
         assert fields[authority]["code"] == "0xef0100cb4dd2ac21ee75be478989d8b05897de225e5910"
 
 
-@pytest.mark.parametrize("version,accounts,code_bytes", [(3, 6, 21), (5, 1, 4)])
+@pytest.mark.parametrize("version,accounts,code_bytes", [(3, 6, 21), (4, 1, 427), (5, 1, 4)])
 def test_existing_account_selfdestruct_native_markers_match_surviving_archive_state(version, accounts, code_bytes):
     evidence = json.loads((ROOT / f"docs/evidence/bsc-existing-selfdestruct-v{version}-2026-09-12.json").read_text())
     records = {r["filename"]: r for r in json.loads((FIXTURES / "manifest.json").read_text())["records"]}
@@ -153,13 +153,15 @@ def test_selfdestruct_and_failed_clear_replays_match_saved_account_proofs(name, 
 
 @pytest.mark.parametrize("name,blocks,cases", [
     ("bsc-failed-clears-captured", 60249, 2), ("bsc-invalid-self-clear", 40373, 1),
+    ("bsc-failed-clear-reinstall-v4", 2, 1),
 ])
 def test_captured_clear_block_end_evidence_cannot_be_replaced_by_later_updates(name, blocks, cases):
     evidence = json.loads((ROOT / f"docs/evidence/{name}-2026-09-12.json").read_text())
     records = {r["filename"]: r for r in json.loads((FIXTURES / "manifest.json").read_text())["records"]}
     assert evidence["blocks"] == blocks and len(evidence["comparisons"]) == cases
     expected = {"v5-failed-authority-clear.pb": (3442, 10581),
-                "v5-failed-self-clear.pb": (1170, 40), "v5-invalid-self-clear-noop.pb": (None, 102)}
+                "v5-failed-self-clear.pb": (1170, 40), "v5-invalid-self-clear-noop.pb": (None, 102),
+                "v4-failed-clear-reinstall.pb": (9041, 2966)}
     for checked in evidence["comparisons"]:
         record = records[checked["fixture"]]
         assert checked["fixture_sha256"] == record["sha256"]
@@ -173,6 +175,10 @@ def test_captured_clear_block_end_evidence_cannot_be_replaced_by_later_updates(n
         if ordinal is None:
             assert checked["native_code_patches"] == [] and checked["native_lifecycle"] == []
             assert checked["code_bytes_after"] == 23
+        elif checked["fixture"] == "v4-failed-clear-reinstall.pb":
+            assert checked["code_bytes_after"] == 23
+            assert checked["native_code_patches"] == [{"code": "0xef0100e5a1a2d728ddcf2104fcba190ce4b370e79d6c58", "ordinal": 9043}]
+            assert checked["native_lifecycle"] == [{"kind": "code_cleared", "ordinal": 9041}]
         else:
             assert checked["code_bytes_after"] == 0
             assert checked["native_code_patches"] == [{"code": "0x", "ordinal": ordinal}]

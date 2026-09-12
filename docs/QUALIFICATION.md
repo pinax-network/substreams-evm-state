@@ -8,7 +8,7 @@ make an entire deliverable complete.
 |---|---|---|
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication; 15-minute finalized follow; measured complete pinned reads; fixed finalized decode/spool latency; persistent OS host identity and explicit legacy hostname recovery | Customer latency targets and deployment conditions; storage must honor sync writes (physical host power loss is not emulated) |
 | Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage; real three-account cutover with a killed publisher, unchanged old reader and combined-filter continuation | Broader nonempty hot-account bootstrap and customer account qualification |
-| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; 24 additional captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases; native proof comparisons include failed distinct authorities and failed delegation clearing; captured post-Cancun existing-account SELFDESTRUCT preserves nonce/code; invalid self-clear does not invent a change; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers fail on unknown/wrong metadata | Broader representative lifecycle replay and hot-account completeness; system-execution SELFDESTRUCT remains unsupported |
+| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; 26 additional captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases; native proof comparisons include failed distinct authorities and failed delegation clearing; captured post-Cancun existing-account SELFDESTRUCT preserves nonce/code on all three producers; v4 clear/reinstallation ordering survives reverted execution; invalid self-clear does not invent a change; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers fail on unknown/wrong metadata | Broader representative lifecycle replay and hot-account completeness; system-execution SELFDESTRUCT remains unsupported |
 | Retention/cost qualification and release | Whole-directory capacity monitoring, sampled headroom enforcement and publication/trie guards; measured 64-account synthetic checkpoint/export/restore/churn/retention; observed active merge space and real BSC spool; checkpoint/candidate cleanup preserving readers; native history cleanup and bounded bootstrap chunks; pinned toolchain and package-producing build; separated cold/cached/live results, current price model and old-contract cohort addition | Nonempty hot-account initial state and sustained-growth qualification, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
@@ -18,14 +18,14 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 276 tests (133 offline, 141 ClickHouse
+The Python suite currently contains 286 tests (143 offline, 141 ClickHouse
 integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. The previous 264-test Python baseline passed
-on GitHub CI at `8f4da16` in 88.36 seconds. Current local checks pass 133 offline
-Python tests and 41 Rust tests. CI also runs the complete integration suite. The
+configured development database. The previous 276-test Python baseline passed
+on GitHub CI at `c7baf89` in 139.40 seconds. Current local checks pass 143 offline
+Python tests and 43 Rust tests. CI also runs the complete integration suite. The
 seven focused capacity integration tests pass locally, and `make build` produces
 the same package SHA-256 used by the latest lifecycle replays:
 `7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2`. The
@@ -198,10 +198,11 @@ transaction changed code; this does not complete the broader authorization or
 historical lifecycle matrix, and the parity check is not a complete storage proof.
 
 The [expanded captured matrix](../tests/fixtures/lifecycle/manifest.json) now adds
-24 original transaction/header pairs: v3 WBNB creation, CREATE2 with
+26 original transaction/header pairs: v3 WBNB creation, CREATE2 with
 delegated initialization, pre-Cancun deletion/recreation and storage clearing,
 post-Cancun same-transaction creation/destruction, v4 delegation installation and
-failed self-delegation, v3/v5 existing-account SELFDESTRUCT, and v5
+failed self-delegation and reverted clear/reinstallation, v3/v4/v5
+existing-account SELFDESTRUCT, and v5
 self/multiple/discarded/cleared/repeated authorizations, including failed clears
 and an invalid self-clear request. Literal Rust expectations are cross-checked with before/after
 archive RPC metadata and touched slots. RPC `callTracer` independently identifies

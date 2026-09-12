@@ -31,6 +31,35 @@ settings can change between resumes without changing the module/filter identity.
 Use a distinct `--prometheus-addr` for concurrent native cohorts; `127.0.0.1:0`
 assigns an ephemeral local metrics port for qualification runs.
 
+Both commands accept `--parallel-workers 100` to request server-side execution
+workers through the native sink's `X-Substreams-Parallel-Workers` header. Omitting
+it preserves the provider default; the provider decides the admitted limit.
+This is separate from local decode workers and does not change the package,
+module/filter identity, cursor or spool budget. The native chunk/restart test
+verifies that a worker request can change from 50 to 100 across resumes while
+the source continues at the checked cursor. Record the admitted session limit
+and observed running jobs when interpreting performance.
+
+The [worker scheduling comparison](evidence/bsc-worker-scheduling-2026-09-12.json)
+uses the customer's one supplied example account and its frozen bootstrap
+package. Both 100,000-block intervals pass native ownership, block continuity,
+encoded target-header and durable-cursor checks:
+
+| Historical range | Requested/admitted workers | Peak reported running jobs | Guarded ingestion |
+|---|---|---|---|
+| 56000000–56099999 | 100 / 100 | 100 | 61.90 s |
+| 56100000–56199999 | 50 / 50 | 49 | 66.58 s |
+
+Server telemetry reports 100,000 processed blocks for each interval. The first
+100-worker attempt stopped during its initial capacity measurement before
+starting ingestion; the reported successful run used a fresh database/directory.
+These adjacent ranges are not a controlled same-block scaling experiment, and
+shared infrastructure and underlying block-cache warmth were not controlled.
+The small timing difference does not establish linear scaling. The measurement
+does establish that the guarded native path passes the request to the provider
+and verifies the resulting complete update interval. Full initial storage and
+customer-set throughput remain separate qualifications.
+
 ## Cache comparison
 
 Both runs cover **121300000–121309999**, inclusive, and use a fresh local source

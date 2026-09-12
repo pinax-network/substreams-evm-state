@@ -1,0 +1,133 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "account": "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+  "measurements": [
+    {
+      "blocks": 100000,
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "ad2e69a380f86e2902cc5f2318098d6a615c4b7243c558b55ebb17003efdf4f2",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789234252512527000,
+        "format_version": 1,
+        "guard_samples": 14,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 7559097000,
+        "peak_observed_allocated_bytes": 4910325760,
+        "rejected_guard_stages": [],
+        "samples": 8,
+        "started_ns": 1789234190889479000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      },
+      "capacity_summary_sha256": "b1528763458013dd64b1a7b5faafb70dab11e9d9df0b59d93c34b1b774c47c68",
+      "chain_id": 56,
+      "format_version": 1,
+      "guarded_ingestion_seconds": 61.90094433259219,
+      "header": {
+        "hash": "0x6eea64899301b73706dea7e00cd7c5323905812f54d9402e35906e8e88326514",
+        "number": 56099999,
+        "parent_hash": "0xcd4823d260142ec577dabc074cfe47a2f7dab3c73ab662f7a3425b28f0a30898",
+        "state_root": "0x4b818fa62e4a677e72aacb31be36abf1231f2cdf7ae9bf6eb5d7a4677d73f427",
+        "timestamp": 1754073027
+      },
+      "header_rlp": "0xf9037ca0cd4823d260142ec577dabc074cfe47a2f7dab3c73ab662f7a3425b28f0a30898a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347945009317fd4f6f8feea9dae41e5f0a4737bb7a7d5a04b818fa62e4a677e72aacb31be36abf1231f2cdf7ae9bf6eb5d7a4677d73f427a0e851898840942ea93433889d836caa2e26fb0ed45ac72b647340d6656d517616a0988a04a60e42a5509b3b766d1decfc23fc613c3807ffa3b5dc9f50c6a3ceeae8b90100c121028c1420000080031c46d0a421049e1a33100c412084b3e04a50460200c59506f000e288a1046a1050b10c4701019515c48e5c20260016c01ba41d24099f1527103477782128a108921982132024ac301923a0a40a380c140c4098110763503a00a0584741d084180d239ec44e7fa900c55110049002142110d5806c8e81881441e02a09006289a0220a88800de63134843138a60129a00a01c33506cea9c20408a41a0403345b0225d0230c644124c04250481220600c40000130aa123119501042990af585408aa0a09418c24968e6010202285c54013044420c86a88108100111045a66400345048c000301ca1140a0800410074cd48047202090024c02840358049f84047868c08397fe2b84688d07c3b90118d983010511846765746889676f312e32332e3130856c696e75780000098d24acf8b5831f7fffb8609207eb1f8d1d17c16e0a5be73c491810c0b365538d5b1e02c4a95c16bf1a409a96669fd36d03d242a1564ad1af6d22db17e122355654d30e911529fb33c709b82c22ffadf292798adda82f1e34ab0acc8590b676106fc799e5becfd0fa23a4dcf84c840358049da028cde6e62fdd2d7709c9f58897fc1ea9c989bb46e0a4348aecca5faf24411fde840358049ea0cd4823d260142ec577dabc074cfe47a2f7dab3c73ab662f7a3425b28f0a3089880ed27eb802ed8b8351bcedc23d8e80fbc22c9a08318ee3a2a0b98985f7e66704a01952a012547ddd156119400e3bc01681ac525daae88b10455fd5c3a0f2858d100a000000000000000000000000000000000000000000000000000000000000000fa88000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a0e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "maximum_reported_processed_blocks": 100000,
+      "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+      "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+      "peak_reported_running_jobs": 100,
+      "qualification": "Two adjacent historical ranges, same customer-example filter and frozen package. Shared workload and underlying cache warmth are uncontrolled. Server telemetry measures requested/admitted workers and processing; this is not full-state proof, a linear-scaling claim or customer SLA.",
+      "requested_workers": 100,
+      "run_id": "f18ca43b5a7b4c128c589c62cd741c8d",
+      "sessions": [
+        {
+          "linear_handoff_block": 56100000,
+          "max_parallel_workers": 100,
+          "resolved_start_block": 56000000
+        }
+      ],
+      "start_block": 56000000,
+      "started_ns": 1789234190630425000
+    },
+    {
+      "blocks": 100000,
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "88aed7c11c2ed271ac6a3267527a8c00e1efded094b6ffa8d4e7296658733539",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789234383669420000,
+        "format_version": 1,
+        "guard_samples": 17,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 9869806000,
+        "peak_observed_allocated_bytes": 4722814976,
+        "rejected_guard_stages": [],
+        "samples": 10,
+        "started_ns": 1789234317457455000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      },
+      "capacity_summary_sha256": "68e3984846dc86bdce1d48289979c27ca3cd0d950c758e3c087d48a098c31693",
+      "chain_id": 56,
+      "format_version": 1,
+      "guarded_ingestion_seconds": 66.57738170865923,
+      "header": {
+        "hash": "0x042f765509fd9f00d074378ac84bc78a3727cfb7ef638606f7dc465bb2543efd",
+        "number": 56199999,
+        "parent_hash": "0x3740e8c9a985f5c0f3d4a87737895f15bc9546b35eebea8aed02fc3b30f0ae98",
+        "state_root": "0x875da9e9862edd728e1470b6e7fca7ad7dd76a0d596174c640352e140e5e5a93",
+        "timestamp": 1754148030
+      },
+      "header_rlp": "0xf9037fa03740e8c9a985f5c0f3d4a87737895f15bc9546b35eebea8aed02fc3b30f0ae98a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d4934794ec3c2d51b8a6ca9cf244f709ea3ade0c7b21238fa0875da9e9862edd728e1470b6e7fca7ad7dd76a0d596174c640352e140e5e5a93a0b6faeaa23c6f6f13172405dc894fbb5b47553f263d206b44651b765e9a6230dea03d282b1ed7eca5362f69ac16d872eafc5f146e5867b849f3902b078aea7d7fb2b90100ac38020000241022c603044499000800311180102010020025c2411002c205a1002c50085c05b14803105411082a5294bd4c80e0002324101a006a41d22201c044015013164084282303010d80214424a61148018002334c4194000005000000010c102c700204c86c3017979c4246892820840120068006109200d0ee28429500202621000a014ca0a89500580035d140342407040160186a010b42578e343082042424a00820200a60314002054b4100000242400244040248a08a154504418101040200070c11608801011a0200006082620a02104c70a833c0129820c200889600a140664000814842841015134010e0a0230080010f4030c22034c04150028403598b3f84047868c08377cf0284688e2cbeb90118d883010510846765746888676f312e32342e32856c696e7578000000098d24acf8b5831f7fffb860b880964d9723a851fd02376f935d0b872cb6f1fa6b6ebbc7e796902c842092b1da8290d8fb19defa979a1b4fa3a1bcfa07162fda5b5875113220c61eda054e9b81d86eea08750dfca252d4af240426350b4c3f2dfd0fec06cfaabde7ac25e057f84c8403598b3da0ff373369966df7d8f5b1fbd95c2d78e744636874c856939ab2a8affefa2f106d8403598b3ea03740e8c9a985f5c0f3d4a87737895f15bc9546b35eebea8aed02fc3b30f0ae9880c819f1cbfd12ad249fc9f3d72345331588f97f5198f3f4c69bbb59e90c3e73aa7dc9f6ab01424aed3db9c6efb7f5a34e53c695560aa38d05a735410d6e5c6f9000a000000000000000000000000000000000000000000000000000000000000002ee88000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218302000080a00000000000000000000000000000000000000000000000000000000000000000a0e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "maximum_reported_processed_blocks": 100000,
+      "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+      "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+      "peak_reported_running_jobs": 49,
+      "qualification": "Two adjacent historical ranges, same customer-example filter and frozen package. Shared workload and underlying cache warmth are uncontrolled. Server telemetry measures requested/admitted workers and processing; this is not full-state proof, a linear-scaling claim or customer SLA.",
+      "requested_workers": 50,
+      "run_id": "9085fa04ece947b6b9225742ca7fdfb1",
+      "sessions": [
+        {
+          "linear_handoff_block": 56200000,
+          "max_parallel_workers": 50,
+          "resolved_start_block": 56100000
+        }
+      ],
+      "start_block": 56100000,
+      "started_ns": 1789234317121774000
+    }
+  ],
+  "failed_preflight": {
+    "summary_sha256": "421a0bb36e60438cc4099d997c4dc5c71bf5a4c1041ae6ea6b1124e6238d6171",
+    "summary": {
+      "command_exit_code": null,
+      "config_sha256": "834a989cdda8c6de1885622c8df8e19e31a544aff699120070c7581b8b78977b",
+      "failed_guard_samples": 0,
+      "failed_samples": 1,
+      "finished_ns": 1789233875572414000,
+      "format_version": 1,
+      "guard_samples": 0,
+      "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+      "maximum_sample_gap_ns": 0,
+      "peak_observed_allocated_bytes": 0,
+      "rejected_guard_stages": [],
+      "samples": 0,
+      "started_ns": 1789233845514881000,
+      "status": "stopped",
+      "stop_reasons": [
+        "incomplete_capacity_sample"
+      ],
+      "termination_error": null
+    },
+    "qualification": "First 100-worker attempt was not started because its initial capacity scan timed out. The successful run used a new database and directory; no partial interval is timed as a full replay."
+  },
+  "overall_budget_bytes": 100000000000,
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "live_policy_budget_bytes": 98257164288,
+  "qualification": "Both native intervals, source ownership and durable cursor were verified against their encoded target headers. Adjacent ranges and uncontrolled shared infrastructure preclude a universal worker scaling or customer throughput claim. No complete initial storage is established."
+}

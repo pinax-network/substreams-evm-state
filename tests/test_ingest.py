@@ -74,6 +74,7 @@ def test_finalized_follow_flushes_before_another_decode_batch_arrives(databases,
         result = ingest(client, SPKG, server.endpoint, [A], 100, tmp_path / "native",
                         native_dsn(client.database), stop_block=103, max_retries=0)
         assert result["position"]["block"]["number"] == 102
+        assert server.requested_workers == [None]
         assert not server.errors
         assert int(client.one("SELECT count() AS n FROM state_blocks FINAL")["n"]) == 3
     finally:

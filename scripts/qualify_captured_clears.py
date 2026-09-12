@@ -19,6 +19,7 @@ from evm_state.source import verified_source
 
 
 CASES = {
+    "v4-failed-clear-reinstall.pb": ("0x2eecb88952aced531a7b29ac7320feca57e73a62", 9041),
     "v5-failed-authority-clear.pb": ("0x73d718b4cf0d2d86eb4ac522f6fedf599bbbdfb7", 3442),
     "v5-failed-self-clear.pb": ("0xbbb90cdb4e271be14df46b7e84f4fbf3bab17b6e", 1170),
     "v5-invalid-self-clear-noop.pb": ("0x213864e51cdacf3fdacbdc12726dba9f12167514", None),
@@ -94,6 +95,12 @@ def main():
             if ordinal is None:
                 if codes or markers or before["code"] == "0x" or before["code"] != after["code"]:
                     raise VerificationError("invalid authorization unexpectedly clears delegation")
+            elif record["filename"] == "v4-failed-clear-reinstall.pb":
+                if (codes != [{"code": after["code"], "ordinal": 9043}] or
+                        markers != [{"kind": "code_cleared", "ordinal": ordinal}] or
+                        before["code"] == "0x" or after["code"] == "0x" or before["code"] == after["code"] or
+                        observed[authority].get("code") != after["code"]):
+                    raise VerificationError("native clear/reinstallation ordering differs from captured case")
             elif (codes != [{"code": "0x", "ordinal": ordinal}] or
                   markers != [{"kind": "code_cleared", "ordinal": ordinal}] or
                   before["code"] == "0x" or after["code"] != "0x" or

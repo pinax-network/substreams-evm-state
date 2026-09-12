@@ -1870,6 +1870,168 @@
           }
         }
       }
+    },
+    {
+      "block": 64037736,
+      "block_hash": "0x1efd540523f90c4a2fa9f45e48143f08e4169d00e096cc0e47c13911572aab00",
+      "timestamp": 1760027735,
+      "producer_version": 4,
+      "detail_level": 0,
+      "hash": "0x4bc7032d03ece64d063b30e986765ad6fd5a7bd2eebe6052a18bb23bd9484d1c",
+      "status": 1,
+      "reasons": [
+        "selfdestruct"
+      ],
+      "filename": "v4-post-cancun-existing-selfdestruct.pb",
+      "bytes": 103540,
+      "sha256": "478e88d5849083830007a68af897cdbcdcec2d93c7b0aedbd2ec51007fe2abd7",
+      "root_begin_ordinal": 543,
+      "root_end_ordinal": 1803,
+      "tx_end_ordinal": 1808,
+      "from": "0xde230c944fec7cb4dd5c3301282170fa03caf682",
+      "auths": [],
+      "header_filename": "v4-post-cancun-existing-selfdestruct-header.pb",
+      "header_sha256": "546efb9ad73dc1ef1fb4a610730deef2359dea23e0e224750040430edbe38c7c",
+      "header": {
+        "number": 64037736,
+        "hash": "0x1efd540523f90c4a2fa9f45e48143f08e4169d00e096cc0e47c13911572aab00",
+        "parent_hash": "0x9b5d2aee9f55502645b3a8dee178868a256c6c351c45f4e37a3a30dc69b2c93a",
+        "state_root": "0xda4469d4db3e6aa908a6b690be80fe6578012f52e054bd8617fb2bebe5ec8bdf",
+        "timestamp": 1760027735
+      },
+      "header_rlp": "0xf90380a09b5d2aee9f55502645b3a8dee178868a256c6c351c45f4e37a3a30dc69b2c93aa01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347947e1fdf03eb3ac35bf0256694d7fbe6b6d7b3e0c8a0da4469d4db3e6aa908a6b690be80fe6578012f52e054bd8617fb2bebe5ec8bdfa0d464483821b64186125371a55469a27f969cc49b477323523ce8835cd4f8cd4fa07f33c430283ec930bf1a770bbaa92d14f55024f33b385a936f4f305f9f55f710b90100fe36b67debfb4b17b37bbdf7ac3beda991f1fa4b74734eb17bbeaa88675767fbce98ddbbc4a5d74836b6dbf96b6741d3e580bba3e1bb6e7375552ab6b47f67d06c6bbfb6274fed7cf72b7ffef5ad0cb5bfdfaead55c6acfee74de79eb0b75fef4e2e5d7dffceade917d639a31e74fe679d77b6d2affea5ff5f21ec7d9a2fbadbafa66a367f5ea94a5fb97fcc061c2fbfe9b55fdf253c3b58fdecaffc3deecdfb569e33bf9e0139baeff4fffb7e75ceff6fad63ca7bdf050ea5747e2b7c12f7bb7efebdae9f093eff99fbf840bebb7b1febd54b4b07b5defc7a7dfb1ed3fbec11fcd9ca59796cec6ff7fe76af4b7245feef65b74f55d007e8c6e3dff564cf78b6028403d123688405d3f5ac84024986408468e7e457b90118d883010513846765746888676f312e32342e30856c696e7578000000098d24acf8b5831fffffb8609394d74b164c017074ba202ef4f953bb976fd0ecb6755a8691a1778c00e69c8010db62fbb235e3722a88eebeae82b6620fdb3bcbc071ad6b91e6dbc51d8fb15601a8d82979a1e068d81e7d24c939a1f2e9310ef8f4b77f55dde9c7562d6c5cd9f84c8403d12366a0b1c0bf9640e1bf469c3d2f1c5d830f2f4333c84148f2fbcd5a679c5a21ba61318403d12367a09b5d2aee9f55502645b3a8dee178868a256c6c351c45f4e37a3a30dc69b2c93a80c15713b61828d6c192f65f11ab5881736e11e6cc877f7192d13c944b38a8f1ff3277c4223052e2c2a66de7a2a20173423bedd8bd447cae98232ca13ce509bc3b00a000000000000000000000000000000000000000000000000000000000000000fa88000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218302000080a00000000000000000000000000000000000000000000000000000000000000000a0e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rpc_receipt_status": "0x1",
+      "rpc_transaction_index": 4,
+      "rpc_block_end_state": {
+        "0xde230c944fec7cb4dd5c3301282170fa03caf682": {
+          "before": {
+            "block_number": 64037735,
+            "nonce": 216,
+            "balance": "8750971500000000",
+            "code": "0x",
+            "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storage": {}
+          },
+          "after": {
+            "block_number": 64037736,
+            "nonce": 217,
+            "balance": "2340403169508495705",
+            "code": "0x",
+            "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storage": {}
+          }
+        },
+        "0xf8e48282a7ba545689a3f66275ec7cf010d423e8": {
+          "before": {
+            "block_number": 64037735,
+            "nonce": 1,
+            "balance": "0",
+            "code": "0x60806040526004361061002c575f3560e01c80638da5cb5b14610037578063938e12371461006157610033565b3661003357005b5f80fd5b348015610042575f80fd5b5061004b610077565b604051610058919061015c565b60405180910390f35b34801561006c575f80fd5b5061007561009a565b005b5f8054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b5f8054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163273ffffffffffffffffffffffffffffffffffffffff16146100f0575f80fd5b73fa1df39871ede716100cd664647a3b982ed4ab1473ffffffffffffffffffffffffffffffffffffffff16ff5b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f6101468261011d565b9050919050565b6101568161013c565b82525050565b5f60208201905061016f5f83018461014d565b9291505056fea2646970667358221220c357d0971172e167c321427e76c8e5a243353ff6dbf701a366da234dbf5fb35964736f6c63430008180033",
+            "code_hash": "0xbaf4e855a7315943fa13bc96099bba07c7c2ab00b6b6d10aebb07d26ab9978dc",
+            "storage": {}
+          },
+          "after": {
+            "block_number": 64037736,
+            "nonce": 1,
+            "balance": "0",
+            "code": "0x60806040526004361061002c575f3560e01c80638da5cb5b14610037578063938e12371461006157610033565b3661003357005b5f80fd5b348015610042575f80fd5b5061004b610077565b604051610058919061015c565b60405180910390f35b34801561006c575f80fd5b5061007561009a565b005b5f8054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b5f8054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163273ffffffffffffffffffffffffffffffffffffffff16146100f0575f80fd5b73fa1df39871ede716100cd664647a3b982ed4ab1473ffffffffffffffffffffffffffffffffffffffff16ff5b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f6101468261011d565b9050919050565b6101568161013c565b82525050565b5f60208201905061016f5f83018461014d565b9291505056fea2646970667358221220c357d0971172e167c321427e76c8e5a243353ff6dbf701a366da234dbf5fb35964736f6c63430008180033",
+            "code_hash": "0xbaf4e855a7315943fa13bc96099bba07c7c2ab00b6b6d10aebb07d26ab9978dc",
+            "storage": {}
+          }
+        }
+      }
+    },
+    {
+      "block": 64576907,
+      "block_hash": "0x37316cf4d87c5db21ab8521f078fde3590461eea33c911a8edb65e2a1231f94f",
+      "timestamp": 1760432178,
+      "producer_version": 4,
+      "detail_level": 0,
+      "hash": "0x9be1e3a78843ebacd4ee6a47ecd1472bc94a35156f337f0982382a45cf701d7c",
+      "status": 3,
+      "reasons": [
+        "setcode",
+        "multiple-authorizations",
+        "repeated-authority",
+        "code-clear",
+        "code-change",
+        "failed-setcode"
+      ],
+      "filename": "v4-failed-clear-reinstall.pb",
+      "bytes": 11555,
+      "sha256": "cbbb862332e000bf9a84576255381a4fc9f5c0a81656539598c1248acf440900",
+      "root_begin_ordinal": 9044,
+      "root_end_ordinal": 9083,
+      "tx_end_ordinal": 9088,
+      "from": "0x0e1730aab680245971603f9edeaa0c85ebeaaaaa",
+      "auths": [
+        {
+          "authority": "0x2eecb88952aced531a7b29ac7320feca57e73a62",
+          "delegate": "0x0000000000000000000000000000000000000000",
+          "nonce": 2964,
+          "discarded": false
+        },
+        {
+          "authority": "0x2eecb88952aced531a7b29ac7320feca57e73a62",
+          "delegate": "0xe5a1a2d728ddcf2104fcba190ce4b370e79d6c58",
+          "nonce": 2965,
+          "discarded": false
+        }
+      ],
+      "header_filename": "v4-failed-clear-reinstall-header.pb",
+      "header_sha256": "39a2549333671b2ceff2e4de5e0bc33fd48cc474a8216c3253a128c8ecf25347",
+      "header": {
+        "number": 64576907,
+        "hash": "0x37316cf4d87c5db21ab8521f078fde3590461eea33c911a8edb65e2a1231f94f",
+        "parent_hash": "0x373e191d4930b179389d91c97a6296e70a8668889303701851e14c4df90afb0a",
+        "state_root": "0x2b7be9aa57f9d0f8e9c4c03a4b05f580a88bc6cc842389c3081a418f5cf32ef1",
+        "timestamp": 1760432178
+      },
+      "header_rlp": "0xf9037da0373e191d4930b179389d91c97a6296e70a8668889303701851e14c4df90afb0aa01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d4934794460a252b4feefa821d3351731220627d7b7d1f3da02b7be9aa57f9d0f8e9c4c03a4b05f580a88bc6cc842389c3081a418f5cf32ef1a00fdfbb7c25f4d71cad0e80a5094a2103471223b47b82c2fd9da07184368a5e77a0fb9bd7218ed53b5c5ddfe222b75af0332163d272c4dc240fd1f1f320f10bdab5b901007f7eafc957da3fd7e2ff1ddfae817fff93faf00bbcb4e3ca7fe0f2ecdae749efaf87f5ec15feda6372c2ffb5bd534cd7cbf5aeb27f1b7f2617dc674f7b36bddc6d98ded7edfe8dbc03ec551df3c3b9fda77b9be31e4ad93aee4dc3fd93ed4ffed6dd32ec9ade417aaf5e7df7cecdbcbb5fefef671cfdcff6ffd9df55e79f13dd8e7262e59a4d7d77b29fbd1d7e7467e3e7f7d7bf25a1fddee9fba9db4de7e7fd7bd4379599bbafffeb75cdfd8fff7dd76eff77c44199485ee7f76deef4d9fe71827f8f6f791db52f7eb87e1777db0af37fdcddd7dfeb9cf66ff3f51f6e57bcdc885b6a93535dde2c7fffe7fde48b8b681a96a53aa5b70fd8f0e4efed9fefde1f028403d95d8b8405fbd49b8402776b228468ee1032b90118d983010511846765746889676f312e32332e3130856c696e75780000098d24acf8b5831f7fffb860a1692886d96839c28d9d17de560719399f44a6140bedccf9596329f7be0d828ba9ced6585cec30b1b67be960806aa6e60beb6cd5556d7b8921914d9d103316306d92302f1836e2eb44ac19b7bf5ea40ecbb3221e466ecf506a9c7db8d317c4aaf84c8403d95d89a0ef030014960583025e78361d815ba022b98c094e45c86afa9aa73bb11a7c6cfd8403d95d8aa0373e191d4930b179389d91c97a6296e70a8668889303701851e14c4df90afb0a80fed2ade1ec6d5268c4f6870c28c7ada41bc9bd2441925470e628760e91c5bc1e1f28e714f6f4effd6d4c4c90f07d585ce62fc1a32463a19d18fcc382187fa92701a000000000000000000000000000000000000000000000000000000000000001f488000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a0e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rpc_receipt_status": "0x0",
+      "rpc_transaction_index": 73,
+      "rpc_block_end_state": {
+        "0x0e1730aab680245971603f9edeaa0c85ebeaaaaa": {
+          "before": {
+            "block_number": 64576906,
+            "nonce": 251,
+            "balance": "10045498014764427",
+            "code": "0x",
+            "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storage": {}
+          },
+          "after": {
+            "block_number": 64576907,
+            "nonce": 252,
+            "balance": "10029390414764427",
+            "code": "0x",
+            "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storage": {}
+          }
+        },
+        "0x2eecb88952aced531a7b29ac7320feca57e73a62": {
+          "before": {
+            "block_number": 64576906,
+            "nonce": 2964,
+            "balance": "625804519999",
+            "code": "0xef01000000dcbcf779c73f0e0774fda22a1fe0f0f10000",
+            "code_hash": "0x4cf62dc7c5902b027cf76ba5c28b955cc1812c8d9d33358ad2e9101e9ef2d545",
+            "storage": {
+              "0x3d0c21228529c966e6284c6bd57aa018287ef6a99c842aa853489bc6791eb421": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          "after": {
+            "block_number": 64576907,
+            "nonce": 2966,
+            "balance": "625804519999",
+            "code": "0xef0100e5a1a2d728ddcf2104fcba190ce4b370e79d6c58",
+            "code_hash": "0xd891d25e28c0b90098b402a8e9ef14d179a7a3651bcfa268912dad6d840639df",
+            "storage": {
+              "0x3d0c21228529c966e6284c6bd57aa018287ef6a99c842aa853489bc6791eb421": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        }
+      }
     }
   ]
 }

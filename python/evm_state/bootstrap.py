@@ -171,14 +171,16 @@ def compact(client, directory, end_block=None, budget_bytes=100_000_000_000):
 
 def replay(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_block,
            chunk_blocks=100000, budget_bytes=100_000_000_000, max_retries=3,
-           checkpoint_database=None, decode_batch_size=32, spool_max_idle_ms=1000, prometheus_addr=None):
+           checkpoint_database=None, decode_batch_size=32, spool_max_idle_ms=1000, prometheus_addr=None,
+           parallel_workers=None):
     """Resume bounded native chunks, compacting each before starting the next.
 
     Stop is exclusive, as in the native CLI. This limits accumulated history to
     a chunk plus partition granularity; budget checks are database measurements,
     not a hard limit on total disk allocation or merge/verification workspace.
     """
-    from .ingest import ingest, prepare
+    from .ingest import ingest, prepare, validate_parallel_workers
+    validate_parallel_workers(parallel_workers)
     for name, value in [("chunk blocks", chunk_blocks), ("budget", budget_bytes)]:
         if isinstance(value, bool) or not isinstance(value, int) or value < 1:
             raise ValueError(f"bootstrap {name} must be a positive integer")
@@ -219,4 +221,5 @@ def replay(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
                 raise VerificationError("bootstrap database budget already exhausted")
             ingest(*values, stop_block=min(next_block + chunk_blocks, stop_block), max_retries=max_retries,
                    checkpoint_database=checkpoint_database, decode_batch_size=decode_batch_size,
-                   spool_max_idle_ms=spool_max_idle_ms, prometheus_addr=prometheus_addr)
+                   spool_max_idle_ms=spool_max_idle_ms, prometheus_addr=prometheus_addr,
+                   parallel_workers=parallel_workers)

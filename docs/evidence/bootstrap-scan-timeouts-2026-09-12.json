@@ -1,0 +1,141 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "stopped_runs": [
+    {
+      "cohort": "wbnb-bootstrap",
+      "phase": "host-disk-retry2",
+      "summary_sha256": "fd6d0d32712a3400554af244a01d7a4233b703d38dec26c2a1701dc2afb967d1",
+      "summary": {
+        "command_exit_code": -15,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789233871327583000,
+        "format_version": 1,
+        "guard_samples": 230,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 16556006000,
+        "peak_observed_allocated_bytes": 4855181312,
+        "rejected_guard_stages": [],
+        "samples": 125,
+        "started_ns": 1789232788357022000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      },
+      "failed_periodic_samples": [
+        {
+          "admitted": false,
+          "directory_changed": false,
+          "error_type": "DockerCapacityError",
+          "inspection_operation": "data-directory scan",
+          "reasons": [
+            "incomplete_capacity_sample"
+          ],
+          "sample_finished_ns": 1789233871269994000
+        }
+      ]
+    },
+    {
+      "cohort": "customer-example",
+      "phase": "host-disk-retry1",
+      "summary_sha256": "ca55962f4a84bcbe854053061689f83013d0656291df8c2b465e8ab7394bc3a5",
+      "summary": {
+        "command_exit_code": 1,
+        "config_sha256": "d454dd95bd61d229e8267956cd27bb7404b1b1fd3ec0da0cdd1ac7d742a45724",
+        "failed_guard_samples": 1,
+        "failed_samples": 1,
+        "finished_ns": 1789233871333717000,
+        "format_version": 1,
+        "guard_samples": 277,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 16531110000,
+        "peak_observed_allocated_bytes": 4855181312,
+        "rejected_guard_stages": [
+          "native-progress"
+        ],
+        "samples": 125,
+        "started_ns": 1789232789477258000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      },
+      "failed_periodic_samples": [
+        {
+          "admitted": false,
+          "directory_changed": false,
+          "error_type": "DockerCapacityError",
+          "inspection_operation": "data-directory scan",
+          "reasons": [
+            "incomplete_capacity_sample"
+          ],
+          "sample_finished_ns": 1789233871269951000
+        }
+      ]
+    }
+  ],
+  "subsequent_single_scan": {
+    "timings": [
+      {
+        "operation": "inspect",
+        "seconds": 0.022
+      },
+      {
+        "operation": "inspect",
+        "seconds": 0.024
+      },
+      {
+        "operation": "du",
+        "seconds": 6.45
+      },
+      {
+        "operation": "du",
+        "seconds": 1.997
+      }
+    ],
+    "admitted": true,
+    "allocated_bytes": 4877529088
+  },
+  "subsequent_four_concurrent_scans": [
+    {
+      "index": 0,
+      "seconds": 5.104,
+      "admitted": true,
+      "allocated": 4859895808
+    },
+    {
+      "index": 1,
+      "seconds": 5.152,
+      "admitted": true,
+      "allocated": 4859891712
+    },
+    {
+      "index": 2,
+      "seconds": 5.124,
+      "admitted": true,
+      "allocated": 4859895808
+    },
+    {
+      "index": 3,
+      "seconds": 5.121,
+      "admitted": true,
+      "allocated": 4859895808
+    }
+  ],
+  "resumed_phases": {
+    "wbnb-bootstrap": {
+      "phase": "host-disk-retry3",
+      "requested_workers": 100
+    },
+    "customer-example": {
+      "phase": "host-disk-retry2",
+      "requested_workers": 100
+    }
+  },
+  "qualification": "The Docker directory scans timed out and the managed commands stopped. The later scans all admitted work; four concurrent scans did not reproduce the timeout. Root cause remains unresolved and no scan timeout or capacity threshold was weakened. Both resumed jobs preserve their existing package/filter, checked cursor and private bootstrap state. They still require final complete-state proof."
+}

@@ -23,7 +23,7 @@ def main():
     parser.add_argument("--database", required=True)
     parser.add_argument("--state-dir", type=Path, required=True)
     parser.add_argument("--fixture", required=True, choices=[
-        "v3-post-cancun-existing-selfdestruct.pb", "v5-post-cancun-existing-selfdestruct.pb"])
+        f"v{version}-post-cancun-existing-selfdestruct.pb" for version in [3, 4, 5]])
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():

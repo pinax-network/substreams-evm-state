@@ -44,6 +44,8 @@ def main(argv=None):
                                 help="seal idle spool after this many milliseconds (ingest: 100; bootstrap: 1000)")
         if name in {"ingest", "bootstrap-replay"}:
             native.add_argument("--prometheus-addr", help="native metrics listener; use a distinct port for concurrent cohorts")
+            native.add_argument("--parallel-workers", type=int,
+                                help="requested server-side workers; omitted uses provider default, subject to provider limits")
         if name == "bootstrap-replay":
             native.add_argument("--chunk-blocks", type=int, default=100000)
             native.add_argument("--budget-bytes", type=int, default=100_000_000_000)
@@ -121,10 +123,10 @@ def main(argv=None):
             if args.command == "bootstrap-replay":
                 result = bootstrap_replay(*values, args.stop_block, args.chunk_blocks, args.budget_bytes,
                                           args.max_retries, args.checkpoint_database, args.decode_batch_size,
-                                          args.spool_max_idle_ms, args.prometheus_addr)
+                                          args.spool_max_idle_ms, args.prometheus_addr, args.parallel_workers)
             elif args.command == "ingest":
                 result = ingest(*values, args.stop_block, args.max_retries, args.checkpoint_database,
-                                args.decode_batch_size, args.spool_max_idle_ms, args.prometheus_addr)
+                                args.decode_batch_size, args.spool_max_idle_ms, args.prometheus_addr, args.parallel_workers)
             else:
                 result = {"prepare": prepare, "recover-cursor": recover_cursor}[args.command](
                     *values, checkpoint_database=args.checkpoint_database)

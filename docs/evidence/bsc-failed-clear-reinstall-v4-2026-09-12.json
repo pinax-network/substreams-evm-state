@@ -1,0 +1,80 @@
+{
+  "blocks": 2,
+  "chain_id": 56,
+  "comparisons": [
+    {
+      "authority": "0x2eecb88952aced531a7b29ac7320feca57e73a62",
+      "block": 64576907,
+      "block_hash": "0x37316cf4d87c5db21ab8521f078fde3590461eea33c911a8edb65e2a1231f94f",
+      "code_bytes_after": 23,
+      "code_bytes_before": 23,
+      "fixture": "v4-failed-clear-reinstall.pb",
+      "fixture_sha256": "cbbb862332e000bf9a84576255381a4fc9f5c0a81656539598c1248acf440900",
+      "native_code_patches": [
+        {
+          "code": "0xef0100e5a1a2d728ddcf2104fcba190ce4b370e79d6c58",
+          "ordinal": 9043
+        }
+      ],
+      "native_lifecycle": [
+        {
+          "kind": "code_cleared",
+          "ordinal": 9041
+        }
+      ],
+      "native_metadata": {
+        "0x0e1730aab680245971603f9edeaa0c85ebeaaaaa": {
+          "balance": "10029390414764427",
+          "nonce": 252
+        },
+        "0x2eecb88952aced531a7b29ac7320feca57e73a62": {
+          "code_hash": "0xd891d25e28c0b90098b402a8e9ef14d179a7a3651bcfa268912dad6d840639df",
+          "nonce": 2966
+        }
+      },
+      "storage_patches": 0,
+      "transaction_hash": "0x9be1e3a78843ebacd4ee6a47ecd1472bc94a35156f337f0982382a45cf701d7c"
+    }
+  ],
+  "database": "evm_clear_v4",
+  "format_version": 1,
+  "header": {
+    "hash": "0x37316cf4d87c5db21ab8521f078fde3590461eea33c911a8edb65e2a1231f94f",
+    "number": 64576907,
+    "parent_hash": "0x373e191d4930b179389d91c97a6296e70a8668889303701851e14c4df90afb0a",
+    "state_root": "0x2b7be9aa57f9d0f8e9c4c03a4b05f580a88bc6cc842389c3081a418f5cf32ef1",
+    "timestamp": 1760432178
+  },
+  "module_hash": "5197c0cf8d4e50c10c429d3c7601145374f36654",
+  "package_sha256": "7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2",
+  "qualification": "Exact captured block-end updates and clear markers match archive RPC. No untouched storage completeness, account-root proof or ready checkpoint is claimed.",
+  "run_id": "c07272f1b7394c15812f11ec9f944997",
+  "start_block": 64576906,
+  "ingestion_capacity": {
+    "phases": {
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "13c72345c428e6944bebe19bae02a4bb207e44f088b578d3f8019068fb93047d",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789233832135852000,
+        "format_version": 1,
+        "guard_samples": 4,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 26287379000,
+        "peak_observed_allocated_bytes": 4848578560,
+        "rejected_guard_stages": [],
+        "samples": 4,
+        "started_ns": 1789233786956185000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null,
+        "summary_sha256": "d4285a4fa46e422290eb19313f222f7f637589e426b1f0083a4bd2e1de76e829"
+      }
+    },
+    "overall_budget_bytes": 100000000000,
+    "retained_original_volume_reserved_bytes": 1742835712,
+    "live_policy_budget_bytes": 98257164288,
+    "scope": "Whole shared ClickHouse directory plus both long replay roots and matching migration archives. Historical parity diagnostics are read-only and separately unsupervised; no trie is built."
+  }
+}

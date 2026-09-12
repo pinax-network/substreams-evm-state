@@ -42,7 +42,7 @@ unmodified BSC v5 TransactionTrace messages are also committed as
 transaction at 121114122 and one FAILED transaction at 121114153. Both retain
 sender and accepted-authority nonce changes before root execution; neither
 changes code. Their block hashes and failure status were cross-checked with RPC.
-Twenty-four further unmodified transactions and their original headers now cover
+Twenty-six further unmodified transactions and their original headers now cover
 producer versions 3, 4 and 5; see the [capture manifest](../tests/fixtures/lifecycle/manifest.json).
 The v5 cases include self-authorization with both nonce increments, three accepted
 authorities, discarded authorization with a reverted slot write, and explicit
@@ -207,6 +207,21 @@ through **121488421** verifies seven observed account fields against saved proof
 for that three-account filter. Untouched code/nonce remain unobserved by the
 native projection where no update occurred; the diagnostic does not invent an
 initial state or establish complete storage.
+
+Producer v4 adds the same existing-account check at **64037736**: a 427-byte
+contract receives and transfers balance through SELFDESTRUCT while retaining
+nonce one and unchanged code. Its [two-block native comparison](evidence/bsc-existing-selfdestruct-v4-2026-09-12.json)
+matches archive RPC and emits no nonce/code/storage reset. Existing-account
+post-Cancun SELFDESTRUCT now has specific captured/native cases for v3, v4 and v5.
+
+A [v4 reverted authorization transaction](evidence/bsc-failed-clear-reinstall-v4-2026-09-12.json)
+at **64576907** first clears delegation and then reinstalls different delegation
+for the same authority before root execution. Nonce advances 2964 to 2966; the
+final code patch is the second authorization at ordinal 9043, while the
+`code_cleared` diagnostic stays at ordinal 9041. The reverted execution's storage
+write is excluded. The exact native block-end nonce/code and sender metadata
+match archive RPC. This historical comparison does not claim an account-root
+proof or untouched-slot completeness.
 
 Reproduce these comparisons with `scripts/qualify_captured_selfdestruct.py` and
 `scripts/qualify_captured_clears.py`; each accepts the native database, owned

@@ -151,8 +151,15 @@ def recover_cursor(client, spkg, endpoint, accounts, start_block, directory, dsn
         return {"run_id": run["run_id"], "recovered": True, "position": progress["position"]}
 
 
+def validate_parallel_workers(value):
+    if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 1):
+        raise ValueError("parallel workers must be a positive integer or omitted")
+
+
 def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_block=None, max_retries=3,
-           checkpoint_database=None, decode_batch_size=1, spool_max_idle_ms=100, prometheus_addr=None):
+           checkpoint_database=None, decode_batch_size=1, spool_max_idle_ms=100, prometheus_addr=None,
+           parallel_workers=None):
+    validate_parallel_workers(parallel_workers)
     directory = Path(directory).resolve()
     if stop_block is not None and stop_block <= start_block:
         raise ValueError("stop block must be greater than start block (exclusive)")
@@ -191,6 +198,8 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
         # Otherwise the default 32-block batch adds ~15 seconds on BSC, and
         # one-block batches alone can keep the spool open until its size target.
         command.extend(["--decode-batch-size", str(decode_batch_size)])
+        if parallel_workers is not None:
+            command.extend(["--header", f"X-Substreams-Parallel-Workers:{parallel_workers}"])
         if prometheus_addr is not None:
             command.extend(["--prometheus-addr", prometheus_addr])
         if stop_block is not None:

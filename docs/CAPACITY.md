@@ -172,6 +172,13 @@ operation and whether the directory traversal reported disappearing files,
 without storing third-party error bodies. Resumed historical prefixes still
 require final account/storage proofs.
 
+Subsequent runs recorded explicit Docker data-directory scan timeouts. Their
+[stop/recovery record](evidence/bootstrap-scan-timeouts-2026-09-12.json) also
+includes later successful single and four-way concurrent scans. The concurrent
+check did not reproduce the timeout, so its root cause remains unresolved.
+The timeout and capacity thresholds were retained; both bootstraps resumed only
+after fresh admitted measurements, using their original source state.
+
 The monitor is **not a hard quota or an allocation reservation**. Absolute limits
 need filesystem/container storage quotas and sufficient merge/shutdown headroom.
 Current state, pinned old checkpoints and backups can continue growing; the guard

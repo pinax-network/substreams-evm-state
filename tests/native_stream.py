@@ -46,6 +46,7 @@ class NativeStream:
         self.after_blocks = after_blocks
         self.backfill = backfill
         self.requests = []
+        self.requested_workers = []
         self.errors = []
         self.closed = threading.Event()
         self.server = grpc.server(ThreadPoolExecutor(max_workers=2))
@@ -61,6 +62,7 @@ class NativeStream:
 
     def stream(self, request, context):
         self.requests.append(request)
+        self.requested_workers.append(dict(context.invocation_metadata()).get("x-substreams-parallel-workers"))
         try:
             assert request.final_blocks_only
             start = request.start_block_num

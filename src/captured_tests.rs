@@ -462,3 +462,46 @@ fn captured_v5_failed_self_clear_keeps_two_nonce_increments_and_empty_code() {
     assert_eq!(out.lifecycle[0].kind, "code_cleared");
     assert!(out.storage.is_empty());
 }
+
+#[test]
+fn captured_v4_existing_selfdestruct_transfers_balance_and_preserves_account() {
+    let block = sample!("v4-post-cancun-existing-selfdestruct", 4, 64037736);
+    let account = "0xf8e48282a7ba545689a3f66275ec7cf010d423e8";
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Succeeded);
+    let destroyed = tx.calls.iter().find(|c| c.suicide).unwrap();
+    assert_eq!(destroyed.call_type(), eth::CallType::Call);
+    assert_eq!(destroyed.end_ordinal, 614);
+    let out = project(account, &block).unwrap();
+    assert!(out.nonces.is_empty() && out.codes.is_empty() && out.storage.is_empty());
+    assert_eq!(out.balances.len(), 1);
+    assert_eq!(out.balances[0].value, "0");
+    assert_eq!(out.balances[0].ordinal, 611);
+    assert_eq!(out.lifecycle.len(), 1);
+    assert_eq!(out.lifecycle[0].kind, "selfdestruct");
+    assert_eq!(out.lifecycle[0].ordinal, 614);
+}
+
+#[test]
+fn captured_v4_failed_clear_then_reinstall_keeps_the_last_authorization() {
+    let block = sample!("v4-failed-clear-reinstall", 4, 64576907);
+    let account = "0x2eecb88952aced531a7b29ac7320feca57e73a62";
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Reverted);
+    assert!(tx.calls[0].state_reverted);
+    assert_eq!(tx.calls[0].begin_ordinal, 9044);
+    let changes = crate::collect(account, &block).unwrap();
+    assert_eq!(changes.code_changes.len(), 2);
+    assert!(changes.code_changes.iter().all(|c| c.origin.as_ref().unwrap().scope == Scope::Tx7702 as i32));
+    assert_eq!(changes.nonce_changes.iter().map(|c| c.new_value).collect::<Vec<_>>(), vec![2965, 2966]);
+    let out = project(account, &block).unwrap();
+    assert_eq!((out.nonces[0].value, out.nonces[0].ordinal), (2966, 9042));
+    assert_eq!(out.codes.len(), 1);
+    assert_eq!(out.codes[0].code, "0xef0100e5a1a2d728ddcf2104fcba190ce4b370e79d6c58");
+    assert_eq!(out.codes[0].hash, "0xd891d25e28c0b90098b402a8e9ef14d179a7a3651bcfa268912dad6d840639df");
+    assert_eq!(out.codes[0].ordinal, 9043);
+    assert_eq!(out.lifecycle.len(), 1);
+    assert_eq!(out.lifecycle[0].kind, "code_cleared");
+    assert_eq!(out.lifecycle[0].ordinal, 9041);
+    assert!(out.storage.is_empty()); // The execution's slot write reverted.
+}

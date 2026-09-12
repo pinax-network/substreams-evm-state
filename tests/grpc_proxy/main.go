@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -50,7 +51,13 @@ func main() {
 			if err := stream.RecvMsg(&request); err != nil {
 				return err
 			}
-			backend, err := conn.NewStream(stream.Context(), &grpc.StreamDesc{ServerStreams: true}, method)
+			ctx := stream.Context()
+			incoming, _ := metadata.FromIncomingContext(ctx)
+			// Forward only the scheduling header under test, never credentials.
+			if workers := incoming.Get("x-substreams-parallel-workers"); len(workers) > 0 {
+				ctx = metadata.NewOutgoingContext(ctx, metadata.MD{"x-substreams-parallel-workers": workers})
+			}
+			backend, err := conn.NewStream(ctx, &grpc.StreamDesc{ServerStreams: true}, method)
 			if err != nil {
 				return err
 			}

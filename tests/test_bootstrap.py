@@ -225,13 +225,14 @@ def test_real_native_chunked_replay_resumes_compacted_cursor(databases, tmp_path
     args = (client, SPKG, stream.endpoint, [A], 100, tmp_path / "native", native_dsn(client.database))
     try:
         partial = replay(*args, stop_block=104, chunk_blocks=2, checkpoint_database=target.database,
-                         decode_batch_size=1, prometheus_addr="127.0.0.1:0")
+                         decode_batch_size=1, prometheus_addr="127.0.0.1:0", parallel_workers=50)
         assert partial["status"] == "unverified-bootstrap"
         final = replay(*args, stop_block=106, chunk_blocks=2, checkpoint_database=target.database,
-                       decode_batch_size=1, prometheus_addr="127.0.0.1:0")
+                       decode_batch_size=1, prometheus_addr="127.0.0.1:0", parallel_workers=100)
         repeated = replay(*args, stop_block=106, chunk_blocks=2, checkpoint_database=target.database, decode_batch_size=1)
         assert repeated == final
         assert len(stream.requests) == 3
+        assert stream.requested_workers == ["50", "50", "100"]
         assert stream.requests[1].start_cursor and stream.requests[2].start_cursor
         assert numbers(client, "state_blocks") == numbers(client, "_blocks_") == [105]
         assert not stream.errors
