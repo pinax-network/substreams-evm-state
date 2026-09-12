@@ -42,7 +42,7 @@ unmodified BSC v5 TransactionTrace messages are also committed as
 transaction at 121114122 and one FAILED transaction at 121114153. Both retain
 sender and accepted-authority nonce changes before root execution; neither
 changes code. Their block hashes and failure status were cross-checked with RPC.
-Eighteen further unmodified transactions and their original headers now cover
+Nineteen further unmodified transactions and their original headers now cover
 producer versions 3, 4 and 5; see the [capture manifest](../tests/fixtures/lifecycle/manifest.json).
 The v5 cases include self-authorization with both nonce increments, three accepted
 authorities, discarded authorization with a reverted slot write, and explicit
@@ -61,8 +61,12 @@ persists. At **121468057**, three accepted entries advance one authority from
 higher-nonce entries are discarded and the final valid entry advances nonce
 30817 to 30818. The original producer records and archive RPC agree. This matches
 [EIP-7702's ordered authorization processing](https://eips.ethereum.org/EIPS/eip-7702#behavior).
-Failed transactions with distinct accepted authorities or a delegation-clear
-combination remain synthetic coverage rather than captured mainnet evidence.
+A v5 reverted transaction at **121403152** accepts two distinct authorities,
+each starting at nonce zero with empty code. Both advance to nonce one and install
+the same delegation before root execution; both changes persist despite its
+revert. The original trace and archive RPC before/after values agree. Failed
+transactions that clear delegation remain synthetic coverage rather than captured
+mainnet evidence.
 
 The rebuilt native mapper also replayed 121114100–121114160 for their sender
 and authority. All 61 block identities/parents were checked, and observed sender
@@ -85,6 +89,14 @@ continuity pass, and **nine observed metadata fields** match saved account proof
 at the encoded target header. No storage patches occur for this filter in that
 interval. The source remains a partial update sample, not a complete bootstrap
 of those five accounts. Offline CI verifies the saved proof bundle and captures.
+
+The [three-account failed-authority replay](evidence/bsc-failed-distinct-authorities-2026-09-12.json)
+covers **121403152–121483964**, including that reverted transaction. All **80,813**
+block envelopes and the durable cursor pass continuity checks. **Eight observed
+metadata fields** match saved account proofs at the encoded target header,
+including nonce one and the installed code for both authorities. There are no
+storage patches for this filter. This also remains an observed-update check,
+not complete initial-state qualification.
 
 `scripts/qualify_lifecycle_updates.py --database NAME --state-dir DIR --proofs
 FILE --output FILE` repeats the diagnostic against a completed guarded native
@@ -164,6 +176,6 @@ slot/reset parity, not a complete storage trie or account-root proof. Untouched
 slots remain outside this sample's coverage.
 
 Captured post-Cancun SELFDESTRUCT of a previously existing account and failed
-distinct-authority/code-clear combinations remain open. SELFDESTRUCT in system execution is explicitly unsupported until its
+delegation clearing remain open. SELFDESTRUCT in system execution is explicitly unsupported until its
 execution boundary is qualified. Representative-account replay and the full
 lifecycle acceptance matrix remain release requirements.

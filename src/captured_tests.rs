@@ -314,3 +314,38 @@ fn captured_v5_discarded_higher_nonces_do_not_replace_the_accepted_nonce() {
     assert_eq!((out.nonces[0].value, out.nonces[0].ordinal), (30818, 5490));
     assert!(out.codes.is_empty() && out.storage.is_empty() && out.lifecycle.is_empty());
 }
+
+#[test]
+fn captured_v5_reverted_distinct_authorities_keep_both_new_delegations() {
+    let block = sample!("v5-failed-distinct-authorities", 5, 121403152);
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Reverted);
+    assert!(tx.calls[0].state_reverted);
+    assert_eq!(tx.calls[0].begin_ordinal, 5014);
+    assert_eq!(tx.set_code_authorizations.len(), 2);
+    assert!(tx.set_code_authorizations.iter().all(|a| !a.discarded && a.nonce == 0));
+    assert_ne!(tx.set_code_authorizations[0].authority, tx.set_code_authorizations[1].authority);
+    let sender = "0xce4bb2a4f6e479860e683a7e6c8e79e588888888";
+    let first = "0xa96669262c911d4158e26b972aaeabbb08979ddb";
+    let second = "0x0dcc966314b622bf094c7afb31b6632d646880f9";
+    let filter = format!("{sender},{first},{second}");
+    let changes = crate::collect(&filter, &block).unwrap();
+    assert_eq!(changes.nonce_changes.iter().map(|c|
+        (c.new_value, c.origin.as_ref().unwrap().scope)).collect::<Vec<_>>(),
+        vec![(9288, Scope::TxFailedPersistent as i32), (1, Scope::Tx7702 as i32), (1, Scope::Tx7702 as i32)]);
+    assert_eq!(changes.code_changes.len(), 2);
+    assert!(changes.code_changes.iter().all(|c| c.origin.as_ref().unwrap().scope == Scope::Tx7702 as i32));
+    let out = project(&filter, &block).unwrap();
+    assert_eq!(out.nonces.len(), 3);
+    assert_eq!(out.codes.len(), 2);
+    for (address, nonce_ordinal, code_ordinal) in [(first, 5010, 5011), (second, 5012, 5013)] {
+        let nonce = out.nonces.iter().find(|v| v.address == address).unwrap();
+        assert_eq!((nonce.value, nonce.ordinal), (1, nonce_ordinal));
+        let code = out.codes.iter().find(|v| v.address == address).unwrap();
+        assert_eq!(code.code, "0xef0100cb4dd2ac21ee75be478989d8b05897de225e5910");
+        assert_eq!(code.hash, "0x1c2e42c2598bf6ae4782f16ba9bba3ed63b290173d2f2c38bfa4fd5504e46bd0");
+        assert_eq!(code.ordinal, code_ordinal);
+    }
+    assert_eq!(out.balances.iter().find(|v| v.address == sender).unwrap().value, "85506619714619968");
+    assert!(out.storage.is_empty() && out.lifecycle.is_empty());
+}

@@ -13,7 +13,7 @@ FIXTURES = ROOT / "tests/fixtures/lifecycle"
 def test_captured_lifecycle_messages_and_headers_match_provenance():
     evidence = json.loads((FIXTURES / "manifest.json").read_text())
     assert evidence["chain_id"] == 56
-    assert len(evidence["records"]) == 18
+    assert len(evidence["records"]) == 19
     assert {record["producer_version"] for record in evidence["records"]} == {3, 4, 5}
     for record in evidence["records"]:
         raw = (FIXTURES / record["filename"]).read_bytes()
@@ -87,3 +87,24 @@ def test_repeated_authority_native_updates_match_saved_account_proofs():
         assert keccak256(unhex(value["code"])) == account.code_hash
         expected = {**account.json(), "code": value["code"]}
         assert all(expected[key] == actual for key, actual in fields[address].items())
+
+
+def test_failed_distinct_authority_native_updates_match_saved_account_proofs():
+    evidence = json.loads((ROOT / "docs/evidence/bsc-failed-distinct-authorities-2026-09-12.json").read_text())
+    raw = (FIXTURES / "failed-distinct-proofs.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == evidence["proof_bundle_sha256"]
+    bundle = json.loads(raw)
+    assert bundle["header"] == evidence["header"]
+    verify_header(bundle["header_rlp"], bundle["header"],
+                  "0x848c7f22bf3e1846f080d80623eef146f266db5bf8085818aa6ab7ea7eed5cb0")
+    assert evidence["blocks"] == 80813 and evidence["start_block"] == 121403152
+    fields = evidence["metadata_verified_against_account_proofs"]
+    assert len(fields) == 3 and sum(map(len, fields.values())) == 8
+    for address, value in bundle["accounts"].items():
+        account = verify_account(bundle["header"]["state_root"], address, value["proof"])
+        assert keccak256(unhex(value["code"])) == account.code_hash
+        expected = {**account.json(), "code": value["code"]}
+        assert all(expected[key] == actual for key, actual in fields[address].items())
+    for authority in ["0xa96669262c911d4158e26b972aaeabbb08979ddb", "0x0dcc966314b622bf094c7afb31b6632d646880f9"]:
+        assert fields[authority]["nonce"] == 1
+        assert fields[authority]["code"] == "0xef0100cb4dd2ac21ee75be478989d8b05897de225e5910"

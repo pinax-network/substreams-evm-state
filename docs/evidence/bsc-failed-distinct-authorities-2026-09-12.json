@@ -1,0 +1,82 @@
+{
+  "blocks": 80813,
+  "chain_id": 56,
+  "database": "evm_failed_distinct",
+  "final_touched_slots_verified_against_archive_rpc": {},
+  "format_version": 1,
+  "header": {
+    "hash": "0x848c7f22bf3e1846f080d80623eef146f266db5bf8085818aa6ab7ea7eed5cb0",
+    "number": 121483964,
+    "parent_hash": "0xe730832cbb10ddda30b981f8ec560d7e9195017bb311f4d758cc9a8cdde71347",
+    "state_root": "0x9f8ec483c0aff312580b524a77302a05278cfd977ce2115d6237b14786cff8e2",
+    "timestamp": 1789229649
+  },
+  "header_trust": "provider-finalized-header",
+  "metadata_verified_against_account_proofs": {
+    "0x0dcc966314b622bf094c7afb31b6632d646880f9": {
+      "code": "0xef0100cb4dd2ac21ee75be478989d8b05897de225e5910",
+      "code_hash": "0x1c2e42c2598bf6ae4782f16ba9bba3ed63b290173d2f2c38bfa4fd5504e46bd0",
+      "nonce": 1
+    },
+    "0xa96669262c911d4158e26b972aaeabbb08979ddb": {
+      "code": "0xef0100cb4dd2ac21ee75be478989d8b05897de225e5910",
+      "code_hash": "0x1c2e42c2598bf6ae4782f16ba9bba3ed63b290173d2f2c38bfa4fd5504e46bd0",
+      "nonce": 1
+    },
+    "0xce4bb2a4f6e479860e683a7e6c8e79e588888888": {
+      "balance": "82955347564619968",
+      "nonce": 9889
+    }
+  },
+  "module_hash": "c333cd50b6fedcb6c071196dbe901c01c05ba7b0",
+  "ordered_slot_values_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "package_sha256": "7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2",
+  "proof_bundle_sha256": "b5c932e8d4d712b50573113ca4debd505a1629d5edacc251a0f2d4e511757492",
+  "qualification": "Observed updates only; untouched storage completeness and BSC consensus are not verified.",
+  "run_id": "b681710560ac4409bc95c3401150166c",
+  "slot_digest_encoding": "ascending address/slot, concatenated 20-byte address and 32-byte slot/value",
+  "start_block": 121403152,
+  "proof_bundle": "tests/fixtures/lifecycle/failed-distinct-proofs.json",
+  "captured_transaction": "0xd8ce1527611ea1e3c60ac6ed2426f3418f4958f2e9cba618a6bf5336c535001e",
+  "capture_fixture": "tests/fixtures/lifecycle/v5-failed-distinct-authorities.pb",
+  "capacity": {
+    "capacity": {
+      "command_exit_code": 0,
+      "config_sha256": "7da18e76bc02c67899ed37795970ca77882893e01b57a14118553ef760a4654b",
+      "failed_samples": 0,
+      "finished_ns": 1789229757210510000,
+      "format_version": 1,
+      "guard_samples": 22,
+      "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+      "maximum_sample_gap_ns": 8019220000,
+      "peak_observed_allocated_bytes": 4131463168,
+      "rejected_guard_stages": [],
+      "samples": 12,
+      "started_ns": 1789229676787005000,
+      "status": "completed",
+      "stop_reasons": [],
+      "termination_error": null
+    },
+    "verification-capacity": {
+      "command_exit_code": 0,
+      "config_sha256": "7da18e76bc02c67899ed37795970ca77882893e01b57a14118553ef760a4654b",
+      "failed_samples": 0,
+      "finished_ns": 1789229813918960000,
+      "format_version": 1,
+      "guard_samples": 0,
+      "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+      "maximum_sample_gap_ns": 3391335000,
+      "peak_observed_allocated_bytes": 4085100544,
+      "rejected_guard_stages": [],
+      "samples": 2,
+      "started_ns": 1789229808863942000,
+      "status": "completed",
+      "stop_reasons": [],
+      "termination_error": null
+    },
+    "overall_budget_bytes": 100000000000,
+    "retained_original_volume_reserved_bytes": 1742835712,
+    "live_policy_budget_bytes": 98257164288,
+    "scope": "Whole ClickHouse data directory, both long replay runtime roots and matching migration archives; concurrent cohort allocations are included. The retained original volume is separately reserved."
+  }
+}
