@@ -1,0 +1,69 @@
+{
+  "blocks": 959503,
+  "chain_id": 56,
+  "database": "evm_actual_clear",
+  "final_touched_slots_verified_against_archive_rpc": {},
+  "format_version": 1,
+  "header": {
+    "hash": "0x0df7f4daeb5f3e8ac3e51bfd656b2e1580bbb10ddb5f5c4d446f3d7ae1902689",
+    "number": 121489506,
+    "parent_hash": "0xf6c81c67a8be2a3daa2e2c3bcd6a04bf314532f9a40766952d39518e1946b66a",
+    "state_root": "0x9aa0ff9d4023c304eb7dada6c8d90d90e4d058be302b8605560dbc15efef2e3a",
+    "timestamp": 1789232145
+  },
+  "header_trust": "provider-finalized-header",
+  "metadata_verified_against_account_proofs": {
+    "0x43b563340aeecc524ee9e652de56f47a74abe5d2": {
+      "balance": "7223345500000000",
+      "nonce": 392
+    },
+    "0x73d718b4cf0d2d86eb4ac522f6fedf599bbbdfb7": {
+      "balance": "0",
+      "code": "0xef0100a815ccf7f9a6834f6d40dc63341b8e5238c9dec6",
+      "code_hash": "0xc7ebc141027cf6dc706d789864ca6c53e156724f9b3bb7eaf29786fc3a981cba",
+      "nonce": 22316
+    },
+    "0xbbb90cdb4e271be14df46b7e84f4fbf3bab17b6e": {
+      "balance": "4469673879655352",
+      "code": "0xef0100490aac77c960b0569c8e446ac7e12490bd44ca1d",
+      "code_hash": "0xc4ccbe092743099a70ae6a593d1eb2c827b3fec98da78fef9063a2d5e4a10699",
+      "nonce": 53
+    }
+  },
+  "module_hash": "354a7cf00de12a2d5437d1d85cb3c53621168cd7",
+  "ordered_slot_values_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "package_sha256": "7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2",
+  "proof_bundle_sha256": "a7acd93936c29fa2274d51429da622dbee213e57b4ca3e7abb7e0ab1bac5dbd6",
+  "qualification": "Observed updates only; untouched storage completeness and BSC consensus are not verified.",
+  "run_id": "1cea4639602a46bf9cab92920b3cfacb",
+  "slot_digest_encoding": "ascending address/slot, concatenated 20-byte address and 32-byte slot/value",
+  "start_block": 120530004,
+  "proof_bundle": "tests/fixtures/lifecycle/failed-clear-proofs.json",
+  "ingestion_capacity": {
+    "phases": {
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "66311550a29870ce901cdeb81a4a791f7bf549fc4535d4a495801decfaf247e6",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789232806542720000,
+        "format_version": 1,
+        "guard_samples": 206,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 10061365000,
+        "peak_observed_allocated_bytes": 4442882048,
+        "rejected_guard_stages": [],
+        "samples": 86,
+        "started_ns": 1789232209817478000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null,
+        "summary_sha256": "3b24b8a1064cbdf7cbf2c9a7849233762f762a54a0105dad29c031a58e7267af"
+      }
+    },
+    "overall_budget_bytes": 100000000000,
+    "retained_original_volume_reserved_bytes": 1742835712,
+    "live_policy_budget_bytes": 98257164288,
+    "scope": "Whole ClickHouse data directory, both long replay roots and migration archives; retained original volume separately reserved. These reports supervise ingestion. Read-only parity diagnostics do not allocate temporary tries and were not separately supervised."
+  }
+}

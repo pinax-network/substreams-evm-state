@@ -157,8 +157,20 @@ policy checks. Do not move output or work outside the declared roots mid-run.
 A completed report demonstrates that the sampled workload and publication checks
 stayed within the configured operating thresholds. Directory walks and system
 queries are observations over an interval, not an atomic filesystem snapshot.
-They can miss excursions between samples. A scan racing with file replacement is
-retried once from scratch; an incomplete scan is never accepted as zero usage.
+They can miss excursions between samples. A Docker directory scan that reports
+disappearing files is retried from scratch up to four times, with 0.1, 0.2, 0.4 and
+0.8 second delays. Only a complete fresh traversal supplies a byte total. Permission
+errors, timeouts and other Docker failures stop immediately. Local file-replacement
+races have one fresh retry. Exhausted retries still reject the measurement; an
+incomplete scan is never accepted as zero usage.
+
+The [bootstrap retry record](evidence/bootstrap-capacity-retries-2026-09-12.json)
+preserves two stopped runs, their failed periodic samples and admitted resume
+observations. Those older samples reported only `RuntimeError`, so their precise
+cause cannot be established retrospectively. New Docker failures identify the
+operation and whether the directory traversal reported disappearing files,
+without storing third-party error bodies. Resumed historical prefixes still
+require final account/storage proofs.
 
 The monitor is **not a hard quota or an allocation reservation**. Absolute limits
 need filesystem/container storage quotas and sufficient merge/shutdown headroom.

@@ -1,0 +1,83 @@
+{
+  "blocks": 60249,
+  "chain_id": 56,
+  "comparisons": [
+    {
+      "authority": "0x73d718b4cf0d2d86eb4ac522f6fedf599bbbdfb7",
+      "block": 120530005,
+      "block_hash": "0x4289e407232dcdf445a80d5e0c03b8452633b3c95bd49ca114ec1b7150fcc2ea",
+      "code_bytes_after": 0,
+      "code_bytes_before": 23,
+      "fixture": "v5-failed-authority-clear.pb",
+      "fixture_sha256": "b763a648f1dc0bfce842887c39466e3036b2770e88f49513dd400c70bb999e25",
+      "native_code_patches": [
+        {
+          "code": "0x",
+          "ordinal": 3442
+        }
+      ],
+      "native_lifecycle": [
+        {
+          "kind": "code_cleared",
+          "ordinal": 3442
+        }
+      ],
+      "native_metadata": {
+        "0x43b563340aeecc524ee9e652de56f47a74abe5d2": {
+          "balance": "5448510150000000",
+          "nonce": 360
+        },
+        "0x73d718b4cf0d2d86eb4ac522f6fedf599bbbdfb7": {
+          "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "nonce": 10581
+        }
+      },
+      "storage_patches": 0,
+      "transaction_hash": "0xfe577014f85e453ad9f4d72712356a946b1dbbed69e7969b67de53bc6f1826b0"
+    },
+    {
+      "authority": "0xbbb90cdb4e271be14df46b7e84f4fbf3bab17b6e",
+      "block": 120590252,
+      "block_hash": "0xe54eebbb259cdbe42076ac0656871999e2efb049161b04fb23e8ea44289050bf",
+      "code_bytes_after": 0,
+      "code_bytes_before": 23,
+      "fixture": "v5-failed-self-clear.pb",
+      "fixture_sha256": "66785dd59b99ba736f5df3170d42d0845560a6949cad174df01113c587a4e4a4",
+      "native_code_patches": [
+        {
+          "code": "0x",
+          "ordinal": 1170
+        }
+      ],
+      "native_lifecycle": [
+        {
+          "kind": "code_cleared",
+          "ordinal": 1170
+        }
+      ],
+      "native_metadata": {
+        "0xbbb90cdb4e271be14df46b7e84f4fbf3bab17b6e": {
+          "balance": "3812809610753657",
+          "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "nonce": 40
+        }
+      },
+      "storage_patches": 0,
+      "transaction_hash": "0x703079fe78519e938d9c52f5b44674d67cfaf8fbe233c7a71495a1a10bcd4a44"
+    }
+  ],
+  "database": "evm_actual_clear",
+  "format_version": 1,
+  "header": {
+    "hash": "0xe54eebbb259cdbe42076ac0656871999e2efb049161b04fb23e8ea44289050bf",
+    "number": 120590252,
+    "parent_hash": "0x874b88995549683328f3057945111df70abeeceea096cb2664cb146333aa7f70",
+    "state_root": "0xcfcbd02f80d52b9127794f9b3e64661db7a2506976ab89f71813a29313fe4154",
+    "timestamp": 1788827260
+  },
+  "module_hash": "354a7cf00de12a2d5437d1d85cb3c53621168cd7",
+  "package_sha256": "7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2",
+  "qualification": "Exact captured block-end updates and clear markers match archive RPC. No untouched storage completeness, account-root proof or ready checkpoint is claimed.",
+  "run_id": "1cea4639602a46bf9cab92920b3cfacb",
+  "start_block": 120530004
+}

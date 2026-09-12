@@ -1,0 +1,36 @@
+{
+  "blocks": 2,
+  "chain_id": 56,
+  "comparisons": {
+    "0x2cf78c2adb779c0ac4dad5e598121a0c36f07e36": {
+      "code_bytes_before_and_after": 4,
+      "code_hash_before_and_after": "0x6683da45ab3091784059d05578df094f721c512a6f4cc870bc73beaf9ef51ed4",
+      "nonce_before_and_after": 1,
+      "observed_native_fields": {
+        "balance": "0"
+      },
+      "selfdestruct_ordinals": [
+        5351,
+        7508,
+        7832
+      ]
+    }
+  },
+  "database": "evm_lifecycle_finish",
+  "fixture": "v5-post-cancun-existing-selfdestruct.pb",
+  "fixture_sha256": "fb1eb49aa620d9bb8d7f02df100cf910448c446252282d321b48f204a8ef097a",
+  "format_version": 1,
+  "header": {
+    "hash": "0xde5a7f0ba524a590e6b026a8eb2e9195fa965180ad292b4904ed927fa84447e1",
+    "number": 121208286,
+    "parent_hash": "0x903cc9f6306e206ac99c5cab0c9c6b74169c8b7f7d958b5228d9a88a629cb9f3",
+    "state_root": "0xbea699dac9a820a40e411eefccbabda7d885215f7785a5816bc5216e859a5efa",
+    "timestamp": 1789105504
+  },
+  "module_hash": "1a6f9dab40928042d44700380112f015be981bae",
+  "package_sha256": "7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2",
+  "qualification": "Native diagnostic markers and unchanged code/nonce agree with captured archive RPC. No complete initial storage, historical account-root proof or ready checkpoint is claimed.",
+  "run_id": "b3082ddd0d604c4cb4baf1f822da3687",
+  "start_block": 121208285,
+  "transaction_hash": "0x945d6a72f534c367c59ee97afed04aeddada54940d2b4814c4f05e64f9754238"
+}

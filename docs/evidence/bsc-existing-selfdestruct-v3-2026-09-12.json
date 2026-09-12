@@ -1,0 +1,77 @@
+{
+  "blocks": 2,
+  "chain_id": 56,
+  "comparisons": {
+    "0x01f54b24f6c56b62fa46d66b191d152dade56961": {
+      "code_bytes_before_and_after": 21,
+      "code_hash_before_and_after": "0x1d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac",
+      "nonce_before_and_after": 1,
+      "observed_native_fields": {},
+      "selfdestruct_ordinals": [
+        492
+      ]
+    },
+    "0x0b788605cf19a60d158674bd60f94e804710415d": {
+      "code_bytes_before_and_after": 21,
+      "code_hash_before_and_after": "0x1d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac",
+      "nonce_before_and_after": 1,
+      "observed_native_fields": {},
+      "selfdestruct_ordinals": [
+        516
+      ]
+    },
+    "0x225b54a7b006e2dd6eb5d8991dc1606b501cb6cd": {
+      "code_bytes_before_and_after": 21,
+      "code_hash_before_and_after": "0x1d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac",
+      "nonce_before_and_after": 1,
+      "observed_native_fields": {},
+      "selfdestruct_ordinals": [
+        510
+      ]
+    },
+    "0x5f2851add5e54e2bde5a6cdab1417e54284b3f83": {
+      "code_bytes_before_and_after": 21,
+      "code_hash_before_and_after": "0x1d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac",
+      "nonce_before_and_after": 1,
+      "observed_native_fields": {},
+      "selfdestruct_ordinals": [
+        504
+      ]
+    },
+    "0x6594549d333f54078195ad942d4028e78e2fe780": {
+      "code_bytes_before_and_after": 21,
+      "code_hash_before_and_after": "0x1d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac",
+      "nonce_before_and_after": 1,
+      "observed_native_fields": {},
+      "selfdestruct_ordinals": [
+        498
+      ]
+    },
+    "0xe663f22afbb9bdf12f0c2f65de680cab4f2b4080": {
+      "code_bytes_before_and_after": 21,
+      "code_hash_before_and_after": "0x1d93f60f105899172f7255c030301c3af4564edd4a48577dbdc448aec7ddb0ac",
+      "nonce_before_and_after": 1,
+      "observed_native_fields": {},
+      "selfdestruct_ordinals": [
+        486
+      ]
+    }
+  },
+  "database": "evm_existing_v3",
+  "fixture": "v3-post-cancun-existing-selfdestruct.pb",
+  "fixture_sha256": "e01a8eea17b34fb9b8b65bf129272f65fe836e3092311a726bb7998b422d6531",
+  "format_version": 1,
+  "header": {
+    "hash": "0x06dac499ed55d2e3fba97e3d991ff4e1fe0cb297b0839c6e826105a74b3195ed",
+    "number": 40000129,
+    "parent_hash": "0xbed628296731f94c07109153ed611b00da6d4930183b90ec9545b775866108c7",
+    "state_root": "0xf8ede92d6c06a064c8dd1135a98ed8b1580ac72b9b763979a26f40936b45973a",
+    "timestamp": 1719558967
+  },
+  "module_hash": "e0d7d768cf5333f0d08bc493373c63e13f26613c",
+  "package_sha256": "7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2",
+  "qualification": "Native diagnostic markers and unchanged code/nonce agree with captured archive RPC. No complete initial storage, historical account-root proof or ready checkpoint is claimed.",
+  "run_id": "a0e07480c21e45b99444566b9c6f40ae",
+  "start_block": 40000128,
+  "transaction_hash": "0x76cb54bd9169ac37dcf95357d39cac107dc2115b9c5c73e4b31c2676f9ac6125"
+}

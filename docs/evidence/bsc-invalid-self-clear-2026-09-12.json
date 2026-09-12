@@ -1,0 +1,40 @@
+{
+  "blocks": 40373,
+  "chain_id": 56,
+  "comparisons": [
+    {
+      "authority": "0x213864e51cdacf3fdacbdc12726dba9f12167514",
+      "block": 121248657,
+      "block_hash": "0x3aba6df262b934526f66c452877b285d1e398717201f15f46e3f4f7cbd863eab",
+      "code_bytes_after": 23,
+      "code_bytes_before": 23,
+      "fixture": "v5-invalid-self-clear-noop.pb",
+      "fixture_sha256": "88e4c9f8550638680c1fbc3e017584fbdfb609690a09d2bb1fa12d1053a23183",
+      "native_code_patches": [],
+      "native_lifecycle": [],
+      "native_metadata": {
+        "0x213864e51cdacf3fdacbdc12726dba9f12167514": {
+          "balance": "838441943532195",
+          "code_hash": "0xfd5a05f458001695544fff7b7f58546fdbd423cb1a0651992c7d1720b0acd6f3",
+          "nonce": 102
+        }
+      },
+      "storage_patches": 0,
+      "transaction_hash": "0x736459b266ebd9e3c09ce70c5fe0ef5944e959d67b924333889b060c86f05c3c"
+    }
+  ],
+  "database": "evm_lifecycle_finish",
+  "format_version": 1,
+  "header": {
+    "hash": "0x3aba6df262b934526f66c452877b285d1e398717201f15f46e3f4f7cbd863eab",
+    "number": 121248657,
+    "parent_hash": "0xaca8893abd9311be2e6d01024e22f1d760b28a5633fb0153d92879cdb4c2cef8",
+    "state_root": "0xa1e2e0b9a2b5006e8a6747de0dc391f5da55c016c06035dc6e1fd871bc8c6ac4",
+    "timestamp": 1789123712
+  },
+  "module_hash": "1a6f9dab40928042d44700380112f015be981bae",
+  "package_sha256": "7fa782369a8b50667200b949dddd3acac52e260c38a05dfa46ab968b54fed5d2",
+  "qualification": "Exact captured block-end updates and clear markers match archive RPC. No untouched storage completeness, account-root proof or ready checkpoint is claimed.",
+  "run_id": "b3082ddd0d604c4cb4baf1f822da3687",
+  "start_block": 121208285
+}

@@ -349,3 +349,116 @@ fn captured_v5_reverted_distinct_authorities_keep_both_new_delegations() {
     assert_eq!(out.balances.iter().find(|v| v.address == sender).unwrap().value, "85506619714619968");
     assert!(out.storage.is_empty() && out.lifecycle.is_empty());
 }
+
+#[test]
+fn captured_v3_post_cancun_existing_selfdestruct_preserves_account_metadata() {
+    let block = sample!("v3-post-cancun-existing-selfdestruct", 3, 40000129);
+    let accounts = ["0x01f54b24f6c56b62fa46d66b191d152dade56961", "0x0b788605cf19a60d158674bd60f94e804710415d",
+        "0x225b54a7b006e2dd6eb5d8991dc1606b501cb6cd", "0x5f2851add5e54e2bde5a6cdab1417e54284b3f83",
+        "0x6594549d333f54078195ad942d4028e78e2fe780", "0xe663f22afbb9bdf12f0c2f65de680cab4f2b4080"];
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.calls.iter().filter(|c| c.suicide && !c.state_reverted).count(), 6);
+    assert!(!tx.calls.iter().any(|c| c.call_type() == eth::CallType::Create));
+    let out = project(&accounts.join(","), &block).unwrap();
+    assert!(out.nonces.is_empty() && out.codes.is_empty() && out.storage.is_empty());
+    assert_eq!(out.lifecycle.len(), 6);
+    assert!(out.lifecycle.iter().all(|v| v.kind == "selfdestruct"));
+    assert_eq!(out.lifecycle.iter().map(|v| v.address.as_str()).collect::<Vec<_>>(), accounts);
+}
+
+#[test]
+fn captured_v5_post_cancun_existing_selfdestruct_transfers_balance_without_deleting_code() {
+    let block = sample!("v5-post-cancun-existing-selfdestruct", 5, 121208286);
+    let account = "0x2cf78c2adb779c0ac4dad5e598121a0c36f07e36";
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Succeeded);
+    assert_eq!(tx.calls.len(), 1);
+    assert!(tx.calls[0].suicide && !tx.calls[0].state_reverted);
+    assert_eq!(tx.calls[0].call_type(), eth::CallType::Call);
+    let out = project(account, &block).unwrap();
+    assert!(out.nonces.is_empty() && out.codes.is_empty() && out.storage.is_empty());
+    assert_eq!(out.balances.len(), 1);
+    assert_eq!(out.balances[0].value, "0");
+    assert_eq!(out.balances[0].ordinal, 5349);
+    assert_eq!(out.lifecycle.len(), 1);
+    assert_eq!(out.lifecycle[0].kind, "selfdestruct");
+    assert_eq!(out.lifecycle[0].ordinal, 5351);
+}
+
+#[test]
+fn captured_v5_invalid_self_clear_flag_does_not_synthesize_a_code_change() {
+    let block = sample!("v5-invalid-self-clear-noop", 5, 121248657);
+    let tx = &block.transaction_traces[0];
+    let account = "0x213864e51cdacf3fdacbdc12726dba9f12167514";
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Reverted);
+    assert!(tx.calls[0].state_reverted);
+    assert_eq!(tx.nonce, 101);
+    let authorization = &tx.set_code_authorizations[0];
+    assert_eq!(authorization.authority.as_deref(), Some(tx.from.as_slice()));
+    assert_eq!(authorization.nonce, tx.nonce); // Invalid after the sender increment.
+    assert!(authorization.address.iter().all(|b| *b == 0));
+    // This producer flag is false despite the invalid authorization nonce.
+    // Actual pre-execution changes and RPC state show only the sender increment.
+    assert!(!authorization.discarded);
+    let changes = crate::collect(account, &block).unwrap();
+    assert_eq!(changes.nonce_changes.len(), 1);
+    assert_eq!(changes.nonce_changes[0].origin.as_ref().unwrap().scope, Scope::TxFailedPersistent as i32);
+    assert!(changes.code_changes.is_empty());
+    let out = project(account, &block).unwrap();
+    assert_eq!((out.nonces[0].value, out.nonces[0].ordinal), (102, 7559));
+    assert_eq!(out.balances[0].value, "838441943532195");
+    assert!(out.codes.is_empty() && out.storage.is_empty() && out.lifecycle.is_empty());
+}
+
+#[test]
+fn captured_v5_failed_transaction_preserves_another_authoritys_code_clear() {
+    let block = sample!("v5-failed-authority-clear", 5, 120530005);
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Reverted);
+    assert!(tx.calls[0].state_reverted);
+    assert_eq!(tx.calls[0].begin_ordinal, 3443);
+    let sender = "0x43b563340aeecc524ee9e652de56f47a74abe5d2";
+    let authority = "0x73d718b4cf0d2d86eb4ac522f6fedf599bbbdfb7";
+    let filter = format!("{sender},{authority}");
+    let changes = crate::collect(&filter, &block).unwrap();
+    assert_eq!(changes.nonce_changes.iter().map(|c|
+        (c.new_value, c.origin.as_ref().unwrap().scope)).collect::<Vec<_>>(),
+        vec![(360, Scope::TxFailedPersistent as i32), (10581, Scope::Tx7702 as i32)]);
+    assert_eq!(changes.code_changes.len(), 1);
+    assert_eq!(changes.code_changes[0].origin.as_ref().unwrap().scope, Scope::Tx7702 as i32);
+    let out = project(&filter, &block).unwrap();
+    assert_eq!(out.codes.len(), 1);
+    assert_eq!(out.codes[0].address, authority);
+    assert_eq!(out.codes[0].code, "0x");
+    assert_eq!(out.codes[0].hash, EMPTY_CODE_HASH);
+    assert_eq!(out.codes[0].ordinal, 3442);
+    assert_eq!(out.lifecycle.len(), 1);
+    assert_eq!(out.lifecycle[0].kind, "code_cleared");
+    assert!(out.storage.is_empty());
+}
+
+#[test]
+fn captured_v5_failed_self_clear_keeps_two_nonce_increments_and_empty_code() {
+    let block = sample!("v5-failed-self-clear", 5, 120590252);
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Reverted);
+    assert!(tx.calls[0].state_reverted);
+    assert_eq!(tx.calls[0].begin_ordinal, 1171);
+    assert_eq!(tx.nonce, 38);
+    assert_eq!(tx.set_code_authorizations[0].nonce, tx.nonce + 1);
+    let account = "0xbbb90cdb4e271be14df46b7e84f4fbf3bab17b6e";
+    let changes = crate::collect(account, &block).unwrap();
+    assert_eq!(changes.nonce_changes.iter().map(|c|
+        (c.new_value, c.origin.as_ref().unwrap().scope)).collect::<Vec<_>>(),
+        vec![(39, Scope::TxFailedPersistent as i32), (40, Scope::Tx7702 as i32)]);
+    assert_eq!(changes.code_changes[0].origin.as_ref().unwrap().scope, Scope::Tx7702 as i32);
+    let out = project(account, &block).unwrap();
+    assert_eq!(out.nonces.len(), 1);
+    assert_eq!((out.nonces[0].value, out.nonces[0].ordinal), (40, 1169));
+    assert_eq!(out.codes[0].code, "0x");
+    assert_eq!(out.codes[0].hash, EMPTY_CODE_HASH);
+    assert_eq!(out.codes[0].ordinal, 1170);
+    assert_eq!(out.lifecycle.len(), 1);
+    assert_eq!(out.lifecycle[0].kind, "code_cleared");
+    assert!(out.storage.is_empty());
+}

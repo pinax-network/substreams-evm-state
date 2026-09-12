@@ -1,0 +1,122 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "cohorts": [
+    {
+      "cohort": "wbnb-bootstrap",
+      "stopped_phase": "host-disk-retry1",
+      "stopped_summary_sha256": "a0ba38718ae89355c715fb0e9eea60b88cb66fc06fae8bd46744ea631771b9d4",
+      "stopped_summary": {
+        "command_exit_code": -15,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789231598753227000,
+        "format_version": 1,
+        "guard_samples": 277,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 25061472000,
+        "peak_observed_allocated_bytes": 4756439040,
+        "rejected_guard_stages": [],
+        "samples": 155,
+        "started_ns": 1789230179076098000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      },
+      "failed_periodic_samples": [
+        {
+          "admitted": false,
+          "error_type": "RuntimeError",
+          "reasons": [
+            "incomplete_capacity_sample"
+          ],
+          "sample_finished_ns": 1789231598672451000
+        }
+      ],
+      "resumed_phase": "host-disk-retry2",
+      "resumed_observed_prefix": {
+        "header": {
+          "hash": "0x41188c63f8a53d076e44564657f5e820c520521742948e16af423e6bb5293e24",
+          "number": 9810980,
+          "parent_hash": "0xb891e2051d3912a78db9c30e6a9764b8a4907396e08f6356eaa9da701730fc4f",
+          "state_root": "0xcbd9b058f729ba463648560f4a7ee0fdc95d5a61ab8db822c1b44c300e78d161",
+          "timestamp": 1628296582
+        },
+        "nonzero_slots": 1099787,
+        "state_sha256": "ee5732b4ded5d5a3e312dd2dd70f9b460ca73286961b104cd7591d82e85e51c9",
+        "status": "unverified-bootstrap"
+      },
+      "latest_complete_sample": {
+        "sample_finished_ns": 1789233176946550000,
+        "admitted": true,
+        "reasons": [],
+        "accounted_allocated_bytes": 4516179968,
+        "budget_bytes": 98257164288,
+        "headroom_bytes": 10000000000,
+        "min_free_bytes": 1073741824
+      }
+    },
+    {
+      "cohort": "customer-example",
+      "stopped_phase": "host-disk",
+      "stopped_summary_sha256": "d59f0e3f64c45131720c856c9e54682862a470f7223970d9459fcbbd6060aad0",
+      "stopped_summary": {
+        "command_exit_code": -15,
+        "config_sha256": "d454dd95bd61d229e8267956cd27bb7404b1b1fd3ec0da0cdd1ac7d742a45724",
+        "failed_samples": 1,
+        "finished_ns": 1789231586557007000,
+        "format_version": 1,
+        "guard_samples": 623,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 25041960000,
+        "peak_observed_allocated_bytes": 4760231936,
+        "rejected_guard_stages": [],
+        "samples": 275,
+        "started_ns": 1789229228123964000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      },
+      "failed_periodic_samples": [
+        {
+          "admitted": false,
+          "error_type": "RuntimeError",
+          "reasons": [
+            "incomplete_capacity_sample"
+          ],
+          "sample_finished_ns": 1789231586371994000
+        }
+      ],
+      "resumed_phase": "host-disk-retry1",
+      "resumed_observed_prefix": {
+        "header": {
+          "hash": "0xadc8a4a606569e6d8dbbd5bcc9c1f08201b096267b4b4789b3ba453d4aaa1cad",
+          "number": 50598984,
+          "parent_hash": "0xad76ff8bc011b859a1aadb25f9d7203c4da0019ea8175a40fc58b74cc42a57e5",
+          "state_root": "0xc3474a25a036cbd5e6d32fe0365d9f6e21813cb3ad9bba5f2d761e08b1e228c5",
+          "timestamp": 1748642311
+        },
+        "nonzero_slots": 560,
+        "state_sha256": "ec8e24e6d9756ec8ba0ed3073f6f1c9f9647a40bfc6be55d9397832bb78c3b6e",
+        "status": "unverified-bootstrap"
+      },
+      "latest_complete_sample": {
+        "sample_finished_ns": 1789233176946500000,
+        "admitted": true,
+        "reasons": [],
+        "accounted_allocated_bytes": 4516179968,
+        "budget_bytes": 98257164288,
+        "headroom_bytes": 10000000000,
+        "min_free_bytes": 1073741824
+      }
+    }
+  ],
+  "overall_budget_bytes": 100000000000,
+  "retained_original_volume_reserve_bytes": 1742835712,
+  "qualification": "Old periodic samples reported RuntimeError without a precise operation or stderr classification; disappearance is not established as their cause. Both commands stopped and were resumed only after a fresh admitted full sample. New code retries only reported missing-file Docker traversals, up to five full attempts; failed partial totals are never used. Resumed prefixes remain unverified until final account/storage proof. Samples include shared concurrent workloads and are not a quota."
+}

@@ -63,8 +63,9 @@ def local_usage(paths):
 
 
 class DockerCapacityError(RuntimeError):
-    def __init__(self, operation, timed_out=False):
+    def __init__(self, operation, timed_out=False, directory_changed=False):
         self.operation = operation
+        self.directory_changed = directory_changed
         outcome = "timed out" if timed_out else "failed"
         super().__init__(f"Docker capacity {operation} {outcome}; the sample is incomplete")
 
@@ -77,7 +78,9 @@ def _docker(arguments, timeout=30):
         raise DockerCapacityError(operation, timed_out=True) from None
     if result.returncode:
         # Do not echo inspect environment values or third-party command errors.
-        raise DockerCapacityError(operation)
+        changed = (operation == "data-directory scan" and result.returncode == 1 and
+                   b"No such file or directory" in result.stderr and b"Permission denied" not in result.stderr)
+        raise DockerCapacityError(operation, directory_changed=changed)
     return result.stdout
 
 
@@ -165,15 +168,18 @@ class Meter:
         # Whole data directories include active/inactive/detached parts, merge
         # temporary files, schema metadata and system tables. GNU du deduplicates
         # hard links across all roots in this one invocation.
-        for attempt in range(2):
+        for attempt in range(5):
             try:
                 output = _docker(["exec", self.container_id, "du", "-s", "-c", "-B1", "--null", "--",
                                   *map(str, roots)])
                 break
-            except RuntimeError:
-                # A merge can rename/remove a part during du. Take a fresh full
-                # measurement once; never accept the failed scan's partial total.
-                if attempt: raise
+            except DockerCapacityError as error:
+                # Concurrent merges can invalidate more than one traversal.
+                # Retry only disappearing files, with bounded backoff and a
+                # fresh whole scan. No failed scan's partial total is accepted.
+                if not error.directory_changed or attempt == 4:
+                    raise
+                time.sleep(0.1 * 2**attempt)
         total = output.rstrip(b"\0").split(b"\0")[-1].split(b"\t", 1)
         if len(total) != 2 or total[1] != b"total":
             raise VerificationError("invalid ClickHouse data-directory measurement")
@@ -258,6 +264,7 @@ def check(client, required_paths=(), stage="operation"):
                 "error_type": type(error).__name__}
             if isinstance(error, DockerCapacityError):
                 failure["inspection_operation"] = error.operation
+                failure["directory_changed"] = error.directory_changed
             atomic_json(destination / (uuid.uuid4().hex + ".json"), failure)
         raise
     if destination is not None:
@@ -299,6 +306,7 @@ def supervise(meter, command, output, interval=1.0):
                          "reasons": ["incomplete_capacity_sample"], "error_type": type(error).__name__}
                 if isinstance(error, DockerCapacityError):
                     value["inspection_operation"] = error.operation
+                    value["directory_changed"] = error.directory_changed
                 if isinstance(error, VerificationError):
                     # Meter verification errors are our fixed diagnostic text;
                     # third-party/HTTP/Docker error bodies remain excluded.

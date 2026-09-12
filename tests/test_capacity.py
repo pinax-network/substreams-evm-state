@@ -275,6 +275,42 @@ def test_docker_failure_identifies_operation_without_echoing_third_party_output(
     assert operation in str(caught.value) and "dummy-secret" not in str(caught.value)
 
 
+@pytest.mark.parametrize("stderr,changed", [(b"du: cannot access part: No such file or directory", True),
+    (b"du: Permission denied", False), (b"du: No such file or directory\ndu: Permission denied", False)])
+def test_docker_only_classifies_missing_files_as_a_retryable_traversal(monkeypatch, stderr, changed):
+    monkeypatch.setattr(capacity.subprocess, "run", lambda *args, **kwargs:
+                        SimpleNamespace(returncode=1, stdout=b"untrustworthy partial total", stderr=stderr))
+    with pytest.raises(capacity.DockerCapacityError) as caught:
+        capacity._docker(["exec", "container", "du"])
+    assert caught.value.directory_changed == changed
+
+
+@pytest.mark.parametrize("changed,failures,expected_calls", [(True, 3, 4), (True, 5, 5), (False, 1, 1)])
+def test_directory_scan_retry_is_bounded_and_requires_a_complete_fresh_total(mocked_meter, monkeypatch,
+                                                                          changed, failures, expected_calls):
+    meter, _ = mocked_meter
+    original = capacity._docker
+    calls = 0
+    sleeps = []
+    def docker(arguments, **kwargs):
+        nonlocal calls
+        if arguments[0] == "exec":
+            calls += 1
+            if calls <= failures:
+                raise capacity.DockerCapacityError("data-directory scan", directory_changed=changed)
+        return original(arguments, **kwargs)
+    monkeypatch.setattr(capacity, "_docker", docker)
+    monkeypatch.setattr(capacity.time, "sleep", sleeps.append)
+    if changed and failures < 5:
+        result = meter.sample()
+        assert result["admitted"] and result["server_data_allocated_bytes"] == 600
+    else:
+        with pytest.raises(capacity.DockerCapacityError):
+            meter.sample()
+    assert calls == expected_calls
+    assert sleeps == [0.1 * 2**attempt for attempt in range(expected_calls - 1)]
+
+
 def test_supervisor_includes_internal_scan_failure_even_when_periodic_samples_pass(tmp_path):
     # The child catches the guard error and exits zero: publication still cannot
     # turn the rejected internal measurement into a successful capacity report.
