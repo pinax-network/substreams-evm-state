@@ -16,7 +16,7 @@ from .control import control, object_id
 from .files import atomic_json
 from .header import verify_header
 from .proof import VerificationError, address, unhex, verify_account, verify_complete
-from .triedb import TrieDB
+from .triedb import StorageSortDB
 from .capacity import check as capacity_check
 from .ch import ClickHouse
 
@@ -156,7 +156,7 @@ def _verify(directory, layout, expected_hash=None, work_dir=None, capacity_clien
                     digest.update((account + row["slot"] + row["value"]).encode())
                     yield row["slot"], row["value"]
         with tempfile.TemporaryDirectory(prefix="evm-export-verify-", dir=work_dir) as directory_name:
-            database = TrieDB(Path(directory_name) / "trie.sqlite")
+            database = StorageSortDB(Path(directory_name) / "storage.sqlite")
             try:
                 count = verify_complete(proven, slots(), metadata["code"], metadata, database)
                 capacity_check(capacity_client, capacity_paths, "export-verify-trie")

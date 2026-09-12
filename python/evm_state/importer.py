@@ -11,7 +11,7 @@ from .control import control
 from .export import ACCOUNT_FIELDS, _check_file, _json, _page_rows, _verify
 from .proof import VerificationError, unhex, verify_account, verify_complete
 from .retention import require_partitioned_schema
-from .triedb import TrieDB
+from .triedb import StorageSortDB
 from .capacity import check as capacity_check
 
 
@@ -35,7 +35,7 @@ def _verify_stored(client, snapshot_id, record, work_dir):
                 digest.update((account + row["slot"] + row["value"]).encode())
                 yield row["slot"], row["value"]
         with tempfile.TemporaryDirectory(prefix="evm-import-verify-", dir=work_dir) as directory:
-            trie = TrieDB(Path(directory) / "nodes.sqlite")
+            trie = StorageSortDB(Path(directory) / "storage.sqlite")
             try:
                 slots_count = verify_complete(proven, slots(), metadata["code"], metadata, trie)
                 capacity_check(client, [work_dir, control(client).path], "import-trie")

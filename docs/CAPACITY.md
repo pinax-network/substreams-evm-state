@@ -250,8 +250,9 @@ The [real WBNB trie workspace measurement](evidence/bsc-trie-workspace-2026-09-1
 uses the same isolated 1,912,703-slot result from the aggregation comparison.
 Before reconstruction, its storage and archive-supplied nonce/balance/code fields
 reproduce the previously recorded state checksum. The complete stream also
-reproduces that checksum while the production `storage_root` and `TrieDB` code
-construct the trie.
+reproduces that checksum while the original incremental `storage_root` and
+`TrieDB` code construct the trie. This is the baseline for the sorted builder
+now used by checkpoint, export and restore verification.
 
 | Measurement | Observed result |
 |---|---|
@@ -277,10 +278,35 @@ window. This exercise establishes measured reconstruction cost and input parity,
 not complete account-state acceptance. The long replays retain their separately
 captured recent proofs as final readiness targets.
 
-The 21-minute reconstruction makes full-root verification a material publication
-and export cost even at this intermediate size. Larger state, checkpoint/export
-latency and sustained growth remain qualification gates. Do not extrapolate a
-fixed per-slot memory or time bound from this one shared-machine measurement.
+The [sorted reconstruction comparison](evidence/bsc-trie-sorted-2026-09-12.json)
+repeats the complete input and matches that root and checksum. It first stages
+`keccak256(slot)` and RLP-encoded nonzero values in a fresh SQLite table, then
+hashes completed subtrees in key order. Duplicate keys fail even when their
+values agree. The builder keeps two lookahead entries and completed child
+references instead of retaining a full trie and its node reference counts.
+Account-proof verification and comparison with the proven storage root remain
+unchanged. The original incremental builder remains an independent test oracle.
+
+| Same 1,912,703-slot input | Incremental baseline | Sorted builder |
+|---|---:|---:|
+| Wall time, including progress guards | 1,280.79 s | 200.63 s |
+| Python CPU time during reconstruction | 986.43 s | 84.61 s |
+| Whole measurement process peak resident memory | 578,240,512 bytes | 73,596,928 bytes |
+| Allocated workspace before close | 403,693,568 bytes | 135,061,504 bytes |
+
+The observed wall-time improvement is 6.38 times and CPU improvement is 11.66
+times. Both runs use guards every 100,000 slots, but their guard durations and
+shared-host load differ. The sorted run passes all 20 periodic and 21 guard
+samples; its maximum periodic gap is 22.13 seconds and shared allocated peak is
+8,887,144,448 bytes, plus the separate original-volume reserve. The sorting file
+is committed before hashing and measurement; its entries are **hashed slots,
+not trie nodes**. It remains disposable workspace, not a checkpoint export.
+SQLite requests a 16 MiB page cache; this is not a hard process-memory bound.
+
+This reduces measured reconstruction cost. Larger state, complete hot-account
+proofs, checkpoint/export latency and sustained growth remain qualification
+gates. Do not extrapolate a fixed per-slot memory or time bound from these
+shared-machine measurements.
 
 To reproduce on the retained isolated comparison database, provide a JSON object
 mapping its account to the matching observed fields (`nonce`, decimal-string
@@ -298,6 +324,12 @@ does not reproduce the comparison's recorded checksum:
 Both output directories must be new and inside the measured roots. The evidence
 selects the frozen database and generation; the workload never reads or modifies
 the advancing native source and never publishes a ready manifest.
+To compare the sorted builder, repeat with fresh output directories and add
+`--backend sorted --reference <previous-trie-work>/result.json`. The script
+requires the same source identity, header, input count/checksum and reconstructed
+root. Unit tests compare both assemblers on seeded random keys, deep shared
+paths, full branches and the 31/32/33-byte child-reference boundary; malformed,
+duplicate, zero and interrupted input cannot return an accepted root.
 
 ## Reproduce the state/retention stress fixture
 

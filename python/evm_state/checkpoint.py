@@ -9,7 +9,7 @@ import uuid
 
 from .ch import ClickHouse, identifier
 from .proof import VerificationError, address, unhex, verify_account, verify_complete, EMPTY_STORAGE_ROOT
-from .triedb import TrieDB
+from .triedb import StorageSortDB
 from .header import verify_header
 from .control import control, object_id
 from .source import verified_source
@@ -249,7 +249,7 @@ def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, 
                 digest.update((account_address + row["slot"] + row["value"]).encode())
                 yield row["slot"], row["value"]
         with tempfile.TemporaryDirectory(prefix="evm-state-trie-", dir=work_dir) as directory:
-            trie_db = TrieDB(Path(directory) / "nodes.sqlite")
+            trie_db = StorageSortDB(Path(directory) / "storage.sqlite")
             try:
                 count = verify_complete(proven, slots(), code, metadata, trie_db)
                 capacity_check(client, capacity_paths, "checkpoint-trie")

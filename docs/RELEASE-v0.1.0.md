@@ -25,6 +25,10 @@ not require a `DatabaseChanges` or `db_out` transformation.
 - Portable exports can be verified offline and imported into a new checkpoint
   database. Reader pins preserve a fixed generation across pagination, newer
   publication and retention cleanup.
+- Complete-storage verification sorts hashed slots in temporary SQLite storage
+  and builds the trie in one ordered scan. The 1,912,703-slot comparison matches
+  the original verifier's root while reducing measured reconstruction time and
+  memory; see [capacity evidence](CAPACITY.md#full-trie-reconstruction-workspace).
 - Native ownership, frozen package/filter identity, durable cursor backups and
   local writer locks prevent accidental source replacement or competing writers.
   Cleanup preserves the native cursor and retained checkpoint continuations.

@@ -19,7 +19,7 @@ from evm_state.capacity import check as capacity_check
 from evm_state.ch import ClickHouse
 from evm_state.files import atomic_json
 from evm_state.proof import VerificationError, storage_root
-from evm_state.triedb import TrieDB
+from evm_state.triedb import StorageSortDB, TrieDB
 
 
 def peak_rss_bytes():
@@ -32,6 +32,8 @@ def main():
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--fields", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True, help="fresh directory inside capacity roots")
+    parser.add_argument("--backend", choices=("incremental", "sorted"), default="incremental")
+    parser.add_argument("--reference", type=Path, help="previous reconstruction result to require identical input/root")
     args = parser.parse_args()
     if not os.environ.get("EVM_STATE_CAPACITY_CONFIG"):
         parser.error("run this workload under capacity-run")
@@ -50,6 +52,7 @@ def main():
     if any(variant[key] != value for key, value in measured.items()):
         raise VerificationError("retained generation or account fields differ from the recorded state")
     identity = {"format_version": 1, "status": "unproven-trie-resource-measurement",
+        "backend": args.backend,
         "account": evidence["accounts"][0], "header": evidence["target_header"],
         "database": client.database, "generation": variant["generation"],
         "run_id": evidence["run_id"], "module_hash": evidence["module_hash"],
@@ -60,9 +63,18 @@ def main():
         **measured,
         "qualification": "Resource measurement of a checksummed private account state. "
             "No account proof, independently accepted storage root or ready checkpoint is claimed."}
+    reference = None
+    if args.reference:
+        reference_raw = args.reference.read_bytes()
+        reference = json.loads(reference_raw)
+        for key in ("account", "header", "database", "generation", "run_id", "module_hash",
+                    "package_sha256", "fields_sha256", "nonzero_slots", "state_sha256"):
+            if identity[key] != reference[key]:
+                raise VerificationError(f"reference reconstruction differs in {key}")
+        identity["reference_sha256"] = hashlib.sha256(reference_raw).hexdigest()
     atomic_json(out / "input.json", identity)
-    path = out / "nodes.sqlite"
-    database = TrieDB(path)
+    path = out / ("storage.sqlite" if args.backend == "sorted" else "nodes.sqlite")
+    database = (StorageSortDB if args.backend == "sorted" else TrieDB)(path)
     started, cpu_started = time.monotonic(), time.process_time()
     digest = hashlib.sha256(json.dumps(fields, sort_keys=True, separators=(",", ":")).encode())
     count, previous = 0, None
@@ -73,13 +85,13 @@ def main():
                     "elapsed_seconds": time.monotonic() - started,
                     "process_cpu_seconds": time.process_time() - cpu_started,
                     "process_peak_rss_bytes": peak_rss_bytes(),
-                    "trie_file_bytes": path.stat().st_size,
-                    "trie_allocated_bytes": path.stat().st_blocks * 512}
+                    "workspace_file_bytes": path.stat().st_size,
+                    "workspace_allocated_bytes": path.stat().st_blocks * 512}
                 progress.write(json.dumps(value, sort_keys=True) + "\n")
                 progress.flush()
                 capacity_check(client, [out], stage)
                 print(json.dumps({k: value[k] for k in
-                    ("slots", "elapsed_seconds", "process_peak_rss_bytes", "trie_allocated_bytes")}), flush=True)
+                    ("slots", "elapsed_seconds", "process_peak_rss_bytes", "workspace_allocated_bytes")}), flush=True)
                 return value
 
             def slots():
@@ -101,6 +113,8 @@ def main():
             cpu_seconds = time.process_time() - cpu_started
             if count != root_count or count != measured["nonzero_slots"] or digest.hexdigest() != measured["state_sha256"]:
                 raise VerificationError("trie input count/checksum differs from the frozen generation")
+            if reference and reference["reconstructed_storage_root"] != "0x" + root.hex():
+                raise VerificationError("reconstructed storage root differs from the reference")
             # Measure before closing the disposable SQLite transaction: its
             # file and cache represent actual verification workspace here.
             final = point("trie-workspace-finished")
@@ -108,11 +122,14 @@ def main():
                 "trie_seconds_including_progress_guards": seconds,
                 "process_cpu_seconds_during_trie": cpu_seconds,
                 "whole_process_peak_rss_bytes": peak_rss_bytes(),
-                "trie_nodes": len(database),
-                "trie_file_bytes_before_close": final["trie_file_bytes"],
-                "trie_allocated_bytes_before_close": final["trie_allocated_bytes"],
+                "workspace_entries": len(database),
+                "workspace_entry_kind": "hashed storage slots" if args.backend == "sorted" else "trie nodes",
+                "workspace_file_bytes_before_close": final["workspace_file_bytes"],
+                "workspace_allocated_bytes_before_close": final["workspace_allocated_bytes"],
                 "streamed_input_checksum_matches": True,
-                "workspace_note": "Disposable SQLite transaction is not a portable trie export; close may roll it back. "
+                "reference_root_matches": True if reference else None,
+                "workspace_note": "Disposable SQLite workspace is not a portable trie export. "
+                    + ("Sorted slots are committed before hashing. " if args.backend == "sorted" else "Close may roll back trie nodes. ") +
                     "RSS covers this Python process, not the ClickHouse server or other processes."}
             atomic_json(out / "result.json", result)
     finally:

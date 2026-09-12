@@ -1,0 +1,337 @@
+{
+  "baseline": {
+    "evidence": "bsc-trie-workspace-2026-09-12.json",
+    "evidence_sha256": "7ae34eb69a6c37666689a71863b9061e45c760a052ccebf7d4a53f51b1fe921a",
+    "process_cpu_seconds_during_trie": 986.432495,
+    "trie_allocated_bytes_before_close": 403693568,
+    "trie_seconds_including_progress_guards": 1280.785875541158,
+    "whole_process_peak_rss_bytes": 578240512
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config": {
+      "budget_bytes": 98257164288,
+      "clickhouse_container": "substreams-evm-state-ch",
+      "components": {
+        "native": [
+          "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap/native"
+        ],
+        "spool": [
+          "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap/native/spool"
+        ],
+        "verification": [
+          "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap/verification"
+        ]
+      },
+      "databases": [
+        "evm_wbnb_bootstrap",
+        "evm_wbnb_checkpoints",
+        "evm_wbnb_aggregation_retry3"
+      ],
+      "format_version": 1,
+      "headroom_bytes": 10000000000,
+      "local_paths": [
+        "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap",
+        "/Users/denis/Github/substreams-evm-state/localdata/qualification/customer-example",
+        "/Users/denis/Github/substreams-evm-state/localdata/qualification/storage-migration"
+      ],
+      "min_free_bytes": 1073741824
+    },
+    "config_sha256": "f4e2c0313355685b697e6d50357582654ec1c4cef793d25d2a0158cc42af7ed5",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789242294814549000,
+    "format_version": 1,
+    "guard_samples": 21,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 22125959000,
+    "peak_observed_allocated_bytes": 8887144448,
+    "rejected_guard_stages": [],
+    "samples": 20,
+    "started_ns": 1789242063263185000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "capacity_summary_sha256": "7c08761d38d1d1c7bcd6ac399ad66f93bbdf2d228407631cf800f359cb7bcb47",
+  "date": "2026-09-12",
+  "format_version": 1,
+  "interpretation": [
+    "The complete frozen real-account input matches both the baseline state checksum and independently assembled HexaryTrie root. No ready checkpoint was published.",
+    "The historical provider proof window still prevents account-root acceptance at this old block. This measurement does not establish full bootstrap completeness.",
+    "Sorted construction stages keccak256(slot) and RLP-encoded values, commits the SQLite table, and hashes the ordered stream with two lookahead entries. Workspace entries are slots, not trie nodes.",
+    "Wall time includes 100000-slot progress guards but excludes the preliminary checksum scan and final capacity guard. Both runs used the same guard cadence, with different shared-host load and guard durations. CPU time helps separate that overhead.",
+    "RSS covers this Python process, including its preliminary checksum scan. SQLite requests a 16 MiB page cache; neither that setting nor this measurement is a hard total-memory bound.",
+    "The shared-server allocated peak covers concurrent backfills and declared local roots. Add the original-volume reserve separately. Sampled guards are not a hard quota.",
+    "This is a reconstruction benchmark. Complete hot-account publication, export/restore and sustained-growth qualification remain required."
+  ],
+  "live_policy_budget_bytes": 98257164288,
+  "local_validation": {
+    "elapsed_seconds": 174.35,
+    "limitations": [
+      "The two PostgreSQL setup errors report no space left on device in the existing Docker volume.",
+      "The separate crash-test container did not start (docker run exit 125). Docker overlay reports zero available bytes; this run does not qualify crash recovery.",
+      "The shared ClickHouse data directory is a host bind mount with about 399.5 GB free. The existing backfills remain active. No unrelated Docker data or retained rollback volume was deleted.",
+      "The full opted-in suite must pass on a clean CI runner before accepting this change."
+    ],
+    "log_sha256": "656029795aed53322652c7b92dfcc4d5a21514154280c3c24445036326048c66",
+    "python_failed": 1,
+    "python_passed": 326,
+    "python_setup_errors": 2
+  },
+  "measurement": {
+    "account": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "backend": "sorted",
+    "database": "evm_wbnb_aggregation_retry3",
+    "evidence_sha256": "47f12ffb6aac74d9555598f919c40e5d208241348fcafb6fa13da4ed6aae505e",
+    "fields_sha256": "8cbd2ec8d2b11dc03ca1fcc5f153c79f8ccea9c51e7f2f9c2d16cf37221ea477",
+    "format_version": 1,
+    "generation": "e02f65b3dc7044e8aa34c4ee1b711ec9",
+    "header": {
+      "hash": "0xbc76479ac68845c5a89470206d95d87dd57710fa089d05d5fc389ad11ff3f08b",
+      "number": 13120981,
+      "parent_hash": "0x0946a0d4ecbb4fac2fcf65bdf7e92a2de5e23c44dd111b7b29974fe0ac1de3cd",
+      "state_root": "0x6b0733de65d4a57e88601b49727131e63ce84e996004b76b0205bef4f8e8a319",
+      "timestamp": 1638418625
+    },
+    "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+    "nonzero_slots": 1912703,
+    "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+    "process_cpu_seconds_during_trie": 84.60902399999999,
+    "qualification": "Resource measurement of a checksummed private account state. No account proof, independently accepted storage root or ready checkpoint is claimed.",
+    "reconstructed_storage_root": "0xd672105a8c3dfc77d33324fa8d8881000bacc3e83de76c5cceced2b7edab99ca",
+    "reference_root_matches": true,
+    "reference_sha256": "2aabaada6a38b02014ee03af28f420dc1996664c01752e16caba43855004ac4f",
+    "run_id": "62b4938ec1554bc093644232ef4b469d",
+    "script_sha256": "66f35bb9c2ef7d8ce3c3ca5436a782224fb570c8e5032ab8241a635e15b0d7a3",
+    "state_sha256": "54152c1af63f611f0a67c290148e56da1c39863235287570aded7cd7db6b64ca",
+    "status": "unproven-trie-resource-measurement",
+    "streamed_input_checksum_matches": true,
+    "trie_seconds_including_progress_guards": 200.6320142922923,
+    "whole_process_peak_rss_bytes": 73596928,
+    "workspace_allocated_bytes_before_close": 135061504,
+    "workspace_entries": 1912703,
+    "workspace_entry_kind": "hashed storage slots",
+    "workspace_file_bytes_before_close": 126369792,
+    "workspace_note": "Disposable SQLite workspace is not a portable trie export. Sorted slots are committed before hashing. RSS covers this Python process, not the ClickHouse server or other processes."
+  },
+  "observed_ratios": {
+    "allocated_workspace_reduction_fraction": 0.6654355810791615,
+    "cpu_speedup": 11.658714973476117,
+    "peak_python_rss_reduction_fraction": 0.8727226362168136,
+    "wall_speedup": 6.383756251757684
+  },
+  "overall_budget_bytes": 100000000000,
+  "progress": [
+    {
+      "elapsed_seconds": 1.6529298331588507,
+      "observed_ns": 1789242087592377000,
+      "process_cpu_seconds": 1.5374599999999994,
+      "process_peak_rss_bytes": 64798720,
+      "slots": 100000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 8192,
+      "workspace_file_bytes": 8192
+    },
+    {
+      "elapsed_seconds": 7.926192708313465,
+      "observed_ns": 1789242093865738000,
+      "process_cpu_seconds": 3.2304840000000006,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 200000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 8192,
+      "workspace_file_bytes": 8192
+    },
+    {
+      "elapsed_seconds": 16.514225292019546,
+      "observed_ns": 1789242102453906000,
+      "process_cpu_seconds": 5.041523999999999,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 300000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 19701760,
+      "workspace_file_bytes": 19312640
+    },
+    {
+      "elapsed_seconds": 23.949777875095606,
+      "observed_ns": 1789242109889575000,
+      "process_cpu_seconds": 7.1026029999999984,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 400000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 27058176,
+      "workspace_file_bytes": 26087424
+    },
+    {
+      "elapsed_seconds": 31.28319212514907,
+      "observed_ns": 1789242117223105000,
+      "process_cpu_seconds": 9.242691,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 500000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 33349632,
+      "workspace_file_bytes": 32710656
+    },
+    {
+      "elapsed_seconds": 40.025272000581026,
+      "observed_ns": 1789242125965322000,
+      "process_cpu_seconds": 11.48754,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 600000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 39641088,
+      "workspace_file_bytes": 39313408
+    },
+    {
+      "elapsed_seconds": 52.49843129236251,
+      "observed_ns": 1789242138438678000,
+      "process_cpu_seconds": 13.705226,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 700000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 45932544,
+      "workspace_file_bytes": 45867008
+    },
+    {
+      "elapsed_seconds": 59.476587125100195,
+      "observed_ns": 1789242145416943000,
+      "process_cpu_seconds": 16.129787,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 800000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 53272576,
+      "workspace_file_bytes": 52543488
+    },
+    {
+      "elapsed_seconds": 68.50894391722977,
+      "observed_ns": 1789242154449442000,
+      "process_cpu_seconds": 18.530890000000003,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 900000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 59564032,
+      "workspace_file_bytes": 59162624
+    },
+    {
+      "elapsed_seconds": 76.54704116750509,
+      "observed_ns": 1789242162487666000,
+      "process_cpu_seconds": 20.932984,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1000000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 65855488,
+      "workspace_file_bytes": 65785856
+    },
+    {
+      "elapsed_seconds": 83.77418437507004,
+      "observed_ns": 1789242169714922000,
+      "process_cpu_seconds": 23.432461999999997,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1100000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 84729856,
+      "workspace_file_bytes": 72388608
+    },
+    {
+      "elapsed_seconds": 93.00911487545818,
+      "observed_ns": 1789242178949998000,
+      "process_cpu_seconds": 25.871301999999996,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1200000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 84729856,
+      "workspace_file_bytes": 78962688
+    },
+    {
+      "elapsed_seconds": 100.11052600014955,
+      "observed_ns": 1789242186051521000,
+      "process_cpu_seconds": 28.270805,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1300000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 101507072,
+      "workspace_file_bytes": 85655552
+    },
+    {
+      "elapsed_seconds": 112.96798829175532,
+      "observed_ns": 1789242198909185000,
+      "process_cpu_seconds": 30.837951999999998,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1400000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 101507072,
+      "workspace_file_bytes": 92184576
+    },
+    {
+      "elapsed_seconds": 122.72361216694117,
+      "observed_ns": 1789242208664962000,
+      "process_cpu_seconds": 33.404853,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1500000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 101507072,
+      "workspace_file_bytes": 98816000
+    },
+    {
+      "elapsed_seconds": 130.25208866689354,
+      "observed_ns": 1789242216193557000,
+      "process_cpu_seconds": 35.868926,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1600000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 118284288,
+      "workspace_file_bytes": 105500672
+    },
+    {
+      "elapsed_seconds": 137.59069550037384,
+      "observed_ns": 1789242223532280000,
+      "process_cpu_seconds": 38.285899,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1700000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 118284288,
+      "workspace_file_bytes": 112021504
+    },
+    {
+      "elapsed_seconds": 144.9208490420133,
+      "observed_ns": 1789242230862548000,
+      "process_cpu_seconds": 40.71987299999999,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1800000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 135061504,
+      "workspace_file_bytes": 118681600
+    },
+    {
+      "elapsed_seconds": 151.94024324975908,
+      "observed_ns": 1789242237882053000,
+      "process_cpu_seconds": 43.144431,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1900000,
+      "stage": "trie-workspace-progress",
+      "workspace_allocated_bytes": 135061504,
+      "workspace_file_bytes": 125382656
+    },
+    {
+      "elapsed_seconds": 200.63204670790583,
+      "observed_ns": 1789242286574622000,
+      "process_cpu_seconds": 84.609054,
+      "process_peak_rss_bytes": 73596928,
+      "slots": 1912703,
+      "stage": "trie-workspace-finished",
+      "workspace_allocated_bytes": 135061504,
+      "workspace_file_bytes": 126369792
+    }
+  ],
+  "progress_file_sha256": "3d831090a2d0de017dde13f91ae9db73c8470822e5499e188bb8c82275fee983",
+  "result_sha256": "29710f52cde14794878c955dcc277193018629000f380e65b942300bd1dc1f20",
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "runtime": {
+    "platform": "darwin",
+    "python_version": "3.14.4",
+    "rlp_version": "5.0.0",
+    "sqlite_version": "3.53.0",
+    "trie_version": "4.0.0"
+  }
+}

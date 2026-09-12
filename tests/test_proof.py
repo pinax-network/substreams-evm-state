@@ -14,6 +14,19 @@ SLOTS = [("0x" + f"{key:064x}", "0x" + f"{value:064x}") for key, value in [(0, 1
 CODE = "0x60006000"
 
 
+@pytest.fixture(params=["memory", "sorted-disk"])
+def storage_database(request, tmp_path):
+    if request.param == "memory":
+        yield None
+    else:
+        from evm_state.triedb import StorageSortDB
+        database = StorageSortDB(tmp_path / "storage.sqlite")
+        try:
+            yield database
+        finally:
+            database.close()
+
+
 def bundle():
     storage = HexaryTrie({})
     for slot, value in SLOTS:
@@ -30,10 +43,10 @@ def bundle():
     return "0x" + state.root_hash.hex(), proof
 
 
-def test_account_and_all_slots_verified_at_exact_root():
+def test_account_and_all_slots_verified_at_exact_root(storage_database):
     root, proof = bundle()
     account = verify_account(root, ADDRESS, proof)
-    assert verify_complete(account, SLOTS, CODE, account.json()) == 2
+    assert verify_complete(account, SLOTS, CODE, account.json(), storage_database) == 2
     assert account.balance == 2**200
     assert storage_root([]) == (EMPTY_STORAGE_ROOT, 0)
 
@@ -60,7 +73,7 @@ def test_missing_proof_wrong_root_and_wrong_address_fail():
 
 @pytest.mark.parametrize("defect", ["missing_slot", "extra_slot", "duplicate_slot", "zero_slot",
     "wrong_nonce", "missing_balance", "wrong_code", "missing_code_hash"])
-def test_complete_verification_rejects_partial_or_inconsistent_state(defect):
+def test_complete_verification_rejects_partial_or_inconsistent_state(defect, storage_database):
     root, proof = bundle()
     account = verify_account(root, ADDRESS, proof)
     metadata, slots, code = account.json(), copy.copy(SLOTS), CODE
@@ -73,17 +86,17 @@ def test_complete_verification_rejects_partial_or_inconsistent_state(defect):
     elif defect == "wrong_code": code = "0x"
     elif defect == "missing_code_hash": del metadata["code_hash"]
     with pytest.raises(VerificationError):
-        verify_complete(account, slots, code, metadata)
+        verify_complete(account, slots, code, metadata, storage_database)
 
 
-def test_non_inclusion_is_proven_and_not_confused_with_missing_metadata():
+def test_non_inclusion_is_proven_and_not_confused_with_missing_metadata(storage_database):
     empty = HexaryTrie({})
     proof = {"address": ADDRESS, "nonce": "0x0", "balance": "0x0",
              "storageHash": "0x" + EMPTY_STORAGE_ROOT.hex(),
              "codeHash": "0x" + EMPTY_CODE_HASH.hex(), "accountProof": []}
     account = verify_account("0x" + empty.root_hash.hex(), ADDRESS, proof)
     assert not account.exists
-    assert verify_complete(account, [], "0x", account.json()) == 0
+    assert verify_complete(account, [], "0x", account.json(), storage_database) == 0
     proof.pop("nonce")
     with pytest.raises(VerificationError):
         verify_account("0x" + empty.root_hash.hex(), ADDRESS, proof)

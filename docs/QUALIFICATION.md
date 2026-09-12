@@ -209,6 +209,13 @@ input checksum. It measures 21.35 minutes including progress guards, 578 MB peak
 Python resident memory and 404 MB allocated trie workspace, with no rejected
 capacity samples. A historical account proof is unavailable outside the provider's
 proof window, so this is resource evidence, not complete-account acceptance.
+The subsequent [sorted reconstruction comparison](evidence/bsc-trie-sorted-2026-09-12.json)
+matches the entire input and the independent incremental root in 200.63 seconds,
+using 84.61 seconds of Python CPU, 73.6 MB peak resident memory and 135.1 MB
+allocated sorting workspace. All capacity samples pass. Checkpoint, export and
+restore verification now use this sorted builder; the original assembler remains
+available for differential checks. The unavailable historical account proof and
+complete hot-state publication/export/growth gates are unchanged.
 
 The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
 account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps

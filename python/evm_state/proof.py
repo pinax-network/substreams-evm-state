@@ -8,7 +8,11 @@ import re
 
 from Crypto.Hash import keccak
 import rlp
+from rlp.codec import encode_raw
 from trie import HexaryTrie
+from trie.utils.nibbles import bytes_to_nibbles, decode_nibbles, encode_nibbles
+
+from .triedb import StorageSortDB
 
 EMPTY_STORAGE_ROOT = bytes.fromhex("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
 
@@ -104,12 +108,86 @@ def verify_account(state_root: str, expected_address: str, proof: dict) -> Accou
     return account
 
 
+def _ordered_storage_root(entries) -> bytes:
+    """Build the MPT root of ordered, unique 32-byte hashed storage keys.
+
+    Values are already RLP-encoded nonzero storage integers. Two lookahead
+    entries identify leaves; completed siblings collapse to inline nodes or
+    hashes. The fixed key length bounds recursion at 64 nibbles and means a
+    branch never has a terminal value. No full trie or node reference counts
+    remain in memory. Compact paths and RLP use the pinned py-trie/rlp codecs.
+    Encoding rules: https://ethereum.org/en/developers/docs/data-structures-and-encoding/patricia-merkle-trie/
+    """
+    source, previous = iter(entries), None
+
+    def take():
+        nonlocal previous
+        try:
+            key, value = next(source)
+        except StopIteration:
+            return None
+        if (not isinstance(key, bytes) or len(key) != 32
+                or (previous is not None and key <= previous)):
+            raise VerificationError("expected unique ordered 32-byte hashed storage keys")
+        previous = key
+        return bytes_to_nibbles(key), value
+
+    current, following = take(), take()
+    if current is None:
+        return EMPTY_STORAGE_ROOT
+
+    def advance():
+        nonlocal current, following
+        current, following = following, take()
+
+    def reference(node):
+        encoded = encode_raw(node)
+        return node if len(encoded) < 32 else keccak256(encoded)
+
+    def subtree(depth):
+        prefix = current[0][:depth]
+        if following is None or following[0][:depth] != prefix:
+            key, value = current
+            advance()
+            return [encode_nibbles(key[depth:] + (16,)), value]
+        children = []
+        while current is not None and current[0][:depth] == prefix:
+            digit = current[0][depth]
+            children.append((digit, subtree(depth + 1)))
+        if len(children) == 1:
+            digit, child = children[0]
+            if len(child) == 2:
+                return [encode_nibbles((digit,) + decode_nibbles(child[0])), child[1]]
+            return [encode_nibbles((digit,)), reference(child)]
+        branch = [b""] * 17
+        for digit, child in children:
+            branch[digit] = reference(child)
+        return branch
+
+    return keccak256(encode_raw(subtree(0)))
+
+
 def storage_root(slots, database=None) -> tuple[bytes, int]:
     """Hash all nonzero (32-byte slot, 32-byte value) pairs.
 
-    Supply a disk-backed byte mapping as database for large reconstructions.
-    Duplicates are rejected even when their values agree.
+    Supply a fresh StorageSortDB for large reconstructions. The original
+    HexaryTrie path remains available with a byte mapping or no database.
+    Both paths reject duplicates even when their values agree.
     """
+    if isinstance(database, StorageSortDB):
+        database.begin()
+        count = 0
+        for slot, value in slots:
+            key = keccak256(unhex(slot, 32))
+            number = int.from_bytes(unhex(value, 32), "big")
+            if number == 0:
+                raise VerificationError("complete-storage input must contain nonzero slots only")
+            try:
+                database.add(key, rlp.encode(number))
+            except KeyError as error:
+                raise VerificationError("duplicate nonzero storage slot") from error
+            count += 1
+        return _ordered_storage_root(database.ordered_entries()), count
     tree = HexaryTrie({} if database is None else database, prune=True)
     count = 0
     for slot, value in slots:
