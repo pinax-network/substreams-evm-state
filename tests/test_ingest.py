@@ -53,6 +53,33 @@ def test_cursor_without_database_rows_requires_restore(databases, tmp_path):
         ingest(*args, stop_block=101)
 
 
+def test_finalized_follow_flushes_before_another_decode_batch_arrives(databases, tmp_path, native_proxy, monkeypatch):
+    # STEP_NEW_IRREVERSIBLE never triggers the pinned sink's direct-insert
+    # transition. Keep the RPC open and require its second block to become
+    # durable before providing a third, without end-of-range draining.
+    for name in os.environ:
+        if name.startswith("SUBSTREAMS_"):
+            monkeypatch.delenv(name)
+    client = databases(False)
+    bundle = proof_bundle(102, {A: state({1: 8})})
+    rows = [block(100, bundle, storage={(A, 1): 7}), block(101, bundle, storage={(A, 1): 8}),
+            block(102, bundle)]
+    def before(number, server, context):
+        if number == 102:
+            path = tmp_path / "native/durable_progress.json"
+            wait_until(lambda: path.exists() and
+                json.loads(path.read_text())["position"]["block"]["number"] == 101, timeout=5)
+    server = NativeStream(rows, native_proxy, before_block=before, backfill=True)
+    try:
+        result = ingest(client, SPKG, server.endpoint, [A], 100, tmp_path / "native",
+                        native_dsn(client.database), stop_block=103, max_retries=0)
+        assert result["position"]["block"]["number"] == 102
+        assert not server.errors
+        assert int(client.one("SELECT count() AS n FROM state_blocks FINAL")["n"]) == 3
+    finally:
+        server.close()
+
+
 @pytest.mark.parametrize("defect", ["schema", "package", "owner", "replaced_database", "phase"])
 def test_damaged_or_replaced_run_metadata_fails_closed(databases, tmp_path, defect):
     client, args, _ = prepared(databases, tmp_path)

@@ -1,6 +1,6 @@
 # EVM selective state: qualification scope
 
-Updated 2026-09-11. The review of prototype `8433af7` is in [REVIEW.md](REVIEW.md).
+Updated 2026-09-12. The review of prototype `8433af7` is in [REVIEW.md](REVIEW.md).
 The ClickHouse implementation now exists; acceptance evidence and remaining
 release gates are tracked in [QUALIFICATION.md](QUALIFICATION.md).
 
@@ -139,7 +139,9 @@ physical host power loss is not emulated and storage must honor sync writes.
 Initial replay compaction has adversarial and native-sink tests. The capacity
 monitor includes source/server data, spool, trie work and exports, with configured
 headroom and incomplete-sample rejection. Recorded workloads remain samples;
-representative initial replay, sustained growth and latency still need qualification.
+representative hot-account initial replay and sustained growth still need qualification.
+Public measurements now separate cold/cached delivery, 15-minute finalized follow,
+pinned read latency and interrupted three-account cutover. See [throughput](THROUGHPUT.md).
 
 ## Bootstrap and growing account sets
 

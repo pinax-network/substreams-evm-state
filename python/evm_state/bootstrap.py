@@ -171,7 +171,7 @@ def compact(client, directory, end_block=None, budget_bytes=100_000_000_000):
 
 def replay(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_block,
            chunk_blocks=100000, budget_bytes=100_000_000_000, max_retries=3,
-           checkpoint_database=None, decode_batch_size=32):
+           checkpoint_database=None, decode_batch_size=32, spool_max_idle_ms=1000):
     """Resume bounded native chunks, compacting each before starting the next.
 
     Stop is exclusive, as in the native CLI. This limits accumulated history to
@@ -218,4 +218,5 @@ def replay(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
             if used >= budget_bytes:
                 raise VerificationError("bootstrap database budget already exhausted")
             ingest(*values, stop_block=min(next_block + chunk_blocks, stop_block), max_retries=max_retries,
-                   checkpoint_database=checkpoint_database, decode_batch_size=decode_batch_size)
+                   checkpoint_database=checkpoint_database, decode_batch_size=decode_batch_size,
+                   spool_max_idle_ms=spool_max_idle_ms)

@@ -36,6 +36,11 @@ absolute path with those for the deployment:
 
 The budget is decimal bytes. This example stops admitting work at 90 GB measured
 usage and also requires at least 1 GiB of unreserved/available filesystem space.
+ClickHouse reads its free and unreserved counters separately; concurrent writes
+can briefly make the latter exceed the former. The guard validates both counters
+against total capacity and uses their lower value for the free-space floor. A
+4 KiB disagreement was reproduced during real replay; it is not corrupt disk
+accounting or permission to use the higher reading.
 Choose both reserves for the largest expected in-flight write and merge; the
 budget reserve does not create physical free space. All roots must exist. Nested
 roots and hard links are deduplicated locally; internal symlinks and special

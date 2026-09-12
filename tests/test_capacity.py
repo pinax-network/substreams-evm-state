@@ -93,6 +93,35 @@ def test_budget_and_disk_headroom_are_independent(mocked_meter):
     assert result["reasons"] == ["budget_headroom_exhausted", "filesystem_free_space_below_floor"]
 
 
+def test_nonatomic_disk_counters_use_the_lower_reading(mocked_meter):
+    meter, _ = mocked_meter
+    rows = meter.client.rows
+    def skewed(sql):
+        values = list(rows(sql))
+        if "system.disks" in sql:
+            values[0].update(free_space=799_995_904, unreserved_space=800_000_000)
+        return iter(values)
+    meter.client.rows = skewed
+    meter.min_free = 800_000_000
+    result = meter.sample()
+    assert result["reasons"] == ["filesystem_free_space_below_floor"]
+    meter.min_free = 799_995_904
+    assert meter.sample()["admitted"]
+
+
+def test_invalid_disk_counter_still_fails_measurement(mocked_meter):
+    meter, _ = mocked_meter
+    rows = meter.client.rows
+    def invalid(sql):
+        values = list(rows(sql))
+        if "system.disks" in sql:
+            values[0]["unreserved_space"] = -1
+        return iter(values)
+    meter.client.rows = invalid
+    with pytest.raises(ValueError, match="invalid ClickHouse disk capacity counters"):
+        meter.sample()
+
+
 def test_local_measurement_deduplicates_nested_roots_and_hard_links(tmp_path):
     nested = tmp_path / "nested"
     nested.mkdir()

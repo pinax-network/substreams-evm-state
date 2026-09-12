@@ -38,7 +38,12 @@ def main(argv=None):
         if name in {"ingest", "bootstrap-replay"}:
             native.add_argument("--stop-block", type=int, required=name == "bootstrap-replay")
             native.add_argument("--max-retries", type=int, default=3)
-            native.add_argument("--decode-batch-size", type=int, default=32)
+            native.add_argument("--decode-batch-size", type=int, default=32 if name == "bootstrap-replay" else 1,
+                                help="blocks decoded together (ingest: 1 for finalized follow; bootstrap: 32)")
+            native.add_argument("--spool-max-idle-ms", type=int, default=1000 if name == "bootstrap-replay" else 100,
+                                help="seal idle spool after this many milliseconds (ingest: 100; bootstrap: 1000)")
+        if name == "ingest":
+            native.add_argument("--prometheus-addr", help="native metrics listener; use a distinct port for concurrent cohorts")
         if name == "bootstrap-replay":
             native.add_argument("--chunk-blocks", type=int, default=100000)
             native.add_argument("--budget-bytes", type=int, default=100_000_000_000)
@@ -115,9 +120,11 @@ def main(argv=None):
             values = (client, args.package, args.endpoint, args.accounts, args.start_block, args.state_dir, dsn)
             if args.command == "bootstrap-replay":
                 result = bootstrap_replay(*values, args.stop_block, args.chunk_blocks, args.budget_bytes,
-                                          args.max_retries, args.checkpoint_database, args.decode_batch_size)
+                                          args.max_retries, args.checkpoint_database, args.decode_batch_size,
+                                          args.spool_max_idle_ms)
             elif args.command == "ingest":
-                result = ingest(*values, args.stop_block, args.max_retries, args.checkpoint_database, args.decode_batch_size)
+                result = ingest(*values, args.stop_block, args.max_retries, args.checkpoint_database,
+                                args.decode_batch_size, args.spool_max_idle_ms, args.prometheus_addr)
             else:
                 result = {"prepare": prepare, "recover-cursor": recover_cursor}[args.command](
                     *values, checkpoint_database=args.checkpoint_database)

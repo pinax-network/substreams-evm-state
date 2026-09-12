@@ -145,8 +145,8 @@ class Meter:
                                       "FROM system.disks ORDER BY name"))
         if not disks or any(disk["type"] != "Local" or disk["is_remote"] for disk in disks):
             raise VerificationError("complete capacity measurement requires local ClickHouse data disks")
-        if any(not 0 <= int(disk["unreserved_space"]) <= int(disk["free_space"]) <= int(disk["total_space"])
-               or not int(disk["total_space"]) for disk in disks):
+        if any(not int(disk["total_space"]) or any(not 0 <= int(disk[field]) <= int(disk["total_space"])
+               for field in ["free_space", "unreserved_space"]) for disk in disks):
             raise VerificationError("invalid ClickHouse disk capacity counters")
         roots = _roots([PurePosixPath(disk["path"]) for disk in disks])
         mounts = [PurePosixPath(mount["Destination"]) for mount in info["Mounts"]
@@ -193,7 +193,11 @@ class Meter:
                      "GROUP BY database ORDER BY database") if row["database"] in self.databases]
         merges = [row for row in self.client.rows("SELECT database,total_size_bytes_compressed AS input_bytes "
                    "FROM system.merges") if row["database"] in self.databases]
-        available = min(int(disk["unreserved_space"]) for disk in disks)
+        # ClickHouse reads free and unreserved counters separately. Concurrent
+        # writes/merges can make unreserved briefly exceed the earlier free
+        # reading (observed by 4096 bytes during real replay). Both must be
+        # valid counters; use their lower value instead of assuming atomicity.
+        available = min(min(int(disk["free_space"]), int(disk["unreserved_space"])) for disk in disks)
         local_disks = []
         for path in self.paths:
             fs = os.statvfs(path)
@@ -269,6 +273,10 @@ def supervise(meter, command, output, interval=1.0):
                 failures += 1
                 value = {"sample_finished_ns": time.time_ns(), "admitted": False,
                          "reasons": ["incomplete_capacity_sample"], "error_type": type(error).__name__}
+                if isinstance(error, VerificationError):
+                    # Meter verification errors are our fixed diagnostic text;
+                    # third-party/HTTP/Docker error bodies remain excluded.
+                    value["error_detail"] = str(error)
             log.write(json.dumps(value, sort_keys=True) + "\n")
             log.flush()
             os.fsync(log.fileno())

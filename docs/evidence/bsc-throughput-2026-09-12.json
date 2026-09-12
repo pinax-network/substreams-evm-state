@@ -1,0 +1,1985 @@
+{
+  "artifact_sha256": {
+    "cold/capacity/summary.json": "2921132ccb4fcc26e4e8eede3d5b457dc40937ceb258ba65257c5e0fa9c6abcb",
+    "cold/lag-samples.jsonl": "0e70f3010a5b22c415fadbdd3d805dffc8ff1798e4c954e85f3a2d6537772c7b",
+    "cold/output.json": "fcf5ff3cd45ed67db7c4d1e5ca69c02f3e19e0e3d40119e28f51d90b96bd57a5",
+    "cold/result.json": "00404a5f05e424901bc0f9b6aaf8d0f1a1f6b47620e57dd6d8288def70c16782",
+    "cold/run.log": "2d9f9591e478080f39b0c3bdcfd4ccdce700a83d028c529a734c2ff8c4fbd105",
+    "large-reads.json": "8c02ee0c0601b93707132ca97e6b0ece2b1747c4ca946a09c00e16a62744f46e",
+    "live-tuned/capacity/summary.json": "9f6275a853a4412b3941f230e1b30d85330c472aa6b849f5426fbc77619329cb",
+    "live-tuned/lag-samples.jsonl": "c0b951be108d56aa28c7d738e1529da2a1f66af7f7dd1963e3faa03650f587af",
+    "live-tuned/output.json": "ffb4fa555dee0a3a2043e738c22d068183f9c3207c4da4a884a3750db0535f79",
+    "live-tuned/result.json": "1ce0cdb377380057bf95236afd69161ab733f4a5cb56c78abefbecd2117d0f1e",
+    "live-tuned/run.log": "3fc7892236d0200a5cde99affb8e12a4c1e65e9db5944f976f4e4e2c6522980b",
+    "live/capacity/summary.json": "596330ce7fc1f8a55d6bcd3bafe6593e67de94f7c4c127a7141a64100e4f7cf0",
+    "live/lag-samples.jsonl": "e199192764eb01ddb0218877bcaff41e504e6cf858b6106a81b5d8ff12e6ab8a",
+    "live/output.json": "1e87ae655ddaaabbdca55083d22537582aa9476c2574a82a44ad9a2febda98e5",
+    "live/result.json": "5328609e2b8fb3cc22aca37df1a77473f878366a36079c18e257a94a42d3594d",
+    "live/run.log": "870ab3f547385642f2e62d9c08ab69c19c3e465002f1d7ed7c58fd9257295118",
+    "quiet-reads.json": "de1ccd9a2f9f63d7a85cc3ed54a6578354136d92e4f388cf20cdec1b0db18189",
+    "warm/capacity/summary.json": "e9b5e6be6123977141a4a565f7fb371158aaae6cf6fdbc0a86c60efecdbdf975",
+    "warm/lag-samples.jsonl": "bb574f67024452d46a5617ef43648358ce83554e8d9bfc7f4f60dfb0ffbbc7e3",
+    "warm/output.json": "59d0cfcd7f7608d9317ab844f9f4b862f4ee9d04a72b108a14e26aca5f1965c8",
+    "warm/result.json": "05683142982e126a8970f2953735b3265af865d4b94964c748e1c0ce273d6dbb",
+    "warm/run.log": "590b7e20f26dbfb876784d899b43748a33963d3aa3c1e8c21d00958ae7574a88"
+  },
+  "cache_design": {
+    "purpose": "unique filter params for a new output-module cache identity; not a customer account",
+    "sentinel": "0xc1223ab58372ba5338673c0cc778b7662dbf156c",
+    "sentinel_changed_rows": 0,
+    "sentinel_proof_block": 121459654,
+    "sentinel_proven_exists": false,
+    "source_package": "localdata/qualification/capacity-bsc/native/package.spkg",
+    "start_block": 121300000,
+    "stop_block_exclusive": 121310000
+  },
+  "environment": {
+    "architecture": "arm64",
+    "clickhouse_version": "26.3.33.24",
+    "logical_cpus": 10,
+    "operating_system": "Darwin",
+    "os_version": "26.5.1",
+    "python_version": "3.14.4",
+    "qualification_base_commit": "3ddf2f2d5a1b63968f28bc5f8c4d5bb635d3f913",
+    "substreams_commit": "be35ad36f63a52ff49d3e15cf993de4cad6bfbd9",
+    "substreams_version": "1.22.0"
+  },
+  "format_version": 1,
+  "limitations": [
+    "public three-account filter including WBNB; customer 19/64-account lists unavailable",
+    "cache comparison adds one random cache-identity sentinel with no observed changes; not a customer contract",
+    "fresh module-output identity and server progress qualify output cache work; upstream block/input caches are unknown",
+    "warm replay is a new local database; local OS/ClickHouse caches are not flushed",
+    "native is_live=false is expected for finalized-only delivery and does not measure chain lag",
+    "live runs overlap and share a local ClickHouse server with other qualification work",
+    "sampled directory totals include other server databases and do not establish long-term customer capacity",
+    "logical protobuf output is distinct from wire bytes, billable egress and retained disk size",
+    "no complete initial WBNB storage, production SLA, full-history rate or customer price follows from this sample"
+  ],
+  "overlapping_live_window": {
+    "live": {
+      "durable_advanced_blocks": 1056,
+      "durable_block_age_seconds": {
+        "max": 19.289500951766968,
+        "min": 4.2549989223480225,
+        "p50": 11.547215938568115,
+        "p95": 18.180006980895996,
+        "samples": 95
+      },
+      "finalized_lag_blocks": {
+        "max": 38,
+        "min": 5,
+        "p50": 22,
+        "p95": 37,
+        "samples": 95
+      },
+      "rpc_finalized_advanced_blocks": 1045,
+      "rpc_sample_duration_seconds": {
+        "max": 0.1647219592705369,
+        "min": 0.05260429158806801,
+        "p50": 0.06292741652578115,
+        "p95": 0.13879541587084532,
+        "samples": 95
+      },
+      "sample_window_seconds": 470.539261,
+      "samples": 95
+    },
+    "live-tuned": {
+      "durable_advanced_blocks": 1045,
+      "durable_block_age_seconds": {
+        "max": 4.001363039016724,
+        "min": 1.905951976776123,
+        "p50": 2.8241920471191406,
+        "p95": 3.889781951904297,
+        "samples": 95
+      },
+      "finalized_lag_blocks": {
+        "max": 5,
+        "min": 2,
+        "p50": 3,
+        "p95": 5,
+        "samples": 95
+      },
+      "rpc_finalized_advanced_blocks": 1046,
+      "rpc_sample_duration_seconds": {
+        "max": 0.1600049575790763,
+        "min": 0.053826916962862015,
+        "p50": 0.05993699934333563,
+        "p95": 0.1411888748407364,
+        "samples": 95
+      },
+      "sample_window_seconds": 470.495661,
+      "samples": 95
+    }
+  },
+  "reads": {
+    "large-reads.json": {
+      "account": "0x0000000000000000000000000000000000000001",
+      "database": "evm_capacity_20260912_checkpoints",
+      "finished_at_unix_ns": 1789218950088381000,
+      "format_version": 1,
+      "header": {
+        "hash": "0x5d2ca09a84a3b438608bdc099349af73d9e33e0dae2db3269413ac11c2f1519a",
+        "number": 101,
+        "parent_hash": "0x3bae86db87a012c9d8c5851b415b7e9f7ea98b5d92486aaefe820188927efec5",
+        "state_root": "0xd241b89edbc8fffcd04701d67985b2e16fabf5b7c5665982ced31c2fafeebc86",
+        "timestamp": 1700000101
+      },
+      "limitations": [
+        "local Python reader, controller locks and ClickHouse SQL; no remote API network",
+        "sequential repeated scans, not concurrent reader load or a cold database cache",
+        "immutable published generation; publication latency measured separately"
+      ],
+      "ordered_storage_sha256": "bbde3f52718d6d820df1397e92796b73b4a608cdbccb24ff7319c641d80b217a",
+      "page_latency_seconds": {
+        "max": 0.6348829157650471,
+        "min": 0.022120874375104904,
+        "p50": 0.02809333335608244,
+        "p95": 0.033334458246827126,
+        "samples": 500
+      },
+      "page_size": 1000,
+      "passes": [
+        {
+          "nonzero_slots": 100000,
+          "pass": 0,
+          "seconds": 3.0149210412055254
+        },
+        {
+          "nonzero_slots": 100000,
+          "pass": 1,
+          "seconds": 3.499163999222219
+        },
+        {
+          "nonzero_slots": 100000,
+          "pass": 2,
+          "seconds": 2.8956729592755437
+        },
+        {
+          "nonzero_slots": 100000,
+          "pass": 3,
+          "seconds": 3.465442916378379
+        },
+        {
+          "nonzero_slots": 100000,
+          "pass": 4,
+          "seconds": 2.94075558334589
+        }
+      ],
+      "snapshot_id": "ae38f388ccc447ba934fe28c3c21c366",
+      "started_at_unix_ns": 1789218934249366000
+    },
+    "quiet-reads.json": {
+      "account": "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff",
+      "database": "evm_compacted_checkpoints",
+      "finished_at_unix_ns": 1789218933952915000,
+      "format_version": 1,
+      "header": {
+        "hash": "0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28",
+        "number": 121309258,
+        "parent_hash": "0xa332fea9971fbf90fd73d1beb85b40e6399241e59c4cd21f4469e273b1cd9059",
+        "state_root": "0x5b7c64587627f60b4f2904ff274349ac5805e2010edf3e055351339d2cec78e8",
+        "timestamp": 1789150993
+      },
+      "limitations": [
+        "local Python reader, controller locks and ClickHouse SQL; no remote API network",
+        "sequential repeated scans, not concurrent reader load or a cold database cache",
+        "immutable published generation; publication latency measured separately"
+      ],
+      "ordered_storage_sha256": "75a95c09ca6dddc2e43cf067c16ab1df16f75f4a7f6992f2a2098292b82da675",
+      "page_latency_seconds": {
+        "max": 0.020668375305831432,
+        "min": 0.014528791420161724,
+        "p50": 0.016798624768853188,
+        "p95": 0.020668375305831432,
+        "samples": 10
+      },
+      "page_size": 1000,
+      "passes": [
+        {
+          "nonzero_slots": 46,
+          "pass": 0,
+          "seconds": 0.020740125328302383
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 1,
+          "seconds": 0.016566832549870014
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 2,
+          "seconds": 0.01587491761893034
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 3,
+          "seconds": 0.016921292059123516
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 4,
+          "seconds": 0.01903975009918213
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 5,
+          "seconds": 0.01672195829451084
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 6,
+          "seconds": 0.01914554089307785
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 7,
+          "seconds": 0.017583291046321392
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 8,
+          "seconds": 0.014600250869989395
+        },
+        {
+          "nonzero_slots": 46,
+          "pass": 9,
+          "seconds": 0.01934116706252098
+        }
+      ],
+      "snapshot_id": "1713c612daf94b2b9f250e6d663d5e06",
+      "started_at_unix_ns": 1789218933751504000
+    }
+  },
+  "runs": {
+    "cold": {
+      "capacity": {
+        "budget_bytes": 100000000000,
+        "failed_samples": 0,
+        "guard_samples": 26,
+        "headroom_bytes": 10000000000,
+        "maximum_sample_gap_ns": 747589000,
+        "min_free_bytes": 1073741824,
+        "peak_observed_allocated_bytes": 1224220672,
+        "peak_spool_allocated_bytes": 16875520,
+        "rejected_guard_stages": [],
+        "samples": 48,
+        "status": "completed"
+      },
+      "ingestion": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+          "0xc1223ab58372ba5338673c0cc778b7662dbf156c"
+        ],
+        "blocks": 10000,
+        "blocks_per_second": 313.1942664624159,
+        "database": "evm_throughput_cold_20260912",
+        "database_parts_bytes_after": 13479602,
+        "duration_seconds": 31.92906470783055,
+        "endpoint": "bsc.substreams.pinax.network:443",
+        "failed_lag_samples": 0,
+        "final_position": {
+          "hash": "0x2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10",
+          "number": 121309999
+        },
+        "finalized_lag_blocks_all_phases": {
+          "max": 159711,
+          "min": 159667,
+          "p50": 159689,
+          "p95": 159711,
+          "samples": 5
+        },
+        "finished_at_unix_ns": 1789218750512938000,
+        "format_version": 1,
+        "initial_finalized": {
+          "hash": "0x381985a73a47e5e6709748bb30441d68aaa3fbbd8f1f46da0d6c3353f266c0f7",
+          "number": 121459678
+        },
+        "lag_samples": 7,
+        "limitations": [
+          "block-age uses the host wall clock and second-resolution chain timestamps",
+          "RPC and durable cursor are sampled sequentially; a negative lag can reflect sampling skew",
+          "live-phase statistics require the native log's is_live observations; startup is not steady state",
+          "this update interval does not establish full initial storage or publish a checkpoint",
+          "cache state is not inferred from elapsed time"
+        ],
+        "live_blocks_requested": null,
+        "module_hash": "d7842af0f32665ec5f6f61d695c668862d5f8822",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "requested_parallel_workers": null,
+        "run_id": "f623ef789c66459e8358a48498ba8239",
+        "sample_interval_seconds": 5,
+        "start_block": 121300000,
+        "started_at_unix_ns": 1789218718575783000,
+        "stop_block_exclusive": 121310000,
+        "timeout_seconds": 2400,
+        "worker_policy": "provider default; observed session limit is recorded in native log"
+      },
+      "native_log": {
+        "last_reported_processed_blocks": 10000,
+        "max_observed_running_jobs": 10,
+        "native_settings": [
+          {
+            "db_write_max_size": "512 MiB",
+            "db_write_target_duration": "3s",
+            "decode_batch_size": 32,
+            "decode_workers": 8,
+            "spool_max_idle": "1s",
+            "spool_max_size": "1.0 GiB"
+          }
+        ],
+        "progress": [
+          {
+            "data_msg_rate": "0.000 msg/s (0 total)",
+            "last_block": "None",
+            "timestamp": "2026-09-12T09:12:01.739-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "31.118 msg/s (529 total)",
+            "is_live": false,
+            "last_block": "#121300528 (3df57d81a492068fb8567c31b9e1fbca62edf38bd237e4f671a1295b4bdb416c)",
+            "progress_running_jobs": {
+              "stage 0": 10
+            },
+            "progress_total_processed_blocks": 0,
+            "timestamp": "2026-09-12T09:12:16.740-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "333.333 msg/s (10000 total)",
+            "is_live": false,
+            "last_block": "#121309999 (2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10)",
+            "progress_running_jobs": {
+              "stage 0": 0
+            },
+            "progress_total_processed_blocks": 10000,
+            "timestamp": "2026-09-12T09:12:30.399-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          }
+        ],
+        "sessions": [
+          {
+            "linear_handoff_block": 121310000,
+            "max_parallel_workers": 50,
+            "resolved_start_block": 121300000,
+            "timestamp": "2026-09-12T09:12:00.566-0400",
+            "trace_id": "cac116f1f62290d32f296f90048b23a8"
+          }
+        ]
+      },
+      "output": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+          "0xc1223ab58372ba5338673c0cc778b7662dbf156c"
+        ],
+        "blocks": 10000,
+        "changed_rows": {
+          "balances": 9936,
+          "codes": 0,
+          "lifecycle": 0,
+          "nonces": 0,
+          "storage": 219692
+        },
+        "database": "evm_throughput_cold_20260912",
+        "digest_encoding": "ascending blocks; deterministic protobuf; each prefixed by its uint64 big-endian byte length",
+        "end_block": 121309999,
+        "first_block_timestamp": 1789146826,
+        "format_version": 1,
+        "header": {
+          "hash": "0x2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10",
+          "number": 121309999,
+          "parent_hash": "0x22f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130",
+          "state_root": "0xd646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93f",
+          "timestamp": 1789151326
+        },
+        "header_rlp": "0xf9037ca022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347945009317fd4f6f8feea9dae41e5f0a4737bb7a7d5a0d646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93fa0bf4f5e2c61570198e04c4128b878f837b40a492e5f34cd20330e057abfe563c8a09d59e61aeaac5cb196e6df32ea14cf4394431e0953d79a1099cb8a6bb6f69daab9010020210ac080e80d5309231055a69c8001900006200c24448014021009200081843778500019c101000623a129402e0000000908024436219507900a010f28108064c00290a45280a80d021019222400a32c7018291d680030f0141c0ad0cb0d4011a80b2a428b0000bc442002040408081806c6530004964060098852e90846002470305c2840a040c1c8000840000aca61a4848521802819081001410108042002b42042190402782fcc2a90ab0405000560884042a02b884097224f088082090006c1d7067c044940a1503004b4b00020d432224ec000993e104006003ca0066a502e170a6d480025c8064da04413648800a128c61005584402900ac00145100284073b0b2f84042c1b6b835d3fde846aa4485eb90118db8301070888636462373534386289676f312e32352e3132836c696ed38cc282f8b5831dffffb860884b45353a73360d145ea9701db285595f7a506acd9d819bfff30e3a8031b531fc64c7c4cbf7457336c8bd7e292f99ee127f0f4c004570ac36976002f4caf592eb3ce34e4a9f6c49e0bc77c18add19b16fcf36444ac993e650a8d0bd1abb7963f84c84073b0b2da05b357ff8476e2a1617f0c56e571c35de3319b7c6fd7a7f4402f0019c1f27ab5384073b0b2ea022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130800c5186f3731ea1445f0056cbaa7cf337360e7b83404cd93758471699533cfad8027ff223dd47c16d3973253ff9bcd2dc38f814a85baf3d0b5ed1358fc0c48fb601a000000000000000000000000000000000000000000000000000000000000003b688000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000020557e8cb169f90f6ef421a54e29d7dd0629ca597",
+        "header_trust": "provider-finalized-header",
+        "limitations": [
+          "account storage completeness is not established by this update sample",
+          "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",
+          "cache warmth and wall time are separate measurements"
+        ],
+        "logical_protobuf_bytes": 45533529,
+        "max_protobuf_bytes_per_block": 23904,
+        "mean_block_interval_seconds": 0.45004500450045004,
+        "mean_protobuf_bytes_per_block": 4553.3529,
+        "module_hash": "d7842af0f32665ec5f6f61d695c668862d5f8822",
+        "ordered_output_sha256": "d12d9e54a90653bb811c011029d1ec4a64906e34479de1d8e5563990fda67910",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "run_id": "f623ef789c66459e8358a48498ba8239",
+        "start_block": 121300000,
+        "validation": "encoded header, native interval and durable cursor verified"
+      }
+    },
+    "live": {
+      "after_first_60_seconds": {
+        "durable_advanced_blocks": 1881,
+        "durable_block_age_seconds": {
+          "max": 20.975702047348022,
+          "min": 3.7176361083984375,
+          "p50": 11.51085114479065,
+          "p95": 18.180006980895996,
+          "samples": 169
+        },
+        "finalized_lag_blocks": {
+          "max": 41,
+          "min": 5,
+          "p50": 22,
+          "p95": 37,
+          "samples": 169
+        },
+        "rpc_finalized_advanced_blocks": 1868,
+        "rpc_sample_duration_seconds": {
+          "max": 0.1647219592705369,
+          "min": 0.05260429158806801,
+          "p50": 0.06398508325219154,
+          "p95": 0.13879541587084532,
+          "samples": 169
+        },
+        "sample_window_seconds": 840.981054,
+        "samples": 169
+      },
+      "capacity": {
+        "budget_bytes": 100000000000,
+        "failed_samples": 0,
+        "guard_samples": 720,
+        "headroom_bytes": 10000000000,
+        "maximum_sample_gap_ns": 2300605000,
+        "min_free_bytes": 1073741824,
+        "peak_observed_allocated_bytes": 2343714816,
+        "peak_spool_allocated_bytes": 208896,
+        "rejected_guard_stages": [],
+        "samples": 736,
+        "status": "completed"
+      },
+      "ingestion": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+        ],
+        "blocks": 2101,
+        "blocks_per_second": 2.3314534279140333,
+        "database": "evm_throughput_live_20260912",
+        "database_parts_bytes_after": 19245504,
+        "duration_seconds": 901.1546080419794,
+        "endpoint": "bsc.substreams.pinax.network:443",
+        "failed_lag_samples": 0,
+        "final_position": {
+          "hash": "0x7311839ebdffbd428a63a7fbdeff877cf57954268d912f05f5aedecd19dcee1c",
+          "number": 121461893
+        },
+        "finalized_lag_blocks_all_phases": {
+          "max": 41,
+          "min": 5,
+          "p50": 22,
+          "p95": 37,
+          "samples": 180
+        },
+        "finished_at_unix_ns": 1789219716625941000,
+        "format_version": 1,
+        "initial_finalized": {
+          "hash": "0x61cf4aa4721dd9b99728a2dabd9c8107001e3fa104c116779e01773044d66702",
+          "number": 121459893
+        },
+        "lag_samples": 181,
+        "limitations": [
+          "block-age uses the host wall clock and second-resolution chain timestamps",
+          "RPC and durable cursor are sampled sequentially; a negative lag can reflect sampling skew",
+          "live-phase statistics require the native log's is_live observations; startup is not steady state",
+          "this update interval does not establish full initial storage or publish a checkpoint",
+          "cache state is not inferred from elapsed time"
+        ],
+        "live_blocks_requested": 2000,
+        "module_hash": "da327dbc1039a2d58b892570e6cf01f182dfd79e",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "requested_parallel_workers": null,
+        "run_id": "3677065cb14d4f9ca4f6eb2e33b2af9f",
+        "sample_interval_seconds": 5,
+        "start_block": 121459793,
+        "started_at_unix_ns": 1789218815456077000,
+        "stop_block_exclusive": 121461894,
+        "timeout_seconds": 2400,
+        "worker_policy": "provider default; observed session limit is recorded in native log"
+      },
+      "native_log": {
+        "last_reported_processed_blocks": 2101,
+        "max_observed_running_jobs": 0,
+        "native_settings": [
+          {
+            "db_write_max_size": "512 MiB",
+            "db_write_target_duration": "3s",
+            "decode_batch_size": 32,
+            "decode_workers": 8,
+            "spool_max_idle": "1s",
+            "spool_max_size": "1.0 GiB"
+          }
+        ],
+        "progress": [
+          {
+            "data_msg_rate": "53.000 msg/s (106 total)",
+            "is_live": false,
+            "last_block": "#121459898 (0e6f5fc8561ad4be5261b467a4dd9cd484efebb66fff561b5544b9638ee96fc6)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 106,
+            "timestamp": "2026-09-12T09:13:38.272-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "8.176 msg/s (139 total)",
+            "is_live": false,
+            "last_block": "#121459931 (b015c1e12ea3de66bb3c1168b85a36fa46952c5df5c6519b5440e2e26c004668)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 139,
+            "timestamp": "2026-09-12T09:13:53.273-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (172 total)",
+            "is_live": false,
+            "last_block": "#121459964 (3757140e86465547688caae4cabdbe2fbbb485a3b81a259928294c44a841caed)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 172,
+            "timestamp": "2026-09-12T09:14:08.273-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (206 total)",
+            "is_live": false,
+            "last_block": "#121459998 (de375388b6dbd39137e9ba91b0d8abf0ddd7a4b12b6c43459f35f85121bb2cbc)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 206,
+            "timestamp": "2026-09-12T09:14:23.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (239 total)",
+            "is_live": false,
+            "last_block": "#121460031 (5ba0d3879fb73500e4f69e9f86e0479ed77711a7150d98940fd01f704d6c0af2)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 239,
+            "timestamp": "2026-09-12T09:14:38.273-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (272 total)",
+            "is_live": false,
+            "last_block": "#121460064 (f45ca63352ef47a6322e2e3183c5fa81ea034c89b151f148a952001076861ebd)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 272,
+            "timestamp": "2026-09-12T09:14:53.273-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (306 total)",
+            "is_live": false,
+            "last_block": "#121460098 (6560bbb84fc1026d573ce66ae409d87ec4f7b44afdeb610b8aba0ad728a413ee)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 306,
+            "timestamp": "2026-09-12T09:15:08.273-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (339 total)",
+            "is_live": false,
+            "last_block": "#121460131 (ad4229a9125cd8fdc020ab44bb912a0a904e4be0c2f171dff5b09f6306a7c7d3)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 339,
+            "timestamp": "2026-09-12T09:15:23.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (372 total)",
+            "is_live": false,
+            "last_block": "#121460164 (e82f412732eef2fec31fe069393cb9984d49b4e94f99b5e8a99517299c555288)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 372,
+            "timestamp": "2026-09-12T09:15:38.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (406 total)",
+            "is_live": false,
+            "last_block": "#121460198 (9b579d8ee5c9d7f101e39e3b746138222b7488962cdc22cc738c8b2e3e827e07)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 406,
+            "timestamp": "2026-09-12T09:15:53.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (438 total)",
+            "is_live": false,
+            "last_block": "#121460230 (0edd71139714f7cf7b6c2a8bc5cb05c8faa720c4ba0ac5b3a67b116a493c56a8)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 438,
+            "timestamp": "2026-09-12T09:16:08.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (472 total)",
+            "is_live": false,
+            "last_block": "#121460264 (be0059679ce155568dde18d0362a0fc0847269e1b34fcc97f353f264249537eb)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 472,
+            "timestamp": "2026-09-12T09:16:23.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.267 msg/s (506 total)",
+            "is_live": false,
+            "last_block": "#121460298 (e5e90632fd042dbec6ab14fc7193fd18cd195859a9e6d784d18b7a6abc48cc97)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 506,
+            "timestamp": "2026-09-12T09:16:38.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (539 total)",
+            "is_live": false,
+            "last_block": "#121460331 (719198f12761661454c101d6b26fe2678e4d79c950a7e4c778ad6bf8b08e1013)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 539,
+            "timestamp": "2026-09-12T09:16:53.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (572 total)",
+            "is_live": false,
+            "last_block": "#121460364 (43d2be1dfdb9950d274494d0de137f2b1c4e6361b2c2fb144481855e049b4982)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 572,
+            "timestamp": "2026-09-12T09:17:08.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (606 total)",
+            "is_live": false,
+            "last_block": "#121460398 (7fc1869116a51d3ed747eaca1a909e7fb86da8525859f2719acc376b17e61d2d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 606,
+            "timestamp": "2026-09-12T09:17:23.274-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (639 total)",
+            "is_live": false,
+            "last_block": "#121460431 (b0ee0db440c7208568963c318c92d974d3abd9c1be5df763e78876ced82f111f)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 639,
+            "timestamp": "2026-09-12T09:17:38.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (672 total)",
+            "is_live": false,
+            "last_block": "#121460464 (98b90778cd084b6e71f1fdc132cde4990967c42f8a23f0112a5099de77112577)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 672,
+            "timestamp": "2026-09-12T09:17:53.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (705 total)",
+            "is_live": false,
+            "last_block": "#121460497 (b6d65724c597bdd27b02b99f9534a01975e693432320cebdcda482d273b0b9cf)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 705,
+            "timestamp": "2026-09-12T09:18:08.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (739 total)",
+            "is_live": false,
+            "last_block": "#121460531 (45e83428e0de659fca09b0a17e60fe0456fbf014469fa6f51a10de51507dfc81)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 739,
+            "timestamp": "2026-09-12T09:18:23.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (772 total)",
+            "is_live": false,
+            "last_block": "#121460564 (5e8755dd440fae86b0de564a275b073e59d35cb6e0be1c5b03ce7645ac66427c)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 772,
+            "timestamp": "2026-09-12T09:18:38.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (806 total)",
+            "is_live": false,
+            "last_block": "#121460598 (b613256283542a09e88c821942eb5989f09098230a52744805188ef80c1963d2)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 806,
+            "timestamp": "2026-09-12T09:18:53.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (839 total)",
+            "is_live": false,
+            "last_block": "#121460631 (2967f77d58322f4d60d9824b64eb2525b556a3d2979ea0da0e3124ecd5076f15)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 839,
+            "timestamp": "2026-09-12T09:19:08.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (872 total)",
+            "is_live": false,
+            "last_block": "#121460664 (d15c792c8cb2270df17e05269e53926286daa895cd17987cd7e634c0be6af5e3)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 872,
+            "timestamp": "2026-09-12T09:19:23.275-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (906 total)",
+            "is_live": false,
+            "last_block": "#121460698 (eafd249fa2a6c0806247ed205791f39f2c7bd78d7ea8dcc00bcc69b6165fca17)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 906,
+            "timestamp": "2026-09-12T09:19:38.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (939 total)",
+            "is_live": false,
+            "last_block": "#121460731 (d9bc7bdbf395a9a1d118d5a1a9f766c406f21668d1ff48d6d9811d80599b0d69)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 939,
+            "timestamp": "2026-09-12T09:19:53.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (972 total)",
+            "is_live": false,
+            "last_block": "#121460764 (d5409edbf8907f04d35cdc5ceff5aad0f53a3422e13a6e31950809d007f50b85)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 972,
+            "timestamp": "2026-09-12T09:20:08.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1006 total)",
+            "is_live": false,
+            "last_block": "#121460798 (1b8592dfae1d233d37439e4638d3f7966f84eaa4d11454b0340321b736eb3468)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1006,
+            "timestamp": "2026-09-12T09:20:23.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1039 total)",
+            "is_live": false,
+            "last_block": "#121460831 (d6c94af38c9cc423875429ee72265dee99bcc7918f96b8c083afad024935cb18)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1039,
+            "timestamp": "2026-09-12T09:20:38.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1072 total)",
+            "is_live": false,
+            "last_block": "#121460864 (6c2c23724d89f6ad5f1e2109aec4202362889a88ee45a71a023e35b20be6d706)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1072,
+            "timestamp": "2026-09-12T09:20:53.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1106 total)",
+            "is_live": false,
+            "last_block": "#121460898 (d9d16f69c1c835beffdc5291d6cebb96646f586a04e4bf595b8e1745eb5e7b22)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1106,
+            "timestamp": "2026-09-12T09:21:08.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1139 total)",
+            "is_live": false,
+            "last_block": "#121460931 (bcaf43b7d05afddc9430e100455dd315b2b2f46d75e8a2df5db731f90123e943)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1139,
+            "timestamp": "2026-09-12T09:21:23.276-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1172 total)",
+            "is_live": false,
+            "last_block": "#121460964 (615c6644978cdc1d613be3510263a19d4aaef561983d8ccca72833c8ed25c00b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1172,
+            "timestamp": "2026-09-12T09:21:38.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1206 total)",
+            "is_live": false,
+            "last_block": "#121460998 (71c72c34468ee320bdccf920d037581e992582a3b40fba618e597a63db062838)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1206,
+            "timestamp": "2026-09-12T09:21:53.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1239 total)",
+            "is_live": false,
+            "last_block": "#121461031 (230d3d267909d6e5500056f296746532483a441b29eab969015273f5c520d497)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1239,
+            "timestamp": "2026-09-12T09:22:08.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1272 total)",
+            "is_live": false,
+            "last_block": "#121461064 (dae35723de9fbd5d147077e1099e8761f9bf0ef1a32a67aca41423a5855f341d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1272,
+            "timestamp": "2026-09-12T09:22:23.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1306 total)",
+            "is_live": false,
+            "last_block": "#121461098 (3acac814f6ac0c29434823f6b0a5fe40c7bdc5e45b6102b67c3029f598775d24)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1306,
+            "timestamp": "2026-09-12T09:22:38.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1339 total)",
+            "is_live": false,
+            "last_block": "#121461131 (49000387d58018f65524582abb5970336d1c33731674452873947cc652056d3e)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1339,
+            "timestamp": "2026-09-12T09:22:53.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1372 total)",
+            "is_live": false,
+            "last_block": "#121461164 (335e3f1a72bbe25b682c010fe89066d4353727c732f62c9806e146860832f67d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1372,
+            "timestamp": "2026-09-12T09:23:08.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1406 total)",
+            "is_live": false,
+            "last_block": "#121461198 (0e0fea67a510651e7baf6f5108cda5c2555fa9bb41d29eaf21512a16d07d838a)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1406,
+            "timestamp": "2026-09-12T09:23:23.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1439 total)",
+            "is_live": false,
+            "last_block": "#121461231 (6c2ebfee1c0dc1c091f3a0ac67e32879a4ae3ad8ce0136bdb92cc8eaf9e91d48)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1439,
+            "timestamp": "2026-09-12T09:23:38.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1472 total)",
+            "is_live": false,
+            "last_block": "#121461264 (a08f22a21aedb5bc1d8ff2971f2280c362908eaa35c0a21fadb7312756385370)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1472,
+            "timestamp": "2026-09-12T09:23:53.277-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1506 total)",
+            "is_live": false,
+            "last_block": "#121461298 (d30f802dc16985def8e2d6624516331dcb09284ff5139bd5afbc0614647196cb)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1506,
+            "timestamp": "2026-09-12T09:24:08.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1539 total)",
+            "is_live": false,
+            "last_block": "#121461331 (f6242c937794f49a5b9082e82cad0b32af54845e3c48698462ba5c0c80edad47)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1539,
+            "timestamp": "2026-09-12T09:24:23.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1572 total)",
+            "is_live": false,
+            "last_block": "#121461364 (27879214d30493043667f6310c28e801475a394964e36fc74f37927a4cc53630)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1572,
+            "timestamp": "2026-09-12T09:24:38.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1606 total)",
+            "is_live": false,
+            "last_block": "#121461398 (29165b521100b6cab672ea85a74240f01a37ffcd9701b2b1b2258f0e887aa9be)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1606,
+            "timestamp": "2026-09-12T09:24:53.281-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1639 total)",
+            "is_live": false,
+            "last_block": "#121461431 (821e46d7ff679fc088fd84e55b55f99e978ba2a6f3b1643d10c9efa09653a706)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1639,
+            "timestamp": "2026-09-12T09:25:08.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1672 total)",
+            "is_live": false,
+            "last_block": "#121461464 (6daa36afaf581c9e081723520a7ec28e5aa43b3a54a43056bcb81e41a4790430)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1672,
+            "timestamp": "2026-09-12T09:25:23.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1706 total)",
+            "is_live": false,
+            "last_block": "#121461498 (0748db54f24e4ead019652c39ca3277cfb7e04a7f0f37e3c6674950e42ce9ffe)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1706,
+            "timestamp": "2026-09-12T09:25:38.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1739 total)",
+            "is_live": false,
+            "last_block": "#121461531 (fe4a9539eab41b8df2642322eeb7639cc3a99329bfdaa4febb18e57eb52deae5)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1739,
+            "timestamp": "2026-09-12T09:25:53.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1772 total)",
+            "is_live": false,
+            "last_block": "#121461564 (e636d56f2b2bd1f90819f94456ed41d628c3baa49219db4939dba79c96dcd001)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1772,
+            "timestamp": "2026-09-12T09:26:08.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1805 total)",
+            "is_live": false,
+            "last_block": "#121461597 (733456bb6b4e4057c1ce352c5316b252a1b82f2772d9698d288f0eedc0d3ee47)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1805,
+            "timestamp": "2026-09-12T09:26:23.278-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1839 total)",
+            "is_live": false,
+            "last_block": "#121461631 (54c995312de39532bf3a7d33412961400b8a5df8736631264beb1510491645fc)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1839,
+            "timestamp": "2026-09-12T09:26:38.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1872 total)",
+            "is_live": false,
+            "last_block": "#121461664 (0c25f66ac5b68d37bdcae675a227fcb633d666d0614d1ada44b1f5f8e924ca52)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1872,
+            "timestamp": "2026-09-12T09:26:53.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1906 total)",
+            "is_live": false,
+            "last_block": "#121461698 (c072e326ab381388a0a47125a874c754b230a20ed6fff4f8bf9e259104e03b18)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1906,
+            "timestamp": "2026-09-12T09:27:08.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1939 total)",
+            "is_live": false,
+            "last_block": "#121461731 (1162a30f74e3a17c59cd56a75726cdb56c1dd13089af96a9e9fd127aed414534)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1939,
+            "timestamp": "2026-09-12T09:27:23.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1972 total)",
+            "is_live": false,
+            "last_block": "#121461764 (b21db7be4f09a04b1f9944c24c8256c43c2687b0dfd276617555eb39a255b7cd)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1972,
+            "timestamp": "2026-09-12T09:27:38.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (2006 total)",
+            "is_live": false,
+            "last_block": "#121461798 (09ab0962609dae7de17461b85f13864cc22662e3821384870c256f903c6656fe)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2006,
+            "timestamp": "2026-09-12T09:27:53.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (2039 total)",
+            "is_live": false,
+            "last_block": "#121461831 (e530260c8257818257f64a1bba404694d56721e3128062668088700e208dfbfc)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2039,
+            "timestamp": "2026-09-12T09:28:08.279-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (2072 total)",
+            "is_live": false,
+            "last_block": "#121461864 (ee16781983be0105347d708c9e1a080e5edf8363448b533cbff717a7743ba0bd)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2072,
+            "timestamp": "2026-09-12T09:28:23.280-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.133 msg/s (2101 total)",
+            "is_live": false,
+            "last_block": "#121461893 (7311839ebdffbd428a63a7fbdeff877cf57954268d912f05f5aedecd19dcee1c)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2101,
+            "timestamp": "2026-09-12T09:28:36.531-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          }
+        ],
+        "sessions": [
+          {
+            "linear_handoff_block": 121459793,
+            "max_parallel_workers": 50,
+            "resolved_start_block": 121459793,
+            "timestamp": "2026-09-12T09:13:36.534-0400",
+            "trace_id": "10526899d91ae3d5aa1804f99ec8c5bf"
+          }
+        ]
+      },
+      "output": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+        ],
+        "blocks": 2101,
+        "changed_rows": {
+          "balances": 2098,
+          "codes": 0,
+          "lifecycle": 0,
+          "nonces": 0,
+          "storage": 56405
+        },
+        "database": "evm_throughput_live_20260912",
+        "digest_encoding": "ascending blocks; deterministic protobuf; each prefixed by its uint64 big-endian byte length",
+        "end_block": 121461893,
+        "first_block_timestamp": 1789218769,
+        "format_version": 1,
+        "header": {
+          "hash": "0x7311839ebdffbd428a63a7fbdeff877cf57954268d912f05f5aedecd19dcee1c",
+          "number": 121461893,
+          "parent_hash": "0x3a08d62807d5739f8208049706855c2795495b140c786e0e5230f02823e36a28",
+          "state_root": "0x700287043b719499a561328392fcc3a5442bd378bcbf4a3936b0dd0cbe693575",
+          "timestamp": 1789219714
+        },
+        "header_rlp": "0xf9037ca03a08d62807d5739f8208049706855c2795495b140c786e0e5230f02823e36a28a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347945cf810ab8c718ac065b45f892a5badab2b2946b9a0700287043b719499a561328392fcc3a5442bd378bcbf4a3936b0dd0cbe693575a06cb8c4697b9a207fa472c284d7e198e176b77073e2ea9d0ad211fbf5053533a8a0b346a7213ed76159f59a7eeac32f0301e7879c4bef1298311ab6779a3f2ba007b9010027ec5b3520c4141582a30144c62c0440188812201844e8bd0822b10154c61887842db0002918cc82e34b7c43ad97000081a9e6839400a20520c192d051a8a2bad4170a3a3cc6e06821ba4cb9b6adbab3e456a96110d4287a20559837906b44b6901e36b00a2ec96060310c01264b3e6158608b0748ccc410623f5756181d322baaf80eb3d7588002a5dc661fa4503bee7535042d4100603efb54094d8d4ea73623febec0988d2178ad6f87dc2f00cc801264c2c043e808e82448a38ad107c711a584870a1a602cfd02eb3c892dc25402ee876ec640a80cbe7079e8869a54e210ff166111534b400a47c0ce8fc32099cf8f8284c9d80047436f2458328fc30e360284073d5c8584042c1d8083f8cb72846aa55382b90118db8301070888636462373534386289676f312e32352e3132836c696ed38cc282f8b5831bffffb860942b4c10325027bc51ad961d05dbe42e99db3fc7d9f8906cce42c22ef948bfb011724b92a0f867103758a8c79c124d23152fc8bf5ba493bdfd3df33929ee634f906bfad0230e3649604b4f919755dca1313ba5da84ffc3467291e01a20696e43f84c84073d5c83a0486a3d21a083002eab376933eabfd900d7f0c27563d0699618fb230cb33a07d184073d5c84a03a08d62807d5739f8208049706855c2795495b140c786e0e5230f02823e36a28800e030d8c019ec3d650b599ec1909bcd02a51f96e58a718d84abdff748e1bddd77d3f4fcc303a4a914adb4044db32cb4ed5635cdcf7fc92f1cbfdb12809b6bf9401a000000000000000000000000000000000000000000000000000000000000001f488000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000248b4bbebf0655557a461e91b8905b85864b8bb48",
+        "header_trust": "provider-finalized-header",
+        "limitations": [
+          "account storage completeness is not established by this update sample",
+          "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",
+          "cache warmth and wall time are separate measurements"
+        ],
+        "logical_protobuf_bytes": 11383358,
+        "max_protobuf_bytes_per_block": 21815,
+        "mean_block_interval_seconds": 0.45,
+        "mean_protobuf_bytes_per_block": 5418.066634935745,
+        "module_hash": "da327dbc1039a2d58b892570e6cf01f182dfd79e",
+        "ordered_output_sha256": "49c27183f83445467f21473b2191dccf2102c409bab6956a0530cfb4e4130332",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "run_id": "3677065cb14d4f9ca4f6eb2e33b2af9f",
+        "start_block": 121459793,
+        "validation": "encoded header, native interval and durable cursor verified"
+      }
+    },
+    "live-tuned": {
+      "after_first_60_seconds": {
+        "durable_advanced_blocks": 1868,
+        "durable_block_age_seconds": {
+          "max": 4.291827917098999,
+          "min": 1.905951976776123,
+          "p50": 2.993497133255005,
+          "p95": 3.9240901470184326,
+          "samples": 169
+        },
+        "finalized_lag_blocks": {
+          "max": 5,
+          "min": 1,
+          "p50": 3,
+          "p95": 5,
+          "samples": 169
+        },
+        "rpc_finalized_advanced_blocks": 1869,
+        "rpc_sample_duration_seconds": {
+          "max": 0.16451020911335945,
+          "min": 0.053826916962862015,
+          "p50": 0.06023725029081106,
+          "p95": 0.138476874679327,
+          "samples": 169
+        },
+        "sample_window_seconds": 840.947282,
+        "samples": 169
+      },
+      "capacity": {
+        "budget_bytes": 100000000000,
+        "failed_samples": 0,
+        "guard_samples": 701,
+        "headroom_bytes": 10000000000,
+        "maximum_sample_gap_ns": 2278017000,
+        "min_free_bytes": 1073741824,
+        "peak_observed_allocated_bytes": 2343714816,
+        "peak_spool_allocated_bytes": 32768,
+        "rejected_guard_stages": [],
+        "samples": 720,
+        "status": "completed"
+      },
+      "ingestion": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+        ],
+        "blocks": 2101,
+        "blocks_per_second": 2.3312360801420358,
+        "database": "evm_throughput_tuned_20260912",
+        "database_parts_bytes_after": 350366729,
+        "decode_batch_size": 1,
+        "duration_seconds": 901.2386252498254,
+        "endpoint": "bsc.substreams.pinax.network:443",
+        "failed_lag_samples": 0,
+        "final_position": {
+          "hash": "0x5644def5185fb0631683f9ab394074d83e5ab3011907e2e23f3eb4928258d544",
+          "number": 121462713
+        },
+        "finalized_lag_blocks_all_phases": {
+          "max": 5,
+          "min": 0,
+          "p50": 3,
+          "p95": 5,
+          "samples": 180
+        },
+        "finished_at_unix_ns": 1789220085578866000,
+        "format_version": 1,
+        "harness_sha256": "db98b8d05a8a16d964517db4d3ecb460a678c058118430d6f228b46683a25260",
+        "initial_finalized": {
+          "hash": "0x7157aab0a100fddb8e7cb8fbfaa1620d94ce9685e4d2648d7c90d2b056e84d7e",
+          "number": 121460713
+        },
+        "lag_samples": 181,
+        "limitations": [
+          "block-age uses the host wall clock and second-resolution chain timestamps",
+          "RPC and durable cursor are sampled sequentially; a negative lag can reflect sampling skew",
+          "finalized follow can have native is_live=false; use a declared startup exclusion and observed RPC chain growth",
+          "this update interval does not establish full initial storage or publish a checkpoint",
+          "cache state is not inferred from elapsed time"
+        ],
+        "live_blocks_requested": 2000,
+        "module_hash": "da327dbc1039a2d58b892570e6cf01f182dfd79e",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "requested_parallel_workers": null,
+        "run_id": "dfd8a6bef1984f89a236447e919d3758",
+        "sample_interval_seconds": 5,
+        "spool_max_idle_ms": 100,
+        "start_block": 121460613,
+        "started_at_unix_ns": 1789219184324501000,
+        "stop_block_exclusive": 121462714,
+        "timeout_seconds": 2400,
+        "worker_policy": "provider default; observed session limit is recorded in native log"
+      },
+      "native_log": {
+        "last_reported_processed_blocks": 2101,
+        "max_observed_running_jobs": 0,
+        "native_settings": [
+          {
+            "db_write_max_size": "512 MiB",
+            "db_write_target_duration": "3s",
+            "decode_batch_size": 1,
+            "decode_workers": 8,
+            "spool_max_idle": "100ms",
+            "spool_max_size": "1.0 GiB"
+          }
+        ],
+        "progress": [
+          {
+            "data_msg_rate": "52.500 msg/s (105 total)",
+            "is_live": false,
+            "last_block": "#121460717 (78d3fcecf79a1374131fb80346f9b7b8859fb0a82e3b7d84cc4a95e533e8d30e)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 84,
+            "timestamp": "2026-09-12T09:19:47.048-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "7.882 msg/s (134 total)",
+            "is_live": false,
+            "last_block": "#121460746 (bf8fa0e41aa2a71378652edcbfd56faa32a29710e8d11f89c83d4cd5b6236c29)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 134,
+            "timestamp": "2026-09-12T09:20:02.049-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (172 total)",
+            "is_live": false,
+            "last_block": "#121460784 (22b5267e7bae6e244cd8f3e0813bf7ecff691a3a42416665bfefd74a2c8e1997)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 172,
+            "timestamp": "2026-09-12T09:20:17.049-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.367 msg/s (205 total)",
+            "is_live": false,
+            "last_block": "#121460817 (35a425d3df04709b673423aa99d16fd348582f549b47e03d0a41dc3e289e5dae)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 205,
+            "timestamp": "2026-09-12T09:20:32.049-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (238 total)",
+            "is_live": false,
+            "last_block": "#121460850 (1ae17cdfad9bc0ae1d529713261a0e189334d4de28f58d9fcfb649898a77e160)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 238,
+            "timestamp": "2026-09-12T09:20:47.050-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (272 total)",
+            "is_live": false,
+            "last_block": "#121460884 (ba456a34990e8d8b4f1b5ec273eb6053844245d18bbf2774a3ab5c8abc14180d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 272,
+            "timestamp": "2026-09-12T09:21:02.049-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (305 total)",
+            "is_live": false,
+            "last_block": "#121460917 (dd9f5d6a0d35758e12f72b5af3c2121549331d624d077dde195c27441a20464a)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 305,
+            "timestamp": "2026-09-12T09:21:17.050-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (338 total)",
+            "is_live": false,
+            "last_block": "#121460950 (d7a2856f2bc65a66b4baad9ec76044532067fda74603b03346c870e5702f3915)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 338,
+            "timestamp": "2026-09-12T09:21:32.050-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (372 total)",
+            "is_live": false,
+            "last_block": "#121460984 (d715dcbe82dfeb14b4e107e9e7d76c273eb9614c1f7c727431b09da56e9850f6)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 372,
+            "timestamp": "2026-09-12T09:21:47.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (405 total)",
+            "is_live": false,
+            "last_block": "#121461017 (65c6765a6d80f7e063dd51505305ee345e6c250c2af0531638892be65a661135)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 405,
+            "timestamp": "2026-09-12T09:22:02.050-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (438 total)",
+            "is_live": false,
+            "last_block": "#121461051 (4ee378aa82965274c7c0bd1da75b65f474d41dacb144c98177130f204df7857b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 439,
+            "timestamp": "2026-09-12T09:22:17.050-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (472 total)",
+            "is_live": false,
+            "last_block": "#121461084 (5fe4b64be2920b36c6fc3fe4e7f2740fdb840c5d3a43da2ac1a15fc4b3e0ed5d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 472,
+            "timestamp": "2026-09-12T09:22:32.050-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (505 total)",
+            "is_live": false,
+            "last_block": "#121461117 (566cdd98af414fe3f44409cd3f07d26631e515855fe4fcc6c8ea1f6d03a7596a)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 505,
+            "timestamp": "2026-09-12T09:22:47.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (538 total)",
+            "is_live": false,
+            "last_block": "#121461150 (94dc68a16fbdc29fe46f5818ae52bf4c95addd0f1c3429aee08a0d595b932d08)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 538,
+            "timestamp": "2026-09-12T09:23:02.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (572 total)",
+            "is_live": false,
+            "last_block": "#121461184 (b3f7ae528561d20301a2a45ec3e020d2e21ea47b6107929e7124a91b7ddccea6)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 572,
+            "timestamp": "2026-09-12T09:23:17.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (605 total)",
+            "is_live": false,
+            "last_block": "#121461217 (b5db657ccf1045a6dc08d6ec477d919a5732ce857bd054539bf487276e48281b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 605,
+            "timestamp": "2026-09-12T09:23:32.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (639 total)",
+            "is_live": false,
+            "last_block": "#121461251 (d79400887ce909aaddbd9ddc401184fea1cc1e8c64cfebbbd18786d45737b8c8)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 639,
+            "timestamp": "2026-09-12T09:23:47.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (672 total)",
+            "is_live": false,
+            "last_block": "#121461284 (78590c2b6eda321ab97ca7aded3f422d4303cb9c73371bf73e64b27ff4df89f7)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 672,
+            "timestamp": "2026-09-12T09:24:02.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (705 total)",
+            "is_live": false,
+            "last_block": "#121461317 (75254dd5c7e83bea6312f2bbbdb881b5d9008205817e660da7529b04ec33ce88)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 705,
+            "timestamp": "2026-09-12T09:24:17.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (738 total)",
+            "is_live": false,
+            "last_block": "#121461350 (25266e07047a492fab0f14157f6722254e5f4d1c61c512d07246061f5adae639)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 738,
+            "timestamp": "2026-09-12T09:24:32.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (772 total)",
+            "is_live": false,
+            "last_block": "#121461384 (fcbcec88f7c767b3eb8c038076b4a90c1c867435e5836da3cbada877216f3556)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 772,
+            "timestamp": "2026-09-12T09:24:47.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (805 total)",
+            "is_live": false,
+            "last_block": "#121461417 (02a944292ab6de903a5b225800db5bcc0b5f8d7e7847e392b98af3a21eb818df)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 805,
+            "timestamp": "2026-09-12T09:25:02.051-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (838 total)",
+            "is_live": false,
+            "last_block": "#121461450 (88565e6a7055c97ac21967146dcfb02ec182b19fef40bcc70efccf0dafc9d109)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 838,
+            "timestamp": "2026-09-12T09:25:17.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (872 total)",
+            "is_live": false,
+            "last_block": "#121461484 (dfe931495b8f75b6e1d69fef9352e2392836feb8417dd85d6d35d66d800bf62b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 872,
+            "timestamp": "2026-09-12T09:25:32.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (905 total)",
+            "is_live": false,
+            "last_block": "#121461517 (36d0393fb02d9362509f2cd1a9c57620c316cdca78a45ce2d21c29a7b37abf5d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 905,
+            "timestamp": "2026-09-12T09:25:47.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (938 total)",
+            "is_live": false,
+            "last_block": "#121461551 (d697f9d7e79aff5efa2f2badbf0a387c25e7e7fff0b161aeb47bb50d29ef26ae)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 938,
+            "timestamp": "2026-09-12T09:26:02.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (972 total)",
+            "is_live": false,
+            "last_block": "#121461584 (b22ea09dc8aab0209675685a675650a5e6784a53b6e17102a6576c3a7e24ca0a)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 972,
+            "timestamp": "2026-09-12T09:26:17.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1005 total)",
+            "is_live": false,
+            "last_block": "#121461617 (15b198314a5a1e7ebff4fdcb9cc1b005c6a38b0522cc936323b408668859b8f6)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1005,
+            "timestamp": "2026-09-12T09:26:32.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1038 total)",
+            "is_live": false,
+            "last_block": "#121461650 (d9d1d9762b892146887022b7fd1361a53755e1daa7212a3dbbd6848ae8dc9337)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1038,
+            "timestamp": "2026-09-12T09:26:47.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1072 total)",
+            "is_live": false,
+            "last_block": "#121461684 (5e58293dacc748f57bc388de735ac92a0682d0f376bcef575c63a96e669950d1)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1072,
+            "timestamp": "2026-09-12T09:27:02.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1105 total)",
+            "is_live": false,
+            "last_block": "#121461717 (d186a93955e366b19c6d24fbe4e187016071b610305accb0c05800d84d9977e5)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1105,
+            "timestamp": "2026-09-12T09:27:17.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1138 total)",
+            "is_live": false,
+            "last_block": "#121461750 (11c1b530facf0fd723bcfa5138d7cfd246a0541af641fb518fb26c4cb250477b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1138,
+            "timestamp": "2026-09-12T09:27:32.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1172 total)",
+            "is_live": false,
+            "last_block": "#121461784 (f723f4231ee69022e8dd85a13e926a9696422885111d44cff5c095fe68b6c479)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1172,
+            "timestamp": "2026-09-12T09:27:47.052-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1205 total)",
+            "is_live": false,
+            "last_block": "#121461817 (00c9dfbf15f3e1ba8941231697f3ec5a0469d8fc3d5d637fed7de3020ac82be7)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1205,
+            "timestamp": "2026-09-12T09:28:02.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1238 total)",
+            "is_live": false,
+            "last_block": "#121461850 (1e78b49789a6058a020c89e1dd5a7809b6121eb2b1e2f2a1fe5bee46980ce0b0)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1238,
+            "timestamp": "2026-09-12T09:28:17.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1272 total)",
+            "is_live": false,
+            "last_block": "#121461884 (737acac3ecfe0e6ba21108065704b65cbe5a534c30294061dc9fa5ca71948442)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1272,
+            "timestamp": "2026-09-12T09:28:32.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1305 total)",
+            "is_live": false,
+            "last_block": "#121461917 (aaa99cb960e5282b1685641c52857e050a82fb03a3dba5af32139806ffe1d662)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1305,
+            "timestamp": "2026-09-12T09:28:47.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1338 total)",
+            "is_live": false,
+            "last_block": "#121461950 (cc465247d77062933acf876f3a24b43eb4da1f0b35a77ec0ddc61b71066dab53)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1338,
+            "timestamp": "2026-09-12T09:29:02.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1372 total)",
+            "is_live": false,
+            "last_block": "#121461984 (389e16391b6e6427c84123ec7c351a9633936a3902491857f0de947d513dbddd)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1372,
+            "timestamp": "2026-09-12T09:29:17.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1405 total)",
+            "is_live": false,
+            "last_block": "#121462017 (48c06d5c686d47b48a2b4cab508aac845cef6c418ba1ff46c8d4919fcd004e89)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1405,
+            "timestamp": "2026-09-12T09:29:32.053-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1438 total)",
+            "is_live": false,
+            "last_block": "#121462050 (7d9ef171704ce884b6fc75523809d70f3b822327e096ae341613a80be748fb14)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1438,
+            "timestamp": "2026-09-12T09:29:47.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1472 total)",
+            "is_live": false,
+            "last_block": "#121462084 (e437a440550a88c4a029a7816a35dd3ff0a8a9fad9a2440b77974317e9865f4b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1472,
+            "timestamp": "2026-09-12T09:30:02.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1505 total)",
+            "is_live": false,
+            "last_block": "#121462117 (f2fbc4057f6efccdf9f412f403fb422d12e518aea794824933a3008cd6f2c0e0)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1505,
+            "timestamp": "2026-09-12T09:30:17.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1538 total)",
+            "is_live": false,
+            "last_block": "#121462150 (faa54d44a5f646d18ed7e3d94ee40c5e9f66a05f21b577e973f83f4454a04307)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1538,
+            "timestamp": "2026-09-12T09:30:32.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1572 total)",
+            "is_live": false,
+            "last_block": "#121462184 (101ee19f2fbf25c448208149c5bcc1bb60d89fc752a7d682820d0a6004b50920)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1572,
+            "timestamp": "2026-09-12T09:30:47.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1605 total)",
+            "is_live": false,
+            "last_block": "#121462217 (14bc4071e31c0f563677962c39617348377be97c6c0b7122b7e3a4530257944d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1605,
+            "timestamp": "2026-09-12T09:31:02.059-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1638 total)",
+            "is_live": false,
+            "last_block": "#121462250 (b9bf2d3515f9865b3923c677438493a8ce209772e2c23baa0f802d09c8739e45)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1638,
+            "timestamp": "2026-09-12T09:31:17.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1672 total)",
+            "is_live": false,
+            "last_block": "#121462284 (3ee1ae5cc7ec207b4a8ebc1b9dd452b3c1c05bab4623cca6ca62f5f4f82d021f)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1672,
+            "timestamp": "2026-09-12T09:31:32.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1705 total)",
+            "is_live": false,
+            "last_block": "#121462317 (b22a19a25dbfa73242a71823e5df166ea3701572a10268d493ae1f0d85cf8498)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1705,
+            "timestamp": "2026-09-12T09:31:47.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1738 total)",
+            "is_live": false,
+            "last_block": "#121462350 (791825781b832843de68648aaed346e7c6ea6700653e0c01efe8062a3b158ee9)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1738,
+            "timestamp": "2026-09-12T09:32:02.054-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1772 total)",
+            "is_live": false,
+            "last_block": "#121462384 (9dfb4e1df0a561db1f6b64a7d7127b4c5e6c4444ef0c0fbb721300c5d29f9902)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1772,
+            "timestamp": "2026-09-12T09:32:17.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1805 total)",
+            "is_live": false,
+            "last_block": "#121462417 (ea0a7719eb9bec662546460c7a38f4fa8558b7c45aa3d1813448ebf9821cebf9)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1805,
+            "timestamp": "2026-09-12T09:32:32.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1838 total)",
+            "is_live": false,
+            "last_block": "#121462450 (98f30db53041a7e68a6f6e025efcc41d68a376b4a6dcb9b6f709d4bdca8998aa)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1838,
+            "timestamp": "2026-09-12T09:32:47.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1871 total)",
+            "is_live": false,
+            "last_block": "#121462484 (03e701a9af1c73d0eaa7e247475526976dd9d35ac3f0bb64c650be6d8e95f785)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1872,
+            "timestamp": "2026-09-12T09:33:02.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1905 total)",
+            "is_live": false,
+            "last_block": "#121462517 (244c2fa0bf3bbc91097f5a16695dcdfb5d0aad4c493f3333d9b59c481f2ea81d)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1905,
+            "timestamp": "2026-09-12T09:33:17.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (1938 total)",
+            "is_live": false,
+            "last_block": "#121462550 (339ce9b992cdb514a46436f4b3b8d911e53b2926f845db1319ebd03f0c528046)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1938,
+            "timestamp": "2026-09-12T09:33:32.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.200 msg/s (1971 total)",
+            "is_live": false,
+            "last_block": "#121462583 (7bf3d4a65ac1b124d6349c2d47cc95826a7b1d517b978a66a13d6202c7246e5b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 1971,
+            "timestamp": "2026-09-12T09:33:47.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (2005 total)",
+            "is_live": false,
+            "last_block": "#121462617 (f2b3cd20e08bb7096a5925bc9106a9a0f4baa3691f860db9564110c1641291c2)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2005,
+            "timestamp": "2026-09-12T09:34:02.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (2038 total)",
+            "is_live": false,
+            "last_block": "#121462650 (cb39715b95baebbddc57c058dc7381622266cc7919cf4dcca81c7ff93ff0a98b)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2038,
+            "timestamp": "2026-09-12T09:34:17.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.233 msg/s (2072 total)",
+            "is_live": false,
+            "last_block": "#121462684 (4e37eff21bac9ba533485cc0e963cae9d9df062f510472ab4952b5713a213d7c)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2072,
+            "timestamp": "2026-09-12T09:34:32.055-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          },
+          {
+            "data_msg_rate": "2.167 msg/s (2101 total)",
+            "is_live": false,
+            "last_block": "#121462713 (5644def5185fb0631683f9ab394074d83e5ab3011907e2e23f3eb4928258d544)",
+            "progress_running_jobs": {},
+            "progress_total_processed_blocks": 2101,
+            "timestamp": "2026-09-12T09:34:45.487-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          }
+        ],
+        "sessions": [
+          {
+            "linear_handoff_block": 121460613,
+            "max_parallel_workers": 50,
+            "resolved_start_block": 121460613,
+            "timestamp": "2026-09-12T09:19:45.351-0400",
+            "trace_id": "fa08f1d4222661081a51cca953fbb2bc"
+          }
+        ]
+      },
+      "output": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+        ],
+        "blocks": 2101,
+        "changed_rows": {
+          "balances": 2097,
+          "codes": 0,
+          "lifecycle": 0,
+          "nonces": 0,
+          "storage": 56947
+        },
+        "database": "evm_throughput_tuned_20260912",
+        "digest_encoding": "ascending blocks; deterministic protobuf; each prefixed by its uint64 big-endian byte length",
+        "end_block": 121462713,
+        "first_block_timestamp": 1789219138,
+        "format_version": 1,
+        "header": {
+          "hash": "0x5644def5185fb0631683f9ab394074d83e5ab3011907e2e23f3eb4928258d544",
+          "number": 121462713,
+          "parent_hash": "0x0893388d755fc942c187536cb01feb52583e5d622815db841acadf42b6368190",
+          "state_root": "0xa2b5cd0b7d125c186733108ca7f55e8ef88c72214aa68ab75db589d7d8295d37",
+          "timestamp": 1789220083
+        },
+        "header_rlp": "0xf9037ca00893388d755fc942c187536cb01feb52583e5d622815db841acadf42b6368190a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347945cf810ab8c718ac065b45f892a5badab2b2946b9a0a2b5cd0b7d125c186733108ca7f55e8ef88c72214aa68ab75db589d7d8295d37a07effecbb8568ba891643b8a60e13cef9bec48b9042f69fb4e15d941f12bcc396a0f4ff19a00a26c0e038ef05f2dfc800ebb1a20655a285cdc780b83c9379cab9a2b901009c2c3e895a4cb4146fe908c590cbb61206ec32999a30d494a182b4047586f88584c11080d82da9004e454fa06c87e200a8cd6a01ecc2ac84b3f46021c72c12e3fe353811256600aa25a478bbe63d17a2e6521b2119c7fb7c920e153a920135bdba1d94b4160e1351a66088322c797b23dc42c405357d876df3425755d0fce3bce8bb412c4830e960a7d9250170000bfcefb78fa54b22673e12788952772f56e5caace2e290c060b08b37e3f0fb01a10029f842e95b8488704d28153722e08539514744cb826bc4ae0af45b629a5354093707b708b833c51d185244fb0a6ee285ea54601df05be882d5e846d78275515e08c6c5650c937f4856ac00a604c1641b0284073d5fb984042c1d8083e59228846aa554f3b90118db8301070888636462373534386289676f312e32352e3132836c696ed38cc282f8b5831effffb860a0b20f16dea3a2a0af01141f1c207095d5b586123dd6de356f23a8fbce17f14c28e7025346d6de9703ed163385930cea1204b7cabfa10fbdb9df2897b5bd8cf1420a13255e1e7a908fce0c90d62ea8380c630aee2ffb6c0659593aaebbdd9875f84c84073d5fb7a073758750ca91f5b08e49964271c64ffb1a68c883d167dfa5e25c6ed54734767f84073d5fb8a00893388d755fc942c187536cb01feb52583e5d622815db841acadf42b636819080028f4cdf5a3f154b12fa7b0917c971d870c812cbf5266942b59ef997a147723a712b22482b2a1f77db1a1cedf3119a7b576d8d32624490a1055fdb9c41e8b14700a0000000000000000000000000000000000000000000000000000000000000025888000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000002ba4233f6e478db76698b0a5000972af0196b7be1",
+        "header_trust": "provider-finalized-header",
+        "limitations": [
+          "account storage completeness is not established by this update sample",
+          "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",
+          "cache warmth and wall time are separate measurements"
+        ],
+        "logical_protobuf_bytes": 11484128,
+        "max_protobuf_bytes_per_block": 18281,
+        "mean_block_interval_seconds": 0.45,
+        "mean_protobuf_bytes_per_block": 5466.029509757259,
+        "module_hash": "da327dbc1039a2d58b892570e6cf01f182dfd79e",
+        "ordered_output_sha256": "455ec3284dbcefa781c24a8c469b3d553aca0f87e8fc31cc15d0089bff06a10b",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "run_id": "dfd8a6bef1984f89a236447e919d3758",
+        "start_block": 121460613,
+        "validation": "encoded header, native interval and durable cursor verified"
+      }
+    },
+    "warm": {
+      "capacity": {
+        "budget_bytes": 100000000000,
+        "failed_samples": 0,
+        "guard_samples": 2,
+        "headroom_bytes": 10000000000,
+        "maximum_sample_gap_ns": 745561000,
+        "min_free_bytes": 1073741824,
+        "peak_observed_allocated_bytes": 1255849984,
+        "peak_spool_allocated_bytes": 42315776,
+        "rejected_guard_stages": [],
+        "samples": 6,
+        "status": "completed"
+      },
+      "ingestion": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+          "0xc1223ab58372ba5338673c0cc778b7662dbf156c"
+        ],
+        "blocks": 10000,
+        "blocks_per_second": 4361.617013803661,
+        "database": "evm_throughput_warm_20260912",
+        "database_parts_bytes_after": 14293661,
+        "duration_seconds": 2.2927276669070125,
+        "endpoint": "bsc.substreams.pinax.network:443",
+        "failed_lag_samples": 0,
+        "final_position": {
+          "hash": "0x2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10",
+          "number": 121309999
+        },
+        "finalized_lag_blocks_all_phases": null,
+        "finished_at_unix_ns": 1789218767160991000,
+        "format_version": 1,
+        "initial_finalized": {
+          "hash": "0x92db6ad00e00ea8d70915fcc7b19fa0ba86bbc6f3389d7f4094c7717c6fb9cad",
+          "number": 121459781
+        },
+        "lag_samples": 1,
+        "limitations": [
+          "block-age uses the host wall clock and second-resolution chain timestamps",
+          "RPC and durable cursor are sampled sequentially; a negative lag can reflect sampling skew",
+          "live-phase statistics require the native log's is_live observations; startup is not steady state",
+          "this update interval does not establish full initial storage or publish a checkpoint",
+          "cache state is not inferred from elapsed time"
+        ],
+        "live_blocks_requested": null,
+        "module_hash": "d7842af0f32665ec5f6f61d695c668862d5f8822",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "requested_parallel_workers": null,
+        "run_id": "4a493cf29ce046c883f1465e1bfc9bf4",
+        "sample_interval_seconds": 5,
+        "start_block": 121300000,
+        "started_at_unix_ns": 1789218764860562000,
+        "stop_block_exclusive": 121310000,
+        "timeout_seconds": 2400,
+        "worker_policy": "provider default; observed session limit is recorded in native log"
+      },
+      "native_log": {
+        "last_reported_processed_blocks": 0,
+        "max_observed_running_jobs": 0,
+        "native_settings": [
+          {
+            "db_write_max_size": "512 MiB",
+            "db_write_target_duration": "3s",
+            "decode_batch_size": 32,
+            "decode_workers": 8,
+            "spool_max_idle": "1s",
+            "spool_max_size": "1.0 GiB"
+          }
+        ],
+        "progress": [
+          {
+            "data_msg_rate": "5000.000 msg/s (10000 total)",
+            "is_live": false,
+            "last_block": "#121309999 (2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10)",
+            "progress_running_jobs": {
+              "stage 0": 0
+            },
+            "progress_total_processed_blocks": 0,
+            "timestamp": "2026-09-12T09:12:47.110-0400",
+            "undo_msg_rate": "0.000 msg/s (0 total)"
+          }
+        ],
+        "sessions": [
+          {
+            "linear_handoff_block": 121310000,
+            "max_parallel_workers": 50,
+            "resolved_start_block": 121300000,
+            "timestamp": "2026-09-12T09:12:45.765-0400",
+            "trace_id": "529b5d31123b4232bad4f678af515048"
+          }
+        ]
+      },
+      "output": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+          "0xc1223ab58372ba5338673c0cc778b7662dbf156c"
+        ],
+        "blocks": 10000,
+        "changed_rows": {
+          "balances": 9936,
+          "codes": 0,
+          "lifecycle": 0,
+          "nonces": 0,
+          "storage": 219692
+        },
+        "database": "evm_throughput_warm_20260912",
+        "digest_encoding": "ascending blocks; deterministic protobuf; each prefixed by its uint64 big-endian byte length",
+        "end_block": 121309999,
+        "first_block_timestamp": 1789146826,
+        "format_version": 1,
+        "header": {
+          "hash": "0x2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10",
+          "number": 121309999,
+          "parent_hash": "0x22f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130",
+          "state_root": "0xd646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93f",
+          "timestamp": 1789151326
+        },
+        "header_rlp": "0xf9037ca022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347945009317fd4f6f8feea9dae41e5f0a4737bb7a7d5a0d646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93fa0bf4f5e2c61570198e04c4128b878f837b40a492e5f34cd20330e057abfe563c8a09d59e61aeaac5cb196e6df32ea14cf4394431e0953d79a1099cb8a6bb6f69daab9010020210ac080e80d5309231055a69c8001900006200c24448014021009200081843778500019c101000623a129402e0000000908024436219507900a010f28108064c00290a45280a80d021019222400a32c7018291d680030f0141c0ad0cb0d4011a80b2a428b0000bc442002040408081806c6530004964060098852e90846002470305c2840a040c1c8000840000aca61a4848521802819081001410108042002b42042190402782fcc2a90ab0405000560884042a02b884097224f088082090006c1d7067c044940a1503004b4b00020d432224ec000993e104006003ca0066a502e170a6d480025c8064da04413648800a128c61005584402900ac00145100284073b0b2f84042c1b6b835d3fde846aa4485eb90118db8301070888636462373534386289676f312e32352e3132836c696ed38cc282f8b5831dffffb860884b45353a73360d145ea9701db285595f7a506acd9d819bfff30e3a8031b531fc64c7c4cbf7457336c8bd7e292f99ee127f0f4c004570ac36976002f4caf592eb3ce34e4a9f6c49e0bc77c18add19b16fcf36444ac993e650a8d0bd1abb7963f84c84073b0b2da05b357ff8476e2a1617f0c56e571c35de3319b7c6fd7a7f4402f0019c1f27ab5384073b0b2ea022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130800c5186f3731ea1445f0056cbaa7cf337360e7b83404cd93758471699533cfad8027ff223dd47c16d3973253ff9bcd2dc38f814a85baf3d0b5ed1358fc0c48fb601a000000000000000000000000000000000000000000000000000000000000003b688000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000020557e8cb169f90f6ef421a54e29d7dd0629ca597",
+        "header_trust": "provider-finalized-header",
+        "limitations": [
+          "account storage completeness is not established by this update sample",
+          "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",
+          "cache warmth and wall time are separate measurements"
+        ],
+        "logical_protobuf_bytes": 45533529,
+        "max_protobuf_bytes_per_block": 23904,
+        "mean_block_interval_seconds": 0.45004500450045004,
+        "mean_protobuf_bytes_per_block": 4553.3529,
+        "module_hash": "d7842af0f32665ec5f6f61d695c668862d5f8822",
+        "ordered_output_sha256": "d12d9e54a90653bb811c011029d1ec4a64906e34479de1d8e5563990fda67910",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "run_id": "4a493cf29ce046c883f1465e1bfc9bf4",
+        "start_block": 121300000,
+        "validation": "encoded header, native interval and durable cursor verified"
+      }
+    }
+  },
+  "workload": "public BSC native ClickHouse throughput and read latency"
+}

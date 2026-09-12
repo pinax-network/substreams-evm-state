@@ -6,10 +6,10 @@ make an entire deliverable complete.
 
 | Deliverable | Evidence in this prototype | Remaining acceptance work |
 |---|---|---|
-| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication | Sustained follow and agreed read/publication latency; storage must honor sync writes (physical host power loss is not emulated) |
-| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage | Exercise representative multi-account onboarding and interrupted operational cutover |
+| Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication; 15-minute finalized follow; measured complete pinned reads; fixed finalized decode/spool latency | Customer latency targets and deployment conditions; storage must honor sync writes (physical host power loss is not emulated) |
+| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage; real three-account cutover with a killed publisher, unchanged old reader and combined-filter continuation | Broader nonempty hot-account bootstrap and customer account qualification |
 | Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; BSC fork-aware SELFDESTRUCT and delegated execution; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers use consistent snapshots and fail on unknown/wrong metadata | Captured producer/fork fixtures and full 7702 matrix, historical CREATE/CREATE2 parity, representative lifecycle replay |
-| Retention/cost qualification and release | Whole-directory capacity monitoring, sampled headroom enforcement and publication/trie guards; measured 64-account synthetic checkpoint/export/restore/churn/retention; observed active merge space and real BSC spool; checkpoint/candidate cleanup preserving readers; native history cleanup and bounded bootstrap chunks; pinned toolchain and package-producing build | Representative hot/old/growing-account and sustained-growth measurements, separated cold/cached/live throughput and current cost estimates, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
+| Retention/cost qualification and release | Whole-directory capacity monitoring, sampled headroom enforcement and publication/trie guards; measured 64-account synthetic checkpoint/export/restore/churn/retention; observed active merge space and real BSC spool; checkpoint/candidate cleanup preserving readers; native history cleanup and bounded bootstrap chunks; pinned toolchain and package-producing build; separated cold/cached/live results, current price model and old-contract cohort addition | Nonempty hot-account initial state and sustained-growth qualification, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
 
@@ -18,13 +18,14 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 232 tests (97 offline, 133 ClickHouse
+The Python suite currently contains 242 tests (106 offline, 134 ClickHouse
 integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. All 232 tests passed locally in 91.58
-seconds, and all 19 Rust tests passed. A process-kill test now waits for the killed
+configured development database. All 242 tests passed locally in 91.74 seconds,
+all 19 Rust tests passed, and `make build` produced the package. A process-kill
+test now waits for the killed
 native child to release its inherited writer lock before recovery; reaping its
 wrapper alone was a timing race. The earlier 159-test lifecycle baseline also
 passed on GitHub CI at `41bc101`.
@@ -163,7 +164,8 @@ package descriptor from deduplicated native rows. It contained 219,692 storage
 patches and 9,936 balance patches. This excludes transport framing, retries and
 billing adjustments. `scripts/measure_native_output.py` reproduces the measurement
 and verifies interval/header/cursor identity; it does not claim complete initial
-storage. Pricing and separate cold/cached/live measurements still require work.
+storage. Separate cold/cached/live results and a current price model now appear
+in [THROUGHPUT.md](THROUGHPUT.md).
 
 These totals deliberately include other databases/system data sharing the server
 disks and all declared local files. They are conservative workload observations,
@@ -287,6 +289,68 @@ contract bound, initial-history space cap or customer-set cost.
 The local test transport adapter uses gRPC-Go 1.83.2, incorporating the upstream
 fixes for the three dependency advisories reported against its earlier 1.83.0 pin.
 It remains outside the production data path.
+
+## Native throughput and interrupted real onboarding
+
+The [throughput record](evidence/bsc-throughput-2026-09-12.json) and
+[operating guide](THROUGHPUT.md) separate the new module-output cache run from
+its identical repeat: **31.929 versus 2.293 seconds for 10,000 blocks**. Server
+telemetry reports 10,000 versus zero processed blocks, and the ordered output
+digests match. The public filter adds an unused random address only to establish
+a fresh cache identity. This does not establish cold underlying block storage.
+
+Two 15-minute finalized follows each verified 2,101 contiguous envelopes. The
+new one-block/100 ms defaults reduce post-startup p95 checked-cursor lag from
+**37 to five blocks** behind RPC finality. The pinned sink's `is_live=false` flag
+persists for irreversible cursors, so it cannot serve as the head-lag measurement.
+Pinned pagination returned identical full storage across ten real 46-slot scans
+and five synthetic 100,000-slot scans. Their page p95 latencies were 20.67 ms and
+33.33 ms, respectively; the latter's maximum was 634.88 ms. These are local,
+sequential samples with shared-server background work, not an SLA.
+
+The [three-account onboarding record](evidence/bsc-onboarding-2026-09-12.json)
+adds two public accounts to the restored 46-slot checkpoint:
+
+- `0x10ed43c718714eb63d5aa57b78b54704e256024e` has proven empty storage and
+  21,936 bytes of code, also observed by archive RPC at block 10,000,000.
+- `0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a` is the real failed-7702 sender
+  from the earlier fixtures; its storage is proven empty at this cutover.
+
+The existing account catches up from 121309259 through **121461488**; the new
+cohort independently covers the 501 blocks ending at that common target. Empty
+storage roots permit complete verification from this recent interval. An account
+with nonempty storage would need complete enumeration; a separately examined
+7702 authority had nonempty storage and was not included in this short bootstrap.
+
+The first replay was capacity-stopped with an incomplete sample. Its native
+cursor/spool were retained, and it resumed from block **121368989**. Diagnosis
+reproduced separately read ClickHouse free/unreserved counters disagreeing by
+4 KiB. The monitor now uses the lower valid reading instead of assuming an atomic
+counter snapshot. The original generic failure record is preserved in evidence.
+The resumed capacity run completed with 154 periodic and 165 guard samples,
+no failed samples and a measured peak of **2,228,838,400 bytes**, including shared
+server data. Its 101.403-second catch-up phase times only the resumed remainder,
+not the full 152,230-block interval or time spent diagnosing the stop.
+
+After ingesting both cohorts, the workload sends SIGKILL to its own publication
+child after acknowledged account insertion but before the ready manifest. The
+ready count remains unchanged, and the pinned old account still reads identically.
+A retry verifies and publishes all three accounts at 121461488 in **3.575 seconds**.
+A fresh, combined filter then ingests **974 blocks** through **121462462** and
+publishes another fully verified checkpoint in **2.382 seconds**. The combined
+filter has its own new native identity; neither old run is silently retargeted.
+The two new generations have the same state checksum, with 46 total nonzero slots.
+
+`scripts/qualify_onboarding.py` reproduces this path from an existing ready
+checkpoint into fresh databases. Run it under `capacity-run`, cover the source
+controller and new work root, and set `NATIVE_DSN_TEMPLATE` in the environment
+with a `{database}` placeholder. Supply `--prefix`, `--root`, `--package`,
+`--source-database`, `--source-snapshot`, `--source-control`, and `--new-accounts`.
+It rejects nonempty new-account storage for this bounded scenario. `--resume`
+continues a capacity-stopped run after import and before completed cutover, using
+the already captured target proofs and original native cursors. It keeps failed
+candidates and measurements for inspection. It does not qualify complete initial
+storage for a hot token or the missing customer list.
 
 ## Inputs and release gates
 

@@ -8,8 +8,9 @@ verify the result, and publish an immutable checkpoint for local execution.
 construction, proof verification, portable exports/restores, reader pins,
 cursor recovery and checkpoint/native-history cleanup are implemented and tested.
 Initial replay supports private compaction between bounded native chunks. Capacity
-monitoring covers data directories and temporary work; broader lifecycle,
-throughput and account-set qualification remain unfinished.
+monitoring covers data directories and temporary work. Cold/cached ingestion,
+15-minute finalized follow and a real interrupted three-account cutover are now
+measured; broader historical lifecycle and account-set qualification remain unfinished.
 The customer's actual 19/64-account lists have not been supplied, so their
 capacity, latency and cost are not qualified. See [scope](docs/SCOPE.md) and
 [current evidence](docs/QUALIFICATION.md).
@@ -54,6 +55,11 @@ make ch-up
 make build                   # builds WASM and spkg/evm-state-v0.1.0.spkg
 make dev                     # guarded native ingestion of the 32-block sample
 ```
+
+Finalized follow uses one-block decoding and a 100 ms spool idle threshold.
+The pinned native sink continues spooling finalized blocks even at the chain
+head; its `is_live=false` log field is not a lag indicator. Bounded bootstrap
+keeps larger batches. See [measured throughput and operating settings](docs/THROUGHPUT.md).
 
 The installer checks pinned archive hashes from the upstream v1.22.0 release.
 ClickHouse is pinned to `26.3.33.24`. Local development ports are `18123` for HTTP

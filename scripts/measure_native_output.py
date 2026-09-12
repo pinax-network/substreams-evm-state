@@ -6,6 +6,7 @@ an RPC-finalized header. This is logical decoded output, not wire traffic or an
 invoice, and does not establish complete initial account storage.
 """
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -46,6 +47,8 @@ def main():
     verify_header(encoded, header)
     declared = {k: run["identity"][k] for k in ["database", "accounts", "start_block", "module_hash", "final_blocks_only"]}
     count = total = maximum = 0
+    digest = hashlib.sha256()
+    first_timestamp = None
     with verified_source(client, declared, end_block=end) as checked:
         if checked["state_directory"] != str(directory):
             raise ValueError("measurement directory does not own the native source")
@@ -54,6 +57,8 @@ def main():
         expected = validate_interval(client, checked, header)
         for row in client.rows("SELECT * FROM state_blocks FINAL WHERE number >= {start:UInt64} "
                               "AND number <= {end:UInt64} ORDER BY number", {"start": declared["start_block"], "end": end}):
+            if first_timestamp is None:
+                first_timestamp = int(row["timestamp"])
             value = {}
             for field in message.DESCRIPTOR.fields:
                 if not field.message_type:
@@ -65,7 +70,10 @@ def main():
                         raise ValueError("malformed native Nested arrays")
                     value[field.name] = [dict(zip(names, values)) for values in zip(*columns)]
                     groups[field.name] += len(value[field.name])
-            size = json_format.ParseDict(value, message()).ByteSize()
+            encoded_output = json_format.ParseDict(value, message()).SerializeToString(deterministic=True)
+            size = len(encoded_output)
+            digest.update(size.to_bytes(8, "big"))
+            digest.update(encoded_output)
             count += 1
             total += size
             maximum = max(maximum, size)
@@ -75,6 +83,10 @@ def main():
         "accounts": declared["accounts"], "start_block": declared["start_block"], "end_block": end,
         "blocks": count, "logical_protobuf_bytes": total, "mean_protobuf_bytes_per_block": total / count,
         "max_protobuf_bytes_per_block": maximum, "changed_rows": groups, "header": header, "header_rlp": encoded,
+        "ordered_output_sha256": digest.hexdigest(),
+        "digest_encoding": "ascending blocks; deterministic protobuf; each prefixed by its uint64 big-endian byte length",
+        "first_block_timestamp": first_timestamp,
+        "mean_block_interval_seconds": (header["timestamp"] - first_timestamp) / (count - 1) if count > 1 else None,
         "header_trust": "provider-finalized-header", "validation": "encoded header, native interval and durable cursor verified",
         "limitations": ["account storage completeness is not established by this update sample",
                         "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",

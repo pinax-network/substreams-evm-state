@@ -146,12 +146,14 @@ def recover_cursor(client, spkg, endpoint, accounts, start_block, directory, dsn
 
 
 def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_block=None, max_retries=3,
-           checkpoint_database=None, decode_batch_size=32):
+           checkpoint_database=None, decode_batch_size=1, spool_max_idle_ms=100, prometheus_addr=None):
     directory = Path(directory).resolve()
     if stop_block is not None and stop_block <= start_block:
         raise ValueError("stop block must be greater than start block (exclusive)")
     if isinstance(decode_batch_size, bool) or not isinstance(decode_batch_size, int) or decode_batch_size < 1:
         raise ValueError("decode batch size must be a positive integer")
+    if isinstance(spool_max_idle_ms, bool) or not isinstance(spool_max_idle_ms, int) or spool_max_idle_ms < 1:
+        raise ValueError("spool maximum idle milliseconds must be a positive integer")
     with exclusive_lock(directory / "run.lock") as run_lock:
         capacity_check(client, [directory], "native-start")
         record = _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database)
@@ -176,8 +178,15 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
             "-e", endpoint, "-p", MODULE + "=" + ",".join(record["identity"]["accounts"]), "-s", str(start_block),
             "--final-blocks-only", "--bytes-encoding", "0xhex", "--sink-info-folder", str(directory / "meta"),
             "--cursor-file-path", str(cursor), "--spool-dir", str(directory / "spool"), "--spool-max-size", "1GiB",
-            "--spool-max-idle", "1s", "--max-retries", str(max_retries)]
+            "--spool-max-idle", f"{spool_max_idle_ms}ms", "--max-retries", str(max_retries)]
+        # The pinned sink's direct-insert transition requires STEP_NEW. A
+        # finalized-only follow stays STEP_NEW_IRREVERSIBLE even at the head,
+        # so it needs a one-block decode batch and a short spool idle timeout.
+        # Otherwise the default 32-block batch adds ~15 seconds on BSC, and
+        # one-block batches alone can keep the spool open until its size target.
         command.extend(["--decode-batch-size", str(decode_batch_size)])
+        if prometheus_addr is not None:
+            command.extend(["--prometheus-addr", prometheus_addr])
         if stop_block is not None:
             command.extend(["-t", str(stop_block)])
         # If this wrapper is SIGKILLed, its native child may remain alive. Keep

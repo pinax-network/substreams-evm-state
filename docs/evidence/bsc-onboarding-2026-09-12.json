@@ -1,0 +1,230 @@
+{
+  "artifact_sha256": {
+    "capacity-resume/summary.json": "52cbafc49cfae457f1d7de7ba2d33621d40e1e08975e95591fcbd456ad1339e6",
+    "capacity/summary.json": "45fc4d8af3e5518981fb5bbea82136816b3f2f629d7e855d9c9fa33cb4b888f3",
+    "continuation-proofs.json": "c350a74aad1236813a2b35d3c3a0e442c7a305b4306e316fdac13c24694d223e",
+    "cutover-proofs.json": "9b441e0e839b1b12b57bd6da48702968506ee2fd99c9eee27767e7f6782ab7f0",
+    "old-contract-code.json": "8b940f3fb2a4f94e09d846149877b3c131af66b5a019ee209e32144ae1462715",
+    "result.json": "c2376564d2ac3be82a33af198503e28e2118a7e21d7b2b22a3d504dca7792b75",
+    "resume.log": "cf75c2f2c7f701ecb947917e90c90cbe97748c20e34613f2ca6356a7bee5c3e0",
+    "run.log": "b069bae5505258e5cdfc70928b428991a2f52eb62c47335aff386921c284c8c1"
+  },
+  "base": {
+    "header": {
+      "hash": "0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28",
+      "number": 121309258,
+      "parent_hash": "0xa332fea9971fbf90fd73d1beb85b40e6399241e59c4cd21f4469e273b1cd9059",
+      "state_root": "0x5b7c64587627f60b4f2904ff274349ac5805e2010edf3e055351339d2cec78e8",
+      "timestamp": 1789150993
+    },
+    "nonzero_slots": 46,
+    "snapshot_id": "277a13c616294ddca15a99f4913c6b29",
+    "state_sha256": "388627901da595ca5d1719fbfe5263674aaa6b94c68aa5544680518ef45ef330"
+  },
+  "capacity_attempts": {
+    "capacity": {
+      "command_exit_code": -15,
+      "failed_samples": 1,
+      "guard_samples": 52,
+      "maximum_sample_gap_ns": 1469424000,
+      "peak_observed_allocated_bytes": 2164953088,
+      "samples": 47,
+      "status": "stopped",
+      "stop_reasons": [
+        "incomplete_capacity_sample"
+      ],
+      "termination_error": null
+    },
+    "capacity-resume": {
+      "command_exit_code": 0,
+      "failed_samples": 0,
+      "guard_samples": 165,
+      "maximum_sample_gap_ns": 1455879000,
+      "peak_observed_allocated_bytes": 2228838400,
+      "samples": 154,
+      "status": "completed",
+      "stop_reasons": [],
+      "termination_error": null
+    }
+  },
+  "capacity_recovery": {
+    "diagnosis": "initial monitor stored a generic VerificationError; a separate 500-query probe reproduced non-atomic disk counters, fixed by using the lower valid reading",
+    "first_attempt_end_to_end_seconds": 58.261165,
+    "observed_system_disks": {
+      "free_space": 2716225536,
+      "total_space": 62671097856,
+      "unreserved_space": 2716229632
+    },
+    "resumed_cursor_block": 121368989,
+    "timing_limit": "existing-cohort-catch-up phase measures the resumed remainder, not all 152230 blocks; initial attempt and operator diagnosis are separate"
+  },
+  "continuation": {
+    "header": {
+      "hash": "0x7d4fc350fa04cb7d9b63ae5435f252301d67ca41363b9273adc6365d7a7a1abe",
+      "number": 121462462,
+      "parent_hash": "0x5f1ea4274ff6589306a60304d0d0ec29de23f0ad27dde6f5c7b8cf5493de054c",
+      "state_root": "0x66840c1ef6ff8840f4f569ab3bc19f0645bf929cd2b99c0b89499227bac35c8e",
+      "timestamp": 1789219970
+    },
+    "nonzero_slots": 46,
+    "snapshot_id": "ce69d62957a945a6971d8aa736dfb4c8",
+    "sources": [
+      {
+        "accounts": [
+          "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+          "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff",
+          "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+        ],
+        "database": "evm_onboard_20260912_combined",
+        "database_uuid": "bf618820-eab1-42b1-b5a0-4337bf88e0c3",
+        "final_blocks_only": true,
+        "module_hash": "658ad0a23b156d983981db23f20409775f932552",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "parent_hash": "0xaa00f61924d67c08e3acab80efa0c79e9f9a30ddb0bc2e50487ea7ed83dc3256",
+        "run_id": "c20862136c2c4d1a8cb67c22ec55dd25",
+        "schema_hash": "caf8d0b84623a901",
+        "start_block": 121461489
+      }
+    ],
+    "state_sha256": "d2faa26dda6d97d1aeefeb136b765a091ab5b3da2a48cb8d7328f0abdc467813"
+  },
+  "cutover": {
+    "header": {
+      "hash": "0xaa00f61924d67c08e3acab80efa0c79e9f9a30ddb0bc2e50487ea7ed83dc3256",
+      "number": 121461488,
+      "parent_hash": "0xb1b0cf47a5492ae8ef125b3b100b2a3701445659be97948cddbe8cbce107fd5c",
+      "state_root": "0x8cddc98f715b133409a3f1d852a579048abc83051debbdb26d690eda9c17fbe6",
+      "timestamp": 1789219532
+    },
+    "nonzero_slots": 46,
+    "snapshot_id": "7eb616ccdfb24d59be203cc1fdc77163",
+    "sources": [
+      {
+        "accounts": [
+          "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+        ],
+        "database": "evm_onboard_20260912_old",
+        "database_uuid": "5cfe77d4-571d-4695-b75d-ec47f568621f",
+        "final_blocks_only": true,
+        "module_hash": "46eb3c28d4a5ea711c77aedc0eafb98d54a45120",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "parent_hash": "0xfe2d9b1b55c1220b94909c25c0bfe33992248763940daa4a27d608b241b89d28",
+        "run_id": "106f5838332445e0bac404da7f7dfa84",
+        "schema_hash": "b77e699be1319e35",
+        "start_block": 121309259
+      },
+      {
+        "accounts": [
+          "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+          "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+        ],
+        "database": "evm_onboard_20260912_new",
+        "database_uuid": "300e7d2c-547c-48e3-8971-bdee3edb8aea",
+        "final_blocks_only": true,
+        "module_hash": "1c4d8ffbe8b935475b9e9192c816d58266ec27cd",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "run_id": "e218aa81addd4bfeb947066c80903c11",
+        "schema_hash": "28e3982b15764e5c",
+        "start_block": 121460988
+      }
+    ],
+    "state_sha256": "d2faa26dda6d97d1aeefeb136b765a091ab5b3da2a48cb8d7328f0abdc467813"
+  },
+  "databases": [
+    "evm_onboard_20260912_checkpoints",
+    "evm_onboard_20260912_old",
+    "evm_onboard_20260912_new",
+    "evm_onboard_20260912_combined"
+  ],
+  "export_manifest_sha256": "efddc3d6072cb641c5bcb20126001e5db0fc88f6cdd6fe5965853d88e808ec72",
+  "format_version": 1,
+  "historical_contract": {
+    "address": "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+    "code_bytes": 21936,
+    "code_hash": "0x69aef35de7236f9ae83edadff736f01ea40edd8919b2e73d87dea5d3255b8c3e",
+    "historical_block": 10000000,
+    "validation": "archive RPC code observation; current code and account are independently checked in cutover proofs"
+  },
+  "interrupted_publication_exit_code": -9,
+  "limitations": [
+    "public three-account sample; customer account list unavailable",
+    "two new accounts have proven empty storage, so recent enumeration can prove completeness",
+    "this does not qualify arbitrary recent bootstrap of a nonempty hot contract",
+    "process SIGKILL before ready manifest; no physical host power-loss emulation",
+    "provider-finalized encoded headers, not independent BSC consensus verification"
+  ],
+  "native_sources": [
+    {
+      "accounts": [
+        "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+      ],
+      "database": "evm_onboard_20260912_old",
+      "final_blocks_only": true,
+      "module_hash": "46eb3c28d4a5ea711c77aedc0eafb98d54a45120",
+      "start_block": 121309259
+    },
+    {
+      "accounts": [
+        "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+        "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+      ],
+      "database": "evm_onboard_20260912_new",
+      "final_blocks_only": true,
+      "module_hash": "1c4d8ffbe8b935475b9e9192c816d58266ec27cd",
+      "start_block": 121460988
+    },
+    {
+      "accounts": [
+        "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+        "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff",
+        "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+      ],
+      "database": "evm_onboard_20260912_combined",
+      "final_blocks_only": true,
+      "module_hash": "658ad0a23b156d983981db23f20409775f932552",
+      "start_block": 121461489
+    }
+  ],
+  "new_accounts": [
+    "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+    "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+  ],
+  "old_accounts": [
+    "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff"
+  ],
+  "old_reader_unchanged": true,
+  "phases": [
+    {
+      "phase": "export-existing-checkpoint",
+      "seconds": 0.9446570426225662
+    },
+    {
+      "phase": "restore-isolated-destination",
+      "seconds": 1.7091766251251101
+    },
+    {
+      "phase": "existing-cohort-catch-up",
+      "seconds": 101.40254024975002
+    },
+    {
+      "phase": "new-empty-storage-cohort-bootstrap",
+      "seconds": 36.060293207876384
+    },
+    {
+      "phase": "publication-child-sigkill",
+      "seconds": 3.987713249400258
+    },
+    {
+      "phase": "retry-and-publish-cutover",
+      "seconds": 3.575120458379388
+    },
+    {
+      "phase": "new-combined-filter-continuation",
+      "seconds": 44.63716437481344
+    },
+    {
+      "phase": "verify-combined-continuation",
+      "seconds": 2.3823207914829254
+    }
+  ]
+}
