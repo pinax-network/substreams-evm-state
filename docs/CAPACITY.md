@@ -11,6 +11,37 @@ container owns the configured HTTP endpoint, rejects container replacement and
 remote/object-storage disks, and checks that its data paths reside on persistent
 mounts. It does not provision storage or alter quotas.
 
+## Storage placement and migration
+
+Compose defaults to the named `ch_data` volume. For a fresh database, create a
+persistent directory and set `CH_DATA_SOURCE=./localdata/clickhouse-data` in the
+ignored project `.env`, then run `make ch-up`. Use an absolute path for a directory
+outside the project. Keep this setting for every subsequent Compose invocation.
+On Docker Desktop, a host bind can use a different filesystem from the shared
+Docker VM disk. The capacity guard measures the actual selected data disk; free
+space on the host does not make a full VM disk writable.
+
+Changing this setting alone does not move an existing database. Stop every
+prototype writer and publisher, record database UUIDs and validated native cursor
+and compacted-prefix checksums, and gracefully stop ClickHouse. Preserve a complete
+copy of its data directory **and matching native/controller/proof/spool directories
+from the same stopped state** before changing the mount. Copy into an empty target,
+start only ClickHouse, and verify UUIDs, local file hashes, native cursor coverage
+and compacted state before resuming writers. Retain the original volume and the
+matching recovery files until the new placement is qualified. Reverting only the
+database after local cursors have advanced is not a valid rollback: restore the
+matching runtime state at its original paths on the original machine as well.
+
+Backups remain part of the budget. Archives under declared local roots are measured
+normally. If a retained, immutable old Docker volume is no longer attached to the
+measured server, measure it separately and subtract its allocated bytes from the
+policy budget. Recalculate that reserve if its contents change. Do not lower the
+free-space floor or delete unrelated Docker resources to bypass a capacity stop.
+The [recorded local migration](evidence/storage-migration-2026-09-12.json) preserves
+both stopped replay positions and distinguishes the old volume reserve from the
+archives included in live measurements. Earlier performance measurements used the
+previous volume placement and do not qualify host-bind throughput.
+
 ## Declare the complete data scope
 
 Create an absolute runtime directory and place source run directories, controller

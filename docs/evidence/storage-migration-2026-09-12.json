@@ -1,0 +1,244 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "scope": "Same-machine local prototype storage migration after free-space guard stops; complete bootstrap and customer sizing remain unqualified.",
+  "clickhouse_image": "clickhouse/clickhouse-server:26.3.33.24",
+  "old_volume": "substreams-evm-state_ch_data",
+  "new_bind": "localdata/clickhouse-data",
+  "database_uuids_preserved": 36,
+  "new_disks_after_copy": [
+    {
+      "name": "default",
+      "type": "Local",
+      "total_space": 1995218165760,
+      "free_space": 410366476288,
+      "unreserved_space": 410366476288
+    }
+  ],
+  "archives": {
+    "database": {
+      "bytes": 1613602304,
+      "sha256": "691df3870723b649412d242e6714784a7c465dfc1769c88c7eda7f7ff7c48a20",
+      "local_artifact": "localdata/qualification/storage-migration/clickhouse-before.tar"
+    },
+    "runtime": {
+      "bytes": 20930560,
+      "sha256": "1a3d4670607aaefd825675614766b72eaa88b5ba0b24d3a05a66b62ec9aba1a3",
+      "local_artifact": "localdata/qualification/storage-migration/runtime-before.tar"
+    }
+  },
+  "overall_budget_bytes": 100000000000,
+  "immutable_original_volume_reserved_bytes": 1742835712,
+  "live_policy_budget_bytes": 98257164288,
+  "headroom_bytes": 10000000000,
+  "min_free_bytes": 1073741824,
+  "archives_in_measured_local_roots": true,
+  "rollback_requires_matching_database_and_runtime_at_original_paths": true,
+  "unrelated_docker_resources_modified": false,
+  "runs": {
+    "wbnb-bootstrap": {
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "identity": {
+        "accounts": [
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+        ],
+        "start_block": 149268,
+        "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+        "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963"
+      },
+      "capacity_stop": {
+        "command_exit_code": 1,
+        "config_sha256": "72a5133ec20999e8ac5a6773693572df29ebb520c5c86a44f2768217effd31bd",
+        "failed_samples": 0,
+        "finished_ns": 1789227533087828000,
+        "format_version": 1,
+        "guard_samples": 1256,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6159411000,
+        "peak_observed_allocated_bytes": 3139813376,
+        "rejected_guard_stages": [
+          "native-progress"
+        ],
+        "samples": 353,
+        "started_ns": 1789225687160300000,
+        "status": "stopped",
+        "stop_reasons": [
+          "filesystem_free_space_below_floor"
+        ],
+        "termination_error": null
+      },
+      "last_stopped_sample": {
+        "sample_finished_ns": 1789227532846000000,
+        "accounted_allocated_bytes": 2103353344,
+        "admitted": false,
+        "reasons": [
+          "filesystem_free_space_below_floor"
+        ]
+      },
+      "before": {
+        "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+        "run_id": "62b4938ec1554bc093644232ef4b469d",
+        "durable_block": {
+          "hash": "0xe978fe2fa4dfa0ae42d0ed1f08ecaf22c6b973a58e7b6311e5357446cf9ee8c0",
+          "number": 8449994
+        },
+        "native_block": {
+          "number": 8449994,
+          "hash": "0xe978fe2fa4dfa0ae42d0ed1f08ecaf22c6b973a58e7b6311e5357446cf9ee8c0"
+        },
+        "prefix_header": {
+          "hash": "0x3e597f95d165bd2c44bb9c089bdc0ef9add20441da13746a5b706983e0cb66f3",
+          "number": 8449267,
+          "parent_hash": "0xb84f4948b8d4ef70dbe0f5bcffd6122b65ed77965c890ba3b95acc1f237f3eb8",
+          "state_root": "0x173dc0efca13c8db90eec741e4f2571f5621e2f32049db182294e74ce71b253c",
+          "timestamp": 1624156687
+        },
+        "nonzero_slots": 827900,
+        "state_sha256": "e8d91b7c19ba54aae725e85525d6a0ed5bd75c5b9d0f01eb6be12915bafcdc06",
+        "local_file_sha256": {
+          "run.json": "52a645b032193cc29bc0624b585093c83bdc5d1e5e80761959bacffa5c06cfae",
+          "cursor.txt": "01ffe7673711906f3ba7746e6827d2fc4782eb4aba142e08550f3145352fd9ce",
+          "durable_progress.json": "91fae40f409b8d3cad5d587d0e9526fef836527526b763cf0845f181233d0d03",
+          "bootstrap.json": "bf03966fc6fcd83ec5f5cd9989aac62d4d1cb375637fe17a6a7f59ce3b009cd6",
+          "package.spkg": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963"
+        }
+      },
+      "after_copy": {
+        "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+        "cursor": {
+          "number": 8449994,
+          "hash": "0xe978fe2fa4dfa0ae42d0ed1f08ecaf22c6b973a58e7b6311e5357446cf9ee8c0"
+        },
+        "prefix": {
+          "hash": "0x3e597f95d165bd2c44bb9c089bdc0ef9add20441da13746a5b706983e0cb66f3",
+          "number": 8449267,
+          "parent_hash": "0xb84f4948b8d4ef70dbe0f5bcffd6122b65ed77965c890ba3b95acc1f237f3eb8",
+          "state_root": "0x173dc0efca13c8db90eec741e4f2571f5621e2f32049db182294e74ce71b253c",
+          "timestamp": 1624156687
+        },
+        "nonzero_slots": 827900,
+        "verified": true
+      },
+      "resumed_prefix": {
+        "header": {
+          "hash": "0xe978fe2fa4dfa0ae42d0ed1f08ecaf22c6b973a58e7b6311e5357446cf9ee8c0",
+          "number": 8449994,
+          "parent_hash": "0x6c7dce5076a609857144d8d38946a272baeb6ef9cd2a41a46c0dbe3ed681f5a1",
+          "state_root": "0x064bed1f25236e46c4020bc56750312ac4d82398759904eaafaadb94bb059c64",
+          "timestamp": 1624158868
+        },
+        "nonzero_slots": 828039,
+        "state_sha256": "55dbd6d786eb945844133f85435b040f82eccaff287317dce87537de0be1f2d5",
+        "status": "unverified-bootstrap"
+      },
+      "resumed_capacity": {
+        "sample_finished_ns": 1789229348298953000,
+        "accounted_allocated_bytes": 3651215360,
+        "admitted": true,
+        "reasons": []
+      }
+    },
+    "customer-example": {
+      "run_id": "241fa830acd249b595cb53ccdaecd8b8",
+      "identity": {
+        "accounts": [
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d"
+        ],
+        "start_block": 48261373,
+        "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+        "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715"
+      },
+      "capacity_stop": {
+        "command_exit_code": 1,
+        "config_sha256": "6c6ac336570edafa3d8b141979bac6e689524f7c38e22c9612eb4a4cc59dfd2e",
+        "failed_samples": 0,
+        "finished_ns": 1789227533669129000,
+        "format_version": 1,
+        "guard_samples": 175,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 5461008000,
+        "peak_observed_allocated_bytes": 2664620032,
+        "rejected_guard_stages": [
+          "native-progress"
+        ],
+        "samples": 44,
+        "started_ns": 1789227309571676000,
+        "status": "stopped",
+        "stop_reasons": [
+          "filesystem_free_space_below_floor"
+        ],
+        "termination_error": null
+      },
+      "last_stopped_sample": {
+        "sample_finished_ns": 1789227533637538000,
+        "accounted_allocated_bytes": 2105159680,
+        "admitted": false,
+        "reasons": [
+          "filesystem_free_space_below_floor"
+        ]
+      },
+      "before": {
+        "database_uuid": "0f385c57-beed-493f-9334-809c73c8e39a",
+        "run_id": "241fa830acd249b595cb53ccdaecd8b8",
+        "durable_block": {
+          "hash": "0xb048ba54def35cd5997bc4d95382ddb09b43d8ce220c6497b0c720930ae820fd",
+          "number": 48539979
+        },
+        "native_block": {
+          "number": 48539979,
+          "hash": "0xb048ba54def35cd5997bc4d95382ddb09b43d8ce220c6497b0c720930ae820fd"
+        },
+        "prefix_header": {
+          "hash": "0xd0d1c3d859f277ae2613560f3405258280c194c21e1054343b29a22b768e0d7e",
+          "number": 48461372,
+          "parent_hash": "0x4bb22ca6c053c43fc717c5109a39cd139fa733017275b81967ab326aa8af8fca",
+          "state_root": "0x2073aee193586ccefd01d7cbc44a3536c5150cd0c7fa2084f1e51ebcb10f2f8e",
+          "timestamp": 1744966298
+        },
+        "nonzero_slots": 22,
+        "state_sha256": "0a6ce651129f0a826dd92b8be6df2e9ea8bae0494d8288a4bbc9b48a42ca9023",
+        "local_file_sha256": {
+          "run.json": "601bc00ce1cc6b707fff20376fb11d295cfcb42e1d3bb38acd854e3135d22bcc",
+          "cursor.txt": "f674ef2f10aedb739c47ed4037e64334c8ec41e89350a2cc2b7dcd691a301db0",
+          "durable_progress.json": "82933188d402ff991e2ff3d1924e805452c030105107c0047cdc12f03b789600",
+          "bootstrap.json": "d446e7542df665c57a696fa789e074835dbb5652871d87263eb655126a95bc18",
+          "package.spkg": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715"
+        }
+      },
+      "after_copy": {
+        "database_uuid": "0f385c57-beed-493f-9334-809c73c8e39a",
+        "cursor": {
+          "number": 48539979,
+          "hash": "0xb048ba54def35cd5997bc4d95382ddb09b43d8ce220c6497b0c720930ae820fd"
+        },
+        "prefix": {
+          "hash": "0xd0d1c3d859f277ae2613560f3405258280c194c21e1054343b29a22b768e0d7e",
+          "number": 48461372,
+          "parent_hash": "0x4bb22ca6c053c43fc717c5109a39cd139fa733017275b81967ab326aa8af8fca",
+          "state_root": "0x2073aee193586ccefd01d7cbc44a3536c5150cd0c7fa2084f1e51ebcb10f2f8e",
+          "timestamp": 1744966298
+        },
+        "nonzero_slots": 22,
+        "verified": true
+      },
+      "resumed_prefix": {
+        "header": {
+          "hash": "0xed7c29531bad9cdbc7b9f6eed58a21e5b036e9d1725f3499374c761ec1ec6fe0",
+          "number": 48639979,
+          "parent_hash": "0xe747b6d962789a6613067fa048196d4897b6220cbd9be82f40bcd58597d47fb8",
+          "state_root": "0x3196939ab506c9ee3940fc5085b9e7e8043174853c6ae84adc2731b54f517dfd",
+          "timestamp": 1745502231
+        },
+        "nonzero_slots": 30,
+        "state_sha256": "0418c8f92b23fb2e0e9679eedf7b77a71c3502c549b85b50210dce7be44f6b78",
+        "status": "unverified-bootstrap"
+      },
+      "resumed_capacity": {
+        "sample_finished_ns": 1789229348298960000,
+        "accounted_allocated_bytes": 3651215360,
+        "admitted": true,
+        "reasons": []
+      }
+    }
+  }
+}

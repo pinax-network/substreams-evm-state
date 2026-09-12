@@ -432,3 +432,28 @@ frozen package, cursor, spool and capacity guard. Its first 200,000 blocks retai
 remain pending. This is one actual customer example, not qualification of the
 missing complete pilot set. `bootstrap-replay --prometheus-addr` now permits a
 separate metrics listener for each concurrent cohort, as `ingest` already did.
+
+## Capacity stop and local data migration
+
+Both long replays stopped when the shared Docker VM filesystem fell below the
+1 GiB free-space floor. The measured prototype allocation was about 2.1 GB at the
+stop, far below the selected 100 GB budget. WBNB retained its private prefix through
+8449267 (827,900 nonzero slots) and a validated native cursor through 8449994; the
+customer example retained its prefix through 48461372 (22 slots) and cursor through
+48539979. Neither stop published a ready checkpoint.
+
+The [migration record](evidence/storage-migration-2026-09-12.json) captures a
+gracefully stopped database copy to a persistent host bind, matching database and
+runtime recovery archives, and verification of all 36 database UUIDs, original
+local file hashes, cursor coverage and compacted state. The new data filesystem
+reported about 410 GB free. The original Docker volume remains intact; unrelated
+Docker resources were left alone.
+
+Its 1,742,835,712 allocated bytes are reserved outside the live meter by reducing
+both policies to 98,257,164,288 bytes. The database and runtime archives are inside
+the measured local roots. Together this preserves the overall 100 GB budget,
+10 GB operating reserve and 1 GiB free-space floor. Both resumed runs passed the
+new capacity checks and compacted their preserved suffixes through 8449994 and
+48539979 respectively. They remain unverified historical prefixes, with final
+root verification and sustained-growth qualification still pending. This recovery
+does not establish host-bind performance or a customer footprint bound.

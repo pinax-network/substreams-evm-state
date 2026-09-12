@@ -65,7 +65,10 @@ keeps larger batches. See [measured throughput and operating settings](docs/THRO
 
 The installer checks pinned archive hashes from the upstream v1.22.0 release.
 ClickHouse is pinned to `26.3.33.24`. Local development ports are `18123` for HTTP
-and `19000` for the native protocol, bound to loopback. Docker volumes retain data.
+and `19000` for the native protocol, bound to loopback. Docker volumes retain data
+by default. `CH_DATA_SOURCE` can select a persistent host directory instead; see
+[storage placement and safe migration](docs/CAPACITY.md#storage-placement-and-migration)
+before changing an existing database's mount.
 
 | Setting | Default |
 |---|---|
