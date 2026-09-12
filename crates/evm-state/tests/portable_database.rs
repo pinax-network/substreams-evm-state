@@ -84,6 +84,18 @@ fn portable_import_export_roundtrip_preserves_proofs_and_pinned_pages() -> Resul
     assert_eq!(final_page["header"], first_page["header"]);
     assert!(final_page["next_cursor"].is_null());
     reader::unpin(&db.0, pin["pin_id"].as_str().unwrap())?;
+    let measured = evm_state::read_qualification::measure(
+        &mut db.0.clone(),
+        second["snapshot_id"].as_str().unwrap(),
+        portable::A,
+        &root.path().join("read-result.json"),
+        &work,
+        2,
+        1,
+    )?;
+    assert_eq!(measured["root_matches_captured_account_proof"], true);
+    assert_eq!(measured["calls"].as_array().unwrap().len(), 4);
+    assert!(reader::list_pins(&db.0)?.is_empty());
     Ok(())
 }
 

@@ -15,6 +15,40 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Compact a verified durable source interval into a private initial state.
+    CompactBootstrap {
+        #[arg(long)]
+        state_dir: PathBuf,
+        #[arg(long)]
+        end_block: Option<u64>,
+        #[arg(long, default_value_t = 100_000_000_000_u64)]
+        budget_bytes: u64,
+    },
+    /// Replay bounded native chunks and retain a resumable private prefix.
+    BootstrapReplay {
+        #[command(flatten)]
+        native: NativeArgs,
+        #[arg(long)]
+        stop_block: u64,
+        #[arg(long, default_value_t = 100000)]
+        chunk_blocks: u64,
+        #[arg(long, default_value_t = 100_000_000_000_u64)]
+        budget_bytes: u64,
+        #[arg(long, default_value_t = 3)]
+        max_retries: u32,
+        #[arg(long, default_value_t = 32)]
+        decode_batch_size: u32,
+        #[arg(long, default_value_t = 1000)]
+        spool_max_idle_ms: u64,
+        #[arg(long)]
+        prometheus_addr: Option<String>,
+        #[arg(long)]
+        parallel_workers: Option<u32>,
+    },
+    /// Plan whole native-history partition cleanup with continuation protection.
+    SourceRetentionPlan(SourceRetentionArgs),
+    /// Prune native history while preserving retained checkpoints and progress.
+    PruneSource(SourceRetentionArgs),
     /// Verify and restore a portable checkpoint into a new generation.
     ImportExport {
         directory: PathBuf,
@@ -132,6 +166,16 @@ enum Commands {
 }
 
 #[derive(Args)]
+struct SourceRetentionArgs {
+    #[arg(long)]
+    state_dir: PathBuf,
+    #[arg(long)]
+    checkpoint: String,
+    #[arg(long, default_value_t = 10000)]
+    keep_blocks: u64,
+}
+
+#[derive(Args)]
 struct NativeArgs {
     #[arg(long)]
     package: PathBuf,
@@ -185,6 +229,50 @@ fn run() -> Result<()> {
     let args = Cli::parse();
     let client = ClickHouse::new(&args.database)?;
     let result = match args.command {
+        Commands::CompactBootstrap {
+            state_dir,
+            end_block,
+            budget_bytes,
+        } => evm_state::bootstrap::compact(&client, &state_dir, end_block, budget_bytes)?,
+        Commands::BootstrapReplay {
+            native,
+            stop_block,
+            chunk_blocks,
+            budget_bytes,
+            max_retries,
+            decode_batch_size,
+            spool_max_idle_ms,
+            prometheus_addr,
+            parallel_workers,
+        } => evm_state::bootstrap::replay(
+            &client,
+            &native.options()?,
+            &evm_state::ingest::IngestOptions {
+                stop_block: Some(stop_block),
+                max_retries,
+                decode_batch_size,
+                spool_max_idle_ms,
+                prometheus_addr,
+                parallel_workers,
+            },
+            stop_block,
+            chunk_blocks,
+            budget_bytes,
+        )?,
+        Commands::SourceRetentionPlan(options) => evm_state::history::cleanup(
+            &client,
+            &options.state_dir,
+            &options.checkpoint,
+            options.keep_blocks,
+            false,
+        )?,
+        Commands::PruneSource(options) => evm_state::history::cleanup(
+            &client,
+            &options.state_dir,
+            &options.checkpoint,
+            options.keep_blocks,
+            true,
+        )?,
         Commands::ImportExport {
             directory,
             expected_hash,

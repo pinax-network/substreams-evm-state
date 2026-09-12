@@ -39,10 +39,12 @@ impl Drop for ChildGuard {
 
 pub fn capture(command: &mut Command, timeout: Duration) -> Result<Option<Output>> {
     const LIMIT: u64 = 16 * 1024 * 1024;
-    let mut child = command
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()?;
+    let mut child = ChildGuard(
+        command
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?,
+    );
     let read = |pipe: Box<dyn Read + Send>| {
         thread::spawn(move || -> Result<Vec<u8>> {
             let mut bytes = Vec::new();

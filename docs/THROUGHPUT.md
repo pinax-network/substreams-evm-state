@@ -202,10 +202,14 @@ as a full replay timing.
 .venv/bin/python scripts/measure_native_output.py \
   --database <new-source> --state-dir <run>/native --output <run>/output.json
 
-# Uses the source database's existing EVM_STATE_HOME; creates and releases a pin.
-.venv/bin/python scripts/measure_checkpoint_reads.py \
-  --database <checkpoint-db> --snapshot-id <ready-id> --account <address> \
-  --page-size 1000 --passes 5 --output <new-read-report.json>
+# Uses the checkpoint database's existing EVM_STATE_HOME; creates and releases
+# a pin, then proves every returned slot against the captured account proof.
+target/release/evm-state --database <checkpoint-db> capacity-run \
+  --config <capacity.json> --output <read-run>/capacity --interval 1 -- \
+  target/release/evm-state-qualify checkpoint-reads \
+    --database <checkpoint-db> --snapshot-id <ready-id> --account <address> \
+    --page-size 1000 --passes 5 --output <read-run>/result.json \
+    --work-dir <read-run>/work
 ```
 
 Capture stdout and stderr in `run.log`: session and worker telemetry come from

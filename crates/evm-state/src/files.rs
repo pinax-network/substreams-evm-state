@@ -78,6 +78,19 @@ pub struct Lock {
     _file: File,
 }
 
+impl Drop for Lock {
+    fn drop(&mut self) {
+        // A concurrent fork briefly copies every open descriptor before exec
+        // closes CLOEXEC files. Closing ours alone would leave that unrelated
+        // child's copy holding the flock and make immediate reacquisition fail.
+        // On normal return explicitly release the shared open-file-description
+        // lock. Ingestion keeps this guard until its child has been reaped.
+        // SIGKILL skips Drop, so an intentionally inherited native descriptor
+        // still protects the source after its wrapper is killed.
+        let _ = FileExt::unlock(&self._file);
+    }
+}
+
 impl Lock {
     /// Keep the same flock open in a native child even if its wrapper is killed.
     pub fn inherit_in(&self, command: &mut std::process::Command) {

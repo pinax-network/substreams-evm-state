@@ -42,7 +42,8 @@ capture, capacity sampling/supervision, and the private-prefix growth recorder.
 The native CLI exposes reads, pins, retention, capacity, proof capture, native
 preparation/ingestion/cursor recovery and checkpoint publication. It validates
 existing private bootstrap prefixes and supports portable export/import with
-offline proof verification. Compaction/replay still need their Rust replacements.
+offline proof verification. Bounded bootstrap replay, private compaction, source
+history retention and complete returned-page verification are implemented in Rust.
 The native wrapper has not yet passed the
 full fault-injection streaming qualification needed to take over the long replays.
 
@@ -81,3 +82,24 @@ the trie stage took 163.0 seconds including capacity checks. The prior sorted
 implementation used 84.6 CPU seconds and 73.6 MB on the same input. This is prefix
 parity, not proof acceptance of the final hot-account checkpoint. See
 [trie evidence](evidence/bsc-trie-rust-2026-09-12.json).
+
+Bootstrap/history tests use independent account proofs and encoded headers with
+separate day/month partitions. They check repeated compaction, zero clears,
+lifecycle resets, damaged prefixes, orphan candidates, partial partition cleanup,
+retained checkpoint continuation, cursor binding and ownership locks. Private
+prefixes remain unverified until complete checkpoint proof acceptance.
+
+The Rust returned-page qualifier checks every account field and storage slot
+against the captured proof, including absent accounts. Its negative scenarios
+preserve the additional pre-migration read checks: a repeated wrong result cannot
+pass using only a stable digest or matching count. Capacity failure and pin-release
+failure also prevent publishing measurement output.
+
+A CI lock failure exposed a concurrent fork retaining a copied descriptor between
+fork and exec. A deterministic regression reproduced the failure before the fix.
+Normal lock destruction now explicitly unlocks; a killed wrapper still leaves the
+native child's inherited descriptor locked. Both paths have subprocess coverage.
+The pure native test count is now 49; the ClickHouse suite has 30 test functions,
+alongside 43 mapper tests. Test helpers run only as subprocess fixtures and are
+excluded from these totals. Full native streaming fault injection, host recovery,
+PostgreSQL tools and the remaining operational workloads still need Rust parity.

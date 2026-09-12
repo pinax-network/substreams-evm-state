@@ -10,6 +10,23 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Commands {
+    /// Time pinned pagination and prove the complete returned account state.
+    CheckpointReads {
+        #[arg(long)]
+        database: String,
+        #[arg(long)]
+        snapshot_id: String,
+        #[arg(long)]
+        account: String,
+        #[arg(long, default_value_t = 1000)]
+        page_size: usize,
+        #[arg(long, default_value_t = 5)]
+        passes: usize,
+        #[arg(long)]
+        output: PathBuf,
+        #[arg(long)]
+        work_dir: PathBuf,
+    },
     /// Reconstruct a frozen private account trie under capacity supervision.
     TrieWorkspace {
         #[arg(long)]
@@ -37,6 +54,35 @@ enum Commands {
 }
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::CheckpointReads {
+            database,
+            snapshot_id,
+            account,
+            page_size,
+            passes,
+            output,
+            work_dir,
+        } => {
+            anyhow::ensure!(
+                std::env::var_os("EVM_STATE_CAPACITY_CONFIG").is_some(),
+                "run this workload under capacity-run"
+            );
+            let mut client = evm_state::ch::ClickHouse::new(&database)?;
+            let result = evm_state::read_qualification::measure(
+                &mut client,
+                &snapshot_id,
+                &account,
+                &output,
+                &work_dir,
+                passes,
+                page_size,
+            )?;
+            println!(
+                "{}",
+                serde_json::json!({"output":output,"pages":result["calls"].as_array().unwrap().len(),"page_latency_seconds":result["page_latency_seconds"],"root_matches_captured_account_proof":result["root_matches_captured_account_proof"]})
+            );
+            Ok(())
+        }
         Commands::TrieWorkspace {
             evidence,
             fields,
