@@ -13,7 +13,7 @@ FIXTURES = ROOT / "tests/fixtures/lifecycle"
 def test_captured_lifecycle_messages_and_headers_match_provenance():
     evidence = json.loads((FIXTURES / "manifest.json").read_text())
     assert evidence["chain_id"] == 56
-    assert len(evidence["records"]) == 9
+    assert len(evidence["records"]) == 10
     assert {record["producer_version"] for record in evidence["records"]} == {3, 4, 5}
     for record in evidence["records"]:
         raw = (FIXTURES / record["filename"]).read_bytes()

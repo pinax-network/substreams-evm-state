@@ -354,7 +354,7 @@
         "setcode",
         "code-change"
       ],
-      "filename": "v4-first-delegation.pb",
+      "filename": "v4-install-delegation.pb",
       "bytes": 5739,
       "sha256": "b760a317c132a295dac997d0945f259cbf29d3f751ff1b307db63cb923badffc",
       "root_begin_ordinal": 5081,
@@ -369,7 +369,7 @@
           "discarded": false
         }
       ],
-      "header_filename": "v4-first-delegation-header.pb",
+      "header_filename": "v4-install-delegation-header.pb",
       "header_sha256": "cb2f6813dc19d9b519e26a247afbbc1ce39c25ebb8f867ae1d697a26e5008a77",
       "header": {
         "number": 65805822,
@@ -666,6 +666,69 @@
           }
         }
       }
+    },
+    {
+      "block": 64200086,
+      "block_hash": "0x089c5ed81fa7334af86587d0b51503c0073f00bb9e3539e1dd7ae647e6adcaec",
+      "timestamp": 1760149517,
+      "producer_version": 4,
+      "detail_level": 0,
+      "hash": "0x2ef6a87cd526041909b3eb05a0815424440ab88650c109f5b0e700d706d4c926",
+      "status": 2,
+      "reasons": [
+        "setcode",
+        "self-authorization",
+        "code-change",
+        "failed-setcode"
+      ],
+      "filename": "v4-failed-self-delegation.pb",
+      "bytes": 1097,
+      "sha256": "cff4c8e2218c20c7770a17eb86a0cf4a06b9f7e72eb922c4d2afd53469ebb105",
+      "root_begin_ordinal": 21804,
+      "root_end_ordinal": 21805,
+      "tx_end_ordinal": 21810,
+      "from": "0xa26b3b87710720def8c637c5de7b94eae25188c9",
+      "auths": [
+        {
+          "authority": "0xa26b3b87710720def8c637c5de7b94eae25188c9",
+          "delegate": "0x63c0c19a282a1b52b07dd5a65b58948a07dae32b",
+          "nonce": 70,
+          "discarded": false
+        }
+      ],
+      "header_filename": "v4-failed-self-delegation-header.pb",
+      "header_sha256": "f1398afc7d50e1ca4f214e56848543ece09c2d87854fcea04800b21180cdbba0",
+      "header": {
+        "number": 64200086,
+        "hash": "0x089c5ed81fa7334af86587d0b51503c0073f00bb9e3539e1dd7ae647e6adcaec",
+        "parent_hash": "0x7b16bc3d5a9036e0fdce748fa6b726c81760c920b5911f37d729076e94e56713",
+        "state_root": "0x75d27688b6c2c161ae5000d07fba91f25f487df2e07779d39badff2476748261",
+        "timestamp": 1760149517
+      },
+      "header_rlp": "0xf90380a07b16bc3d5a9036e0fdce748fa6b726c81760c920b5911f37d729076e94e56713a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d4934794b4647b856cb9c3856d559c885bed8b43e0846a47a075d27688b6c2c161ae5000d07fba91f25f487df2e07779d39badff2476748261a0f3e9ed758ade47bc6e547353c5251518090aae014040c45dd5960ef16ae5e35da0dffd827bdabe1d2ff7cb555b16a69b2ba15ff5e9f2571adcef8120017249321cb90100fff7b66f0d43d65fab9b7ddef89f5dc3ff5cffd29db0eec7bffeceb46787c8efc56ef913ff95fd3976b6f53dabf7f9a7bdfdd0bd1c0b6ff3f6fe7fed2cbe7fdd67bcb97efdff793861f9dd7de87f36e5acbbdb395cfe767fbe3fe77ffdff0fbcc6bb7de83acbe7cf755fd937de77ecf13b13b7e37ff5fcf5d8fd7fddebfaa7c3feafe2743fbf2b7d95e927cd7fd8fddbd5b63e675360f8c9feeea3ee4de78f7c6effcf8efb30ebffeb76f9fdda6fd7fdffafdbe54fdabadd4edf66bdb6bb9c3bf097b50f8fd3b58e78887e5ff636dbc57ff4fb6a3ef9dd747df3eebfdb4efdf0ef54bb177f8f62a8d5ef2aff2d4191fc5a26be3c6d341f69f8e1eab2fbbfcc2e028403d39d968405f5e10084020a27298468e9c00db90118d983010511846765746889676f312e32332e3130856c696e75780000098d24acf8b5831fffffb86086941fdc1dd9ca5867c83107eec385a463a9822a486da23929a502df47a1ebf4de52c6020aad1a5fb51979cec793aa1612ecfa6d0d1aea2251ed19bacc8e1f1fbc86dc6c5c50f564729ee64c7c50154ab55a6473b9905e92174717939e2ee19bf84c8403d39d94a03766f5da5b8015a642ffb009cd6b8ceff86a922556627bf25dc587d7128dd5278403d39d95a07b16bc3d5a9036e0fdce748fa6b726c81760c920b5911f37d729076e94e5671380b2db8d484e379de86337b19a2694a6274b0c45eef36bb286a3ebfd945ff0ac2519eeee6e29b72e9b50f2a6528ae19d345d640c593395a398851e2c378d5a63b800a000000000000000000000000000000000000000000000000000000000000001f488000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218302000080a00000000000000000000000000000000000000000000000000000000000000000a0e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rpc_receipt_status": "0x0",
+      "rpc_transaction_index": 178,
+      "rpc_block_end_state": {
+        "0xa26b3b87710720def8c637c5de7b94eae25188c9": {
+          "before": {
+            "block_number": 64200085,
+            "nonce": 69,
+            "balance": "526998154130209396",
+            "code": "0x",
+            "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storage": {}
+          },
+          "after": {
+            "block_number": 64200086,
+            "nonce": 71,
+            "balance": "526996314130209396",
+            "code": "0xef010063c0c19a282a1b52b07dd5a65b58948a07dae32b",
+            "code_hash": "0xb09ef517c48d2bf6eed05457ff56871b2596e3fc904fc6e9795882a870c2e993",
+            "storage": {}
+          }
+        }
+      },
+      "discovery_url": "https://bscscan.com/tx/0x2ef6a87cd526041909b3eb05a0815424440ab88650c109f5b0e700d706d4c926"
     }
   ]
 }

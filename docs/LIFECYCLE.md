@@ -42,14 +42,19 @@ unmodified BSC v5 TransactionTrace messages are also committed as
 transaction at 121114122 and one FAILED transaction at 121114153. Both retain
 sender and accepted-authority nonce changes before root execution; neither
 changes code. Their block hashes and failure status were cross-checked with RPC.
-Nine further unmodified transactions and their original headers now cover
+Ten further unmodified transactions and their original headers now cover
 producer versions 3, 4 and 5; see the [capture manifest](../tests/fixtures/lifecycle/manifest.json).
 The v5 cases include self-authorization with both nonce increments, three accepted
 authorities, discarded authorization with a reverted slot write, and explicit
-delegation clearing. A v4 first-delegation transaction verifies the authority's
-nonce and code against archive RPC before and after the block. Failed accepted
-authorizations that actually change code, including failed self/multiple/clear
-combinations, remain synthetic coverage rather than captured mainnet evidence.
+delegation clearing. A v4 transaction installs delegation on an account with
+empty code at the preceding block; its nonce and code match archive RPC before
+and after the block. A captured v4
+FAILED self-delegation at **64200086** retains both nonce increments (69 to 71)
+and installs delegation code despite reverted root execution. Archive RPC
+confirms the new nonce, code and gas-adjusted balance at block end. Its regression
+checks separate sender and authorization scopes as well as native final values.
+Failed multiple-authority/code-clear combinations and repeated authorities remain
+synthetic coverage rather than captured mainnet evidence.
 
 The rebuilt native mapper also replayed 121114100–121114160 for their sender
 and authority. All 61 block identities/parents were checked, and observed sender
@@ -126,7 +131,7 @@ fixture is a complete unmodified block. Historical before/after values are archi
 RPC comparisons, distinct from the recent eight-account proof verification.
 
 Captured post-Cancun SELFDESTRUCT of a previously existing account, same-address
-deletion/recreation, and failed authorization code-change combinations remain
+deletion/recreation, and failed multiple-authority/code-clear combinations remain
 open. SELFDESTRUCT in system execution is explicitly unsupported until its
 execution boundary is qualified. Representative-account replay and the full
 lifecycle acceptance matrix remain release requirements.

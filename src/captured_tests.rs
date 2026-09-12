@@ -98,14 +98,38 @@ fn captured_v5_delegation_clear_is_not_account_deletion() {
 }
 
 #[test]
-fn captured_v4_first_delegation_matches_rpc() {
-    let block = sample!("v4-first-delegation", 4, 65805822);
+fn captured_v4_installed_delegation_matches_rpc() {
+    let block = sample!("v4-install-delegation", 4, 65805822);
     let out = project("0x417204ea716dfc4427bf9883521c820b036cdb7a", &block).unwrap();
     assert_eq!(out.nonces[0].value, 4292);
     assert_eq!(out.nonces[0].ordinal, 5079);
     assert_eq!(out.codes[0].code, "0xef01000000dcbcf779c73f0e0774fda22a1fe0f0f10000");
     assert_eq!(out.codes[0].hash, "0x4cf62dc7c5902b027cf76ba5c28b955cc1812c8d9d33358ad2e9101e9ef2d545");
     assert_eq!(out.codes[0].ordinal, 5080);
+    assert!(out.storage.is_empty() && out.lifecycle.is_empty());
+}
+
+#[test]
+fn captured_v4_failed_self_delegation_persists_nonce_and_code() {
+    let block = sample!("v4-failed-self-delegation", 4, 64200086);
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Failed);
+    assert!(tx.calls[0].state_reverted);
+    assert_eq!(tx.calls[0].begin_ordinal, 21804);
+    let address = "0xa26b3b87710720def8c637c5de7b94eae25188c9";
+    let changes = crate::collect(address, &block).unwrap();
+    assert_eq!(changes.nonce_changes.iter().map(|c|
+        (c.new_value, c.origin.as_ref().unwrap().scope)).collect::<Vec<_>>(),
+        vec![(70, Scope::TxFailedPersistent as i32), (71, Scope::Tx7702 as i32)]);
+    assert_eq!(changes.code_changes.len(), 1);
+    assert_eq!(changes.code_changes[0].origin.as_ref().unwrap().scope, Scope::Tx7702 as i32);
+    let out = project(address, &block).unwrap();
+    assert_eq!(out.nonces[0].value, 71);
+    assert_eq!(out.nonces[0].ordinal, 21802);
+    assert_eq!(out.codes[0].code, "0xef010063c0c19a282a1b52b07dd5a65b58948a07dae32b");
+    assert_eq!(out.codes[0].hash, "0xb09ef517c48d2bf6eed05457ff56871b2596e3fc904fc6e9795882a870c2e993");
+    assert_eq!(out.codes[0].ordinal, 21803);
+    assert_eq!(out.balances[0].value, "526996314130209396");
     assert!(out.storage.is_empty() && out.lifecycle.is_empty());
 }
 
