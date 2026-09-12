@@ -98,10 +98,13 @@ describes measured roots, reserves, incomplete-sample handling and recovery.
 - [ ] Complete the [Rust migration](RUST_MIGRATION.md): native CLI, operations,
   verification, qualification tools and test transport; remove first-party
   Python/Go code and Python dependencies, with behavior and recovery parity.
-- [ ] Finish and prove the complete WBNB and supplied customer-example bootstraps;
-  record their source/package identities, exact block/hash, slot counts and roots.
-- [ ] Advance complete state through a recent finalized continuation and record
-  the current package used for that continuation.
+- [x] Prove the supplied customer-example bootstrap, continue it with the rebuilt
+  package, and verify complete reads plus export/restore. The
+  [record](evidence/bsc-customer-example-rust-2026-09-12.json) contains source/package
+  identities, block hashes, 8,156/8,157 slot counts, roots and capacity phases.
+- [ ] Finish and prove the complete WBNB bootstrap, record its source/package
+  identity, exact block/hash, slot count and root, then advance it through a
+  recent finalized continuation using the current package.
 - [ ] Qualify export/restore, publication/read cost and retained-data growth for
   the representative nonempty hot state, including temporary work and rotation.
 - [ ] Update the four-deliverable acceptance table with the resulting evidence

@@ -471,6 +471,25 @@ of the hot-account qualification.
 
 ## Supplied customer example
 
+The supplied account now has a complete proven checkpoint. Historical enumeration
+covered **73,216,666 blocks** from 48261373 through the frozen target 121478038.
+Rust verified all **8,156 nonzero slots**, account metadata and bytecode against
+the saved account proof and encoded header before publishing the ready manifest.
+The historical replay used the previous wrapper; proof acceptance ran in Rust.
+
+A fresh Rust native run using the rebuilt package continued **57,867 blocks** to
+121535905. Its second complete checkpoint contains **8,157 slots**. Two pinned
+Rust scans reconstructed the proven root from every returned slot; 18 page calls
+had p50 48.3 ms and p95/max 60.4 ms on the shared local server. Rust export and
+restore into a new database preserved the header, slot count and state checksum,
+with full stored-state proof verification before readiness. All seven reported
+capacity phases completed without rejected samples. See
+[customer example evidence](evidence/bsc-customer-example-rust-2026-09-12.json).
+
+This qualifies the one supplied example. The 19/64-account lists, complete WBNB
+qualification and the remaining Rust migration gates are still outstanding.
+The progress notes below describe earlier stages of this same replay.
+
 The customer supplied `0x32c59d556b16db81dfc32525efb3cb257f7e493d` as an example,
 although the full 19-account/76-slot list remains unavailable. Archive RPC located
 a code-presence boundary at 48261373, and the captured v4 Extended block confirms
@@ -481,11 +500,11 @@ and a larger set of 137 keys observed in the existing native samples, both fail
 to reconstruct its storage root at saved proof target 121478038. These are
 incomplete initial-state candidates, not ready exports.
 
-An isolated creation-to-target replay now runs with its own database, controller,
-frozen package, cursor, spool and capacity guard. Its first 200,000 blocks retain
-22 nonzero slots in a private prefix. Final completeness, export and continuation
-remain pending. This is one actual customer example, not qualification of the
-missing complete pilot set. `bootstrap-replay --prometheus-addr` now permits a
+The isolated creation-to-target replay used its own database, controller,
+frozen package, cursor, spool and capacity guard. Its first 200,000 blocks retained
+22 nonzero slots in a private prefix; the complete result is recorded above.
+This is one actual customer example, not qualification of the missing complete
+pilot set. `bootstrap-replay --prometheus-addr` permits a
 separate metrics listener for each concurrent cohort, as `ingest` already did.
 
 ## Capacity stop and local data migration
@@ -509,8 +528,8 @@ both policies to 98,257,164,288 bytes. The database and runtime archives are ins
 the measured local roots. Together this preserves the overall 100 GB budget,
 10 GB operating reserve and 1 GiB free-space floor. Both resumed runs passed the
 new capacity checks and compacted their preserved suffixes through 8449994 and
-48539979 respectively. They remain unverified historical prefixes, with final
-root verification and sustained-growth qualification still pending. This recovery
+48539979 respectively. At that stage they were unverified historical prefixes,
+with final root verification and sustained-growth qualification still pending. This recovery
 does not establish host-bind performance or a customer footprint bound.
 
 The first resumed WBNB run subsequently [stopped](evidence/wbnb-capacity-inspection-stop-2026-09-12.json) after an incomplete Docker

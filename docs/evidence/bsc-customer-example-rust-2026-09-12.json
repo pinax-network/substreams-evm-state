@@ -1,0 +1,210 @@
+{
+  "format_version": 1,
+  "qualification": "Complete customer example bootstrap, Rust continuation, proven reads and portable restore",
+  "account": "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+  "initial_bootstrap": {
+    "start_block": 48261373,
+    "blocks": 73216666,
+    "checkpoint": {
+      "snapshot_id": "863cbc0b4f064ab9a2c0c1e6c94b257c",
+      "status": "ready",
+      "header": {
+        "hash": "0xdc1ec74cd1a5ad58cbe92b7f1d02a59e36c3b1b5155319ee0953368ddfae53af",
+        "number": 121478038,
+        "parent_hash": "0x9c0fbdde0c482024fdd96d9f8bbd35cb632074383fe26d0aaed0d6f709c60de2",
+        "state_root": "0x4cf33f6441cc586de9a5e0e56137b2447dbf263296cfabc9f7219bb3fde1d12d",
+        "timestamp": 1789226982
+      },
+      "accounts": [
+        "0x32c59d556b16db81dfc32525efb3cb257f7e493d"
+      ],
+      "nonzero_slots": 8156,
+      "state_sha256": "e8dc2af85a7ff28c6f121523e4a442c1ecd7af813f1038672561b794aca3e464",
+      "verification": {
+        "0x32c59d556b16db81dfc32525efb3cb257f7e493d": {
+          "account_proof": "verified",
+          "nonzero_slots": 8156,
+          "storage_root": "verified"
+        }
+      },
+      "storage_roots": {
+        "0x32c59d556b16db81dfc32525efb3cb257f7e493d": "0x6bf2ff5dbeee385b5c292a59d2e938001699893bc6690414cb3188b519830d79"
+      }
+    },
+    "source_package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+    "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+    "enumeration_implementation": "Previous Python wrapper with frozen native Substreams package; complete checkpoint proof acceptance performed by Rust"
+  },
+  "rust_continuation": {
+    "blocks": 57867,
+    "checkpoint": {
+      "snapshot_id": "96db6237f85c425eb6f579b0b13af1f5",
+      "status": "ready",
+      "header": {
+        "hash": "0xda92d18bbd091cdc9f12181e536289469d542ff43e8a8dd74b9203bda9b1e4df",
+        "number": 121535905,
+        "parent_hash": "0x368a1875b265f452f7efc935ce8020fadc848092d3385a5c95154bb00ed25c5c",
+        "state_root": "0xda235364aaf4c9466624e16a5a59051073dfe5933fb78361307be48496b07aec",
+        "timestamp": 1789253025
+      },
+      "accounts": [
+        "0x32c59d556b16db81dfc32525efb3cb257f7e493d"
+      ],
+      "nonzero_slots": 8157,
+      "state_sha256": "585c8456b2587219a011d80c3f1749c1b0e335822bd2c237e0baaf00f3c98b8c",
+      "verification": {
+        "0x32c59d556b16db81dfc32525efb3cb257f7e493d": {
+          "account_proof": "verified",
+          "nonzero_slots": 8157,
+          "storage_root": "verified"
+        }
+      },
+      "storage_roots": {
+        "0x32c59d556b16db81dfc32525efb3cb257f7e493d": "0xc71641db4c8088d3265d16a768cd07014ff4a91f571d1164d57956ad1ed0bda7"
+      }
+    },
+    "source_package_sha256": "ec683cd342f2d1c90ca5e12acd9bb589cdbcde4053827a3aab70f1865ea1f61c",
+    "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+    "implementation": "Rust native wrapper, current rebuilt package and full checkpoint verifier"
+  },
+  "complete_returned_state_reads": {
+    "account": "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+    "binary_sha256": "c404cd9c28b9e760a2c5a0f0145e0d865eecbd10e691e3c3ec1889bb2f5cc031",
+    "database": "evm_customer_example_checkpoints",
+    "finished_at_unix_ns": 1789253728403951000,
+    "format_version": 2,
+    "header": {
+      "hash": "0xda92d18bbd091cdc9f12181e536289469d542ff43e8a8dd74b9203bda9b1e4df",
+      "number": 121535905,
+      "parent_hash": "0x368a1875b265f452f7efc935ce8020fadc848092d3385a5c95154bb00ed25c5c",
+      "state_root": "0xda235364aaf4c9466624e16a5a59051073dfe5933fb78361307be48496b07aec",
+      "timestamp": 1789253025
+    },
+    "limitations": [
+      "local Rust reader, controller locks and ClickHouse SQL; no remote API network",
+      "sequential repeated scans, not concurrent reader load or a cold database cache",
+      "scan_and_staging_seconds includes slot validation and SQLite staging between page calls",
+      "root_hash_seconds includes the SQLite commit and ordered root assembly; capacity guards excluded from pass timings",
+      "immutable published generation; publication latency measured separately"
+    ],
+    "ordered_storage_sha256": "4e51591d80e4409e1cadceb428ae2b5946eaa14f5224767e197c6affea599829",
+    "page_latency_seconds": {
+      "max": 0.060355166,
+      "min": 0.043765625,
+      "p50": 0.048265083,
+      "p95": 0.060355166,
+      "samples": 18
+    },
+    "page_size": 1000,
+    "passes": [
+      {
+        "nonzero_slots": 8157,
+        "page_call_seconds": 0.439755165,
+        "pass": 0,
+        "root_hash_seconds": 0.05546937500000004,
+        "scan_and_staging_seconds": 0.765462083,
+        "scan_and_verification_seconds": 0.820931458
+      },
+      {
+        "nonzero_slots": 8157,
+        "page_call_seconds": 0.469851123,
+        "pass": 1,
+        "root_hash_seconds": 0.055492500000000056,
+        "scan_and_staging_seconds": 0.801417667,
+        "scan_and_verification_seconds": 0.856910167
+      }
+    ],
+    "proof_bundle_sha256": "22cef9fe173f54cc61f585f390bcca63eb100950c2d81d5e36a97ac7e96d13bb",
+    "root_matches_captured_account_proof": true,
+    "runtime": "Rust",
+    "snapshot_id": "96db6237f85c425eb6f579b0b13af1f5",
+    "started_at_unix_ns": 1789253714909565000,
+    "verified_storage_root": "0xc71641db4c8088d3265d16a768cd07014ff4a91f571d1164d57956ad1ed0bda7"
+  },
+  "portable_restore": {
+    "snapshot_id": "482195852ef74aa0a7b247db1b7e3c67",
+    "header": {
+      "hash": "0xda92d18bbd091cdc9f12181e536289469d542ff43e8a8dd74b9203bda9b1e4df",
+      "number": 121535905,
+      "parent_hash": "0x368a1875b265f452f7efc935ce8020fadc848092d3385a5c95154bb00ed25c5c",
+      "state_root": "0xda235364aaf4c9466624e16a5a59051073dfe5933fb78361307be48496b07aec",
+      "timestamp": 1789253025
+    },
+    "nonzero_slots": 8157,
+    "state_sha256": "585c8456b2587219a011d80c3f1749c1b0e335822bd2c237e0baaf00f3c98b8c",
+    "matches_exported_checkpoint": true
+  },
+  "artifact_sha256": {
+    "target-proofs.json": "31a7a8df71b459242d749e2a5c6286a388552de99ad3f5e15903addac22f4474",
+    "continuation-rust-proofs.json": "adeb311b10374d97d7993942676854fd8889a271094d00cea5545d63df579947",
+    "manifest.json": "7fc15b05a3aa8d25caa33b6782576a7a545ce1acb4fccfcbdd429bdad019593d"
+  },
+  "capacity": {
+    "last_historical_replay_phase": {
+      "status": "completed",
+      "samples": 1259,
+      "guard_samples": 2217,
+      "failed_samples": 0,
+      "peak_observed_allocated_bytes": 12806746112,
+      "maximum_sample_gap_ns": 36800259000
+    },
+    "initial_publication": {
+      "status": "completed",
+      "samples": 5,
+      "guard_samples": 5,
+      "failed_samples": 0,
+      "peak_observed_allocated_bytes": 9280749568,
+      "maximum_sample_gap_ns": 15138776000
+    },
+    "rust_continuation": {
+      "status": "completed",
+      "samples": 8,
+      "guard_samples": 7,
+      "failed_samples": 0,
+      "peak_observed_allocated_bytes": 10639155200,
+      "maximum_sample_gap_ns": 7383621000
+    },
+    "continuation_publication": {
+      "status": "completed",
+      "samples": 6,
+      "guard_samples": 5,
+      "failed_samples": 0,
+      "peak_observed_allocated_bytes": 10685878272,
+      "maximum_sample_gap_ns": 8312675000
+    },
+    "complete_reads": {
+      "status": "completed",
+      "samples": 5,
+      "guard_samples": 4,
+      "failed_samples": 0,
+      "peak_observed_allocated_bytes": 9919143936,
+      "maximum_sample_gap_ns": 18157422000
+    },
+    "export": {
+      "status": "completed",
+      "samples": 5,
+      "guard_samples": 4,
+      "failed_samples": 0,
+      "peak_observed_allocated_bytes": 10256781312,
+      "maximum_sample_gap_ns": 11476834000
+    },
+    "restore": {
+      "status": "completed",
+      "samples": 12,
+      "guard_samples": 14,
+      "failed_samples": 0,
+      "peak_observed_allocated_bytes": 11150696448,
+      "maximum_sample_gap_ns": 28596688000
+    }
+  },
+  "overall_budget_bytes": 100000000000,
+  "retained_original_volume_reserve_bytes": 1742835712,
+  "live_policy_budget_bytes": 98257164288,
+  "limitations": [
+    "This is the supplied customer example account; the actual 19-account/76-slot and proposed 64-account sets remain unavailable.",
+    "The initial historical enumeration used the previous wrapper; Rust checked its full state and handled the measured continuation, reads, export and restore.",
+    "Capacity totals include shared ClickHouse and declared runtime directories; historical replay capacity here describes its last completed phase, not every earlier attempt.",
+    "Read timing is a shared-server observation, not a production latency SLA or a large hot-account bound.",
+    "Finalized encoded headers are trusted to the provider; BSC consensus is not independently verified."
+  ]
+}
