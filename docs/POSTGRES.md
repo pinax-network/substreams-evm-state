@@ -180,7 +180,7 @@ rejection still require qualification; see [the review](REVIEW.md).
 
 ## Verification
 
-Both scripts now read the head, account metadata/bytecode and storage using one
+The Rust `evm-state postgres-verify` command reads the head, account metadata/bytecode and storage using one
 PostgreSQL statement, so every row belongs to the same database snapshot even
 while the sink writes. `--block` must equal that captured head; these current
 tables cannot provide a historical state view. The RPC must serve finalized
@@ -188,9 +188,9 @@ proofs at that block. Both checks verify the encoded header, compare its hash an
 state root to the database marker, and verify the account proofs and metadata/code
 using the same proof library as the ClickHouse checkpoint path.
 
-`scripts/verify_rpc.py` compares up to 1,000 `storage` slots by default (override
+The default mode compares up to 1,000 `storage` slots (override
 with `--limit`). Its result is explicitly `sample-parity-only`; it cannot establish
-complete storage. `scripts/verify_storage_root.py 0x<addr>` hashes every nonzero
+complete storage. `evm-state postgres-verify --complete --address 0x<addr>` hashes every nonzero
 slot and verifies the complete storage root against the proven account leaf. A
 successful result is `root-verified-diagnostic`, with the exact block/hash and
 provider-finalized header trust recorded. Neither command publishes a checkpoint
@@ -200,9 +200,10 @@ Missing nonce, balance, code hash or bytecode is a failure, as are metadata
 mismatches, missing/extra storage, invalid proofs and state newer than its marker.
 Failures exit nonzero. An unchanged, unknown account field must be initialized
 and verified before the legacy account can pass; it is never silently skipped.
-Use the installed project environment (`make python-deps`, then `make verify`
-or `make verify-root ADDRESS=0x...`) and the current BYTEA code schema. The snapshot
-is materialized in memory; use the streaming ClickHouse checkpoint path for large
+Build the Rust tools with `make native`, then use `make verify`
+or `make verify-root ADDRESS=0x...` with the current BYTEA code schema. `psql` must
+be available. The snapshot is materialized in memory with a 16 MiB output cap;
+larger results fail closed. Use the streaming ClickHouse checkpoint path for large
 accounts. `make test-postgres` exercises disposable schemas, including a writer
 updating state concurrently with snapshot reads. Existing tables remain intact.
 
@@ -308,8 +309,7 @@ src/persist.rs             # persistence rules (unit-tested)
 src/params.rs              # account filter
 src/db_out.rs              # Tables projection
 postgres/schema.*.sql      # numbered layers → schema.sql (generated)
-scripts/verify_rpc.py      # RPC cross-check
-scripts/verify_storage_root.py  # MPT storage root vs eth_getProof
+crates/evm-state/src/postgres.rs  # coherent RPC/sample and complete-root diagnostics
 docker-compose.yml         # local Postgres 16
 docs/SCOPE.md              # scoping notes and open questions
 docs/REVIEW.md             # handoff findings and native ClickHouse constraints

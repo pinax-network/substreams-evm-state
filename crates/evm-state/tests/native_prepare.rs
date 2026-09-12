@@ -111,6 +111,7 @@ fn finalized_follow_and_backfill_arguments_preserve_worker_and_flush_settings() 
     let record = json!({"identity":{"accounts":[A]}});
     let options = IngestOptions {
         stop_block: Some(200),
+        max_retries: -1,
         parallel_workers: Some(200),
         prometheus_addr: Some("127.0.0.1:9991".into()),
         ..Default::default()
@@ -121,6 +122,7 @@ fn finalized_follow_and_backfill_arguments_preserve_worker_and_flush_settings() 
         ["--decode-batch-size", "1"],
         ["--spool-max-idle", "100ms"],
         ["-t", "200"],
+        ["--max-retries", "-1"],
     ] {
         assert!(args.windows(2).any(|values| values == pair));
     }
@@ -129,6 +131,45 @@ fn finalized_follow_and_backfill_arguments_preserve_worker_and_flush_settings() 
         !ingest::command_args(&native, &Default::default(), &record, root.path())?
             .contains(&"--header".into())
     );
+    Ok(())
+}
+
+#[test]
+fn cli_preserves_native_negative_retry_setting_before_ingestion() -> Result<()> {
+    let root = tempfile::tempdir()?;
+    for mode in ["ingest", "bootstrap-replay"] {
+        let directory = root.path().join(mode);
+        let output = std::process::Command::new(env!("CARGO_BIN_EXE_evm-state"))
+            .args([
+                "--database",
+                "evm_test_unused",
+                mode,
+                "--package",
+                "missing.spkg",
+                "--accounts",
+                A,
+                "--start-block",
+                "100",
+                "--stop-block",
+                "101",
+                "--max-retries",
+                "-1",
+                "--parallel-workers",
+                "0",
+                "--state-dir",
+            ])
+            .arg(&directory)
+            .env(
+                "SUBSTREAMS_SINK_DSN",
+                "clickhouse://dummy@localhost:19000/evm_test_unused",
+            )
+            .env("CH_HTTP_URL", "http://127.0.0.1:1")
+            .output()?;
+        assert!(!output.status.success());
+        assert!(String::from_utf8(output.stderr)?
+            .contains("parallel workers must be a positive integer"));
+        assert!(!directory.exists());
+    }
     Ok(())
 }
 

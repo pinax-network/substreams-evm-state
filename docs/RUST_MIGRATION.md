@@ -110,10 +110,19 @@ archive checksums, gzip integrity and layout are validated before atomically
 replacing the executable. Their Python script entry points have been removed.
 These add four standalone tests and two ClickHouse test functions (53 native,
 32 ClickHouse and 43 mapper tests). Full native streaming fault injection,
-PostgreSQL tools and the remaining operational workloads still need Rust parity.
+and the remaining operational workloads still need Rust parity.
 
 The real restored BSC checkpoint also passed complete returned-page verification
 in Rust: two scans of 46 slots, ten page calls, p50 44.0 ms and p95/max 67.1 ms.
 The capacity run admitted five periodic samples and four internal guards without
 rejection. See [read evidence](evidence/bsc-read-rust-2026-09-12.json). This was a
 shared-server run, not a comparison of language overhead or a hot-account SLA.
+
+PostgreSQL diagnostics now use Rust for coherent SQL snapshots, account and full
+storage proofs, sampled RPC checks and metadata/provenance validation. The two
+Python verification script entry points are removed. Six standalone tests retain
+their corruption cases, and two PostgreSQL integration tests exercise real
+queries and concurrent writer consistency in isolated schemas. The native retry
+CLI also retains `--max-retries -1`; a parser regression test checks this before
+any ingestion starts. This brings the standalone native total to 60; CI includes
+32 ClickHouse and two PostgreSQL tests alongside the 43 mapper tests.

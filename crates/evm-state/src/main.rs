@@ -15,6 +15,19 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Diagnose PostgreSQL current state using proofs and optional sampled RPC.
+    PostgresVerify {
+        #[arg(long)]
+        address: Option<String>,
+        #[arg(long)]
+        complete: bool,
+        #[arg(long)]
+        block: Option<u64>,
+        #[arg(long, default_value_t = 1000)]
+        limit: u64,
+        #[arg(long, default_value = "localdata/verification")]
+        work_dir: PathBuf,
+    },
     /// Install the checksummed Substreams 1.22.0 native CLI for this platform.
     InstallSubstreams {
         #[arg(long, default_value = "localdata/toolchain/bin")]
@@ -48,8 +61,8 @@ enum Commands {
         chunk_blocks: u64,
         #[arg(long, default_value_t = 100_000_000_000_u64)]
         budget_bytes: u64,
-        #[arg(long, default_value_t = 3)]
-        max_retries: u32,
+        #[arg(long, default_value_t = 3, allow_negative_numbers = true)]
+        max_retries: i64,
         #[arg(long, default_value_t = 32)]
         decode_batch_size: u32,
         #[arg(long, default_value_t = 1000)]
@@ -227,8 +240,8 @@ struct IngestArgs {
     native: NativeArgs,
     #[arg(long)]
     stop_block: Option<u64>,
-    #[arg(long, default_value_t = 3)]
-    max_retries: u32,
+    #[arg(long, default_value_t = 3, allow_negative_numbers = true)]
+    max_retries: i64,
     #[arg(long, default_value_t = 1)]
     decode_batch_size: u32,
     #[arg(long, default_value_t = 100)]
@@ -243,6 +256,28 @@ fn run() -> Result<()> {
     let args = Cli::parse();
     let client = ClickHouse::new(&args.database)?;
     let result = match args.command {
+        Commands::PostgresVerify {
+            address,
+            complete,
+            block,
+            limit,
+            work_dir,
+        } => {
+            let pg = evm_state::postgres::Postgres::new(None, None);
+            let captured = pg.snapshot(
+                address.as_deref(),
+                if complete { None } else { Some(limit) },
+            )?;
+            let accounts = evm_state::postgres::validate_snapshot(&captured, block)?;
+            let rpc = evm_state::rpc::Rpc::new(None, None)?;
+            let bundle = evm_state::rpc::capture(
+                &rpc,
+                accounts.keys(),
+                captured["header"]["number"].as_u64(),
+                None,
+            )?;
+            evm_state::postgres::verify(&captured, &bundle, complete, Some(&rpc), block, &work_dir)?
+        }
         Commands::InstallSubstreams { destination } => {
             json!({"version":evm_state::installer::VERSION,"path":evm_state::installer::install(&destination)?})
         }

@@ -24,6 +24,7 @@ CH_DSN ?= clickhouse://evm_state:local-development-only@localhost:19000/$(CH_DAT
 CH_STATE ?= localdata/$(CH_DATABASE)
 CH_CHECKPOINT_DATABASE ?= $(CH_DATABASE)
 PYTHON ?= .venv/bin/python
+EVM_STATE ?= target/release/evm-state
 CH_ARGS := --package $(SPKG) --endpoint $(ENDPOINT) --accounts "$(ACCOUNTS)" --start-block $(START_BLOCK) --state-dir "$(CH_STATE)" --checkpoint-database $(CH_CHECKPOINT_DATABASE)
 
 .PHONY: protogen
@@ -46,9 +47,14 @@ test:
 test-integration: pack
 	$(PYTHON) -m pytest --run-clickhouse --run-database-crash -q
 
+.PHONY: native
+native:
+	cargo build --locked --release -p evm-state
+
 .PHONY: test-postgres
 test-postgres:
-	$(PYTHON) -m pytest -m postgres --run-postgres -q
+	cargo test --locked -p evm-state --test postgres_verifier
+	cargo test --locked -p evm-state --test postgres_database -- --ignored
 
 python-deps:
 	python3 -m venv .venv
@@ -128,9 +134,9 @@ sink: setup
 
 # Verify Postgres state against JSON-RPC (RPC_API_KEY / RPC_URL from env).
 .PHONY: verify
-verify:
-	PG_DSN="$(PG_URL)" $(PYTHON) scripts/verify_rpc.py
+verify: native
+	PG_DSN="$(PG_URL)" $(EVM_STATE) postgres-verify
 
 .PHONY: verify-root
-verify-root:
-	PG_DSN="$(PG_URL)" $(PYTHON) scripts/verify_storage_root.py $(ADDRESS)
+verify-root: native
+	PG_DSN="$(PG_URL)" $(EVM_STATE) postgres-verify --complete --address "$(ADDRESS)"

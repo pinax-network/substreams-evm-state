@@ -34,10 +34,10 @@ the shared account/storage proof verifier. Unknown or wrong metadata fails,
 storage. The finding below records the reviewed prototype's original behavior;
 see [current verification commands](POSTGRES.md#verification).
 
-[`verify_storage_root.py`](../scripts/verify_storage_root.py) recomputes a storage
-trie and compares it with `eth_getProof.storageHash`. It never validates
+The former `verify_storage_root.py` prototype recomputed a storage
+trie and compared it with `eth_getProof.storageHash`. It did not validate
 `accountProof` against the exact block header's state root. Its separate SQL
-queries can observe different heads while ingestion runs, and `--block N` changes
+queries could observe different heads while ingestion ran, and `--block N` changed
 the RPC block without selecting historical DB state.
 
 It also exits successfully when nonce/balance/code-hash comparisons print

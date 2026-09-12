@@ -40,7 +40,7 @@ pub struct NativeOptions {
 #[derive(Clone)]
 pub struct IngestOptions {
     pub stop_block: Option<u64>,
-    pub max_retries: u32,
+    pub max_retries: i64,
     pub decode_batch_size: u32,
     pub spool_max_idle_ms: u64,
     pub prometheus_addr: Option<String>,
