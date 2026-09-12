@@ -1,5 +1,7 @@
 //! EVM account-state projection Substreams.
 //!
+//! * `map_block_state(params, Block)` — native ClickHouse block-end envelope,
+//!   including finalized continuity and fork-aware account deletion markers.
 //! * `db_out(params, Block)` — the sink module. Applies the persistence
 //!   rules (`persist.rs`), filters on the changed account (`params.rs`) and
 //!   emits PostgreSQL `DatabaseChanges` (`db_out.rs`). Reads the Firehose
@@ -14,6 +16,8 @@ mod lifecycle;
 mod params;
 pub mod pb;
 mod persist;
+#[cfg(test)]
+mod captured_tests;
 
 use substreams::errors::Error;
 use substreams::scalar::BigInt as SBigInt;

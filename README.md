@@ -13,7 +13,9 @@ monitoring covers data directories and temporary work. Cold/cached ingestion,
 measured; broader historical lifecycle and account-set qualification remain unfinished.
 The customer's actual 19/64-account lists have not been supplied, so their
 capacity, latency and cost are not qualified. See [scope](docs/SCOPE.md) and
-[current evidence](docs/QUALIFICATION.md).
+[current evidence](docs/QUALIFICATION.md). The
+[customer follow-up draft](docs/CUSTOMER_PROPOSAL.md) explains the ClickHouse
+proposal and requests the remaining qualification inputs.
 
 ## Architecture
 

@@ -1,0 +1,76 @@
+{
+  "blocks": 2612,
+  "chain_id": 56,
+  "database": "evm_lifecycle_matrix",
+  "final_touched_slots_verified_against_archive_rpc": {
+    "0x6a4da820c8fc3258d1b44037572005264df821e2": 1
+  },
+  "format_version": 1,
+  "header": {
+    "hash": "0x7cc97d80f89e23bc713c37d6150b27bb65bb56eb78955c082c12a53a78ee0b04",
+    "number": 121467555,
+    "parent_hash": "0x743d7f02cc68f325007c38a247fb552a6d42653774cbd1805b9664067a23afda",
+    "state_root": "0x23234606e82cf4762109bff95f110acaa7f0d4196f2ecac976d37446453dda78",
+    "timestamp": 1789222262
+  },
+  "header_trust": "provider-finalized-header",
+  "metadata_verified_against_account_proofs": {
+    "0x41c690e6093302a84630320ea17dd213b1a9187d": {
+      "balance": "176413690155317172",
+      "nonce": 202127
+    },
+    "0x4e8a0f94b775f1ff377c26d34618100ac32b8354": {
+      "code": "0xef01008ecc1f892bb8dfc53e46ef57ca9795ccf8308c25",
+      "code_hash": "0xc071e566ca0763cfb4ee7d6056f248e7023706b108ef49543f5581d444c6c09c",
+      "nonce": 1
+    },
+    "0x6a4da820c8fc3258d1b44037572005264df821e2": {
+      "code": "0xef010003a46a241aa7073552652032aba85be46f647795",
+      "code_hash": "0x7db4ddc5dcd1fe6012840c0db869c96a924ba4cd127ad65f593498630f9d3019",
+      "nonce": 1
+    },
+    "0x9999b0cdd35d7f3b281ba02efc0d228486940515": {
+      "balance": "0",
+      "code": "0xef0100c2c219534b66c144a8c2333efb103802b1a07e46",
+      "code_hash": "0xb68920370f7e22bbb360e1550531b105d8ad834f8c16ab013b01eee22105c483",
+      "nonce": 71286935
+    },
+    "0xb2b1d7fc79ef3f3aa6c0c0156e64eec50b37c706": {
+      "code": "0xef01008ecc1f892bb8dfc53e46ef57ca9795ccf8308c25",
+      "code_hash": "0xc071e566ca0763cfb4ee7d6056f248e7023706b108ef49543f5581d444c6c09c",
+      "nonce": 1
+    },
+    "0xdc379f81dc18c9a8ad82e937aecb0b79d143793a": {
+      "code": "0xef01008ecc1f892bb8dfc53e46ef57ca9795ccf8308c25",
+      "code_hash": "0xc071e566ca0763cfb4ee7d6056f248e7023706b108ef49543f5581d444c6c09c",
+      "nonce": 1
+    },
+    "0xdcef96a1771ae914b56686cbdb3beffc63f02fd9": {
+      "balance": "3090471330286710",
+      "code": "0x",
+      "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+      "nonce": 141
+    },
+    "0xdeca137a9b8106a41a4980f4f4d394615fd8c045": {
+      "balance": "101234319709774949",
+      "nonce": 452
+    }
+  },
+  "module_hash": "41623cb9af4f716989baa474863d2824ff283794",
+  "ordered_slot_values_sha256": "0df802c71d16dca19a22286c6b3fcd54638e6b344f8e156f8dcedad9f52eaff5",
+  "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+  "proof_bundle_sha256": "5afa29b52baac71b5bdebd06ea26a30b588e1fcd29a270ba82455c59da917029",
+  "qualification": "Observed updates only; untouched storage completeness and BSC consensus are not verified.",
+  "run_id": "7057b49ec5524deea3283ec184e19b54",
+  "slot_digest_encoding": "ascending address/slot, concatenated 20-byte address and 32-byte slot/value",
+  "start_block": 121464944,
+  "proof_bundle": "tests/fixtures/lifecycle/recent-proofs.json",
+  "captured_transactions": "tests/fixtures/lifecycle/manifest.json",
+  "capacity": {
+    "status": "completed",
+    "samples": 29,
+    "failed_samples": 0,
+    "peak_observed_allocated_bytes": 1981038592,
+    "maximum_sample_gap_ns": 1376933000
+  }
+}

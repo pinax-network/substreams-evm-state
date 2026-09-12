@@ -42,13 +42,36 @@ unmodified BSC v5 TransactionTrace messages are also committed as
 transaction at 121114122 and one FAILED transaction at 121114153. Both retain
 sender and accepted-authority nonce changes before root execution; neither
 changes code. Their block hashes and failure status were cross-checked with RPC.
-The broader captured self/multiple/discarded/code-clear matrix is still required.
+Nine further unmodified transactions and their original headers now cover
+producer versions 3, 4 and 5; see the [capture manifest](../tests/fixtures/lifecycle/manifest.json).
+The v5 cases include self-authorization with both nonce increments, three accepted
+authorities, discarded authorization with a reverted slot write, and explicit
+delegation clearing. A v4 first-delegation transaction verifies the authority's
+nonce and code against archive RPC before and after the block. Failed accepted
+authorizations that actually change code, including failed self/multiple/clear
+combinations, remain synthetic coverage rather than captured mainnet evidence.
 
 The rebuilt native mapper also replayed 121114100–121114160 for their sender
 and authority. All 61 block identities/parents were checked, and observed sender
 balance/nonce plus authority nonce matched archive RPC at 121114160. This
 [parity record](evidence/bsc-lifecycle-parity-2026-09-12.json) qualifies those
 observed fields; it is not a complete-account bootstrap or root proof.
+
+A separate eight-account native run replays **121464944–121467555**, including
+the four new v5 cases. All **2,612** block envelopes, parents, filter identity
+and durable cursor are verified. **24 observed account fields** match saved
+account proofs against the encoded target header, and the one final touched
+storage slot matches archive RPC. The
+[result and proof references](evidence/bsc-lifecycle-matrix-2026-09-12.json) retain
+the exact package/module identities. Unobserved fields remain explicitly
+unobserved in this diagnostic; it does not establish full initial storage.
+
+`scripts/qualify_lifecycle_updates.py --database NAME --state-dir DIR --proofs
+FILE --output FILE` repeats the diagnostic against a completed guarded native
+run. Capture the proof bundle before historical replay. The verifier checks all
+observed metadata and final touched slots, and refuses mismatched source/filter,
+cursor, block continuity, proof, metadata or slot values. It does not publish a
+ready checkpoint. Offline CI rechecks the saved account proofs and fixture hashes.
 
 ## SELFDESTRUCT and recreation
 
@@ -87,6 +110,23 @@ the tests use synthetic state with real account/storage trie proofs.
 Current tests exercise the fork boundary with producer version fields 3, 4 and 5,
 delegated execution, same-block recreation, previous-transaction creation and
 reverted destruction. Version-field permutations do not establish full historical
-producer coverage. SELFDESTRUCT in system execution is explicitly unsupported
-until its execution boundary is qualified. Full producer fixtures, historical
-parity and representative-account replay remain release requirements.
+producer coverage. The captured historical additions now prove these specific cases:
+
+| Producer/block | Captured behavior and RPC comparison |
+|---|---|
+| v3 / 149268 | WBNB CREATE: initial nonce, code hash/length and all three constructor-written slots |
+| v3 / 10000000 | CREATE2 confirmed by RPC `callTracer`; proxy bytecode, nonce and three final storage slots after delegated initialization |
+| v3 / 10000001 | Three pre-Cancun SELFDESTRUCT accounts have nonce/code before the block and zero nonce/empty code afterward; no explicit code/nonce clear records are present |
+| v3 / 40000033 | Post-Cancun CREATE and SELFDESTRUCT in the same transaction: an intermediate nonce of one must become zero at transaction end |
+
+The original v3 root call has no begin ordinal, but its state-change and
+transaction-end ordinals remain usable in these captures. Rust tests compose
+each original transaction and header into a partial block; they do not claim the
+fixture is a complete unmodified block. Historical before/after values are archive
+RPC comparisons, distinct from the recent eight-account proof verification.
+
+Captured post-Cancun SELFDESTRUCT of a previously existing account, same-address
+deletion/recreation, and failed authorization code-change combinations remain
+open. SELFDESTRUCT in system execution is explicitly unsupported until its
+execution boundary is qualified. Representative-account replay and the full
+lifecycle acceptance matrix remain release requirements.

@@ -1,6 +1,6 @@
 [package]
 name = "substreams-evm-state"
-description = "EVM account state projection (storage/balance/nonce/code) Substreams — Postgres db_out"
+description = "EVM account state projection Substreams with native ClickHouse and PostgreSQL outputs"
 edition = "2021"
 version = "0.1.0"
 license = "Apache-2.0"
