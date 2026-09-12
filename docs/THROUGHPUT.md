@@ -60,11 +60,29 @@ does establish that the guarded native path passes the request to the provider
 and verifies the resulting complete update interval. Full initial storage and
 customer-set throughput remain separate qualifications.
 
+An additional [200-worker measurement](evidence/bsc-worker-200-2026-09-12.json)
+covers 65,000,000–65,399,999 with the same customer-example filter and frozen
+package. The provider admitted 200 workers, telemetry observed 200 running jobs
+and 400,000 processed blocks, and guarded ingestion finished in **176.76 seconds**.
+Ownership, all 400,000 block identities, the durable cursor and encoded RPC target
+header pass. The capacity supervisor completed with no rejected samples. This is
+a different interval under shared load, not a controlled linear-scaling result.
+
+Both long bootstraps subsequently resumed with `--parallel-workers 200`, retaining
+their package/filter identities, million-block chunks, 1 GiB spool limit and
+capacity policy. The previous native clients were intentionally stopped and their
+supervisors confirmed terminal before replacement. WBNB's resumed session starts
+immediately after its checked private prefix. The customer source first recovered
+two local spool segments: all **78,009 blocks** between its private prefix and the
+new server session are present with continuous hashes and durable cursor coverage.
+Server session start alone therefore does not describe all data recovered during
+a native restart. These private prefixes still await their saved final proofs.
+
 ## Historical chunk size
 
-The two long bootstrap runs now use the existing `--chunk-blocks 1000000`
-option, with 100 requested workers and the same 1 GiB spool limit and capacity
-policy. Their first completed million-block chunks are recorded in
+The first million-block chunk measurements used `--chunk-blocks 1000000`,
+100 requested workers and the same 1 GiB spool limit and capacity policy.
+Those completed chunks are recorded in
 [the chunk-size evidence](evidence/bsc-million-block-chunks-2026-09-12.json):
 
 | Cohort | Historical range | Start to next chunk start | Resulting private nonzero slots | Compaction query memory |

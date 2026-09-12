@@ -1,0 +1,167 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "measurement": {
+    "blocks": 400000,
+    "capacity": {
+      "command_exit_code": 0,
+      "config_sha256": "fd4bc45a4cf695e5bf46cdb3a4c64e0990301caab00a2cf1598983d2af1b404e",
+      "failed_guard_samples": 0,
+      "failed_samples": 0,
+      "finished_ns": 1789239031780119000,
+      "format_version": 1,
+      "guard_samples": 17,
+      "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+      "maximum_sample_gap_ns": 21093401000,
+      "peak_observed_allocated_bytes": 9288404992,
+      "rejected_guard_stages": [],
+      "samples": 14,
+      "started_ns": 1789238855295731000,
+      "status": "completed",
+      "stop_reasons": [],
+      "termination_error": null
+    },
+    "capacity_summary_sha256": "d8c90f3f653fae72350d3e2fbea06269e640c1e1b66b30d895373fc3fe9a9959",
+    "chain_id": 56,
+    "format_version": 1,
+    "guarded_ingestion_seconds": 176.7551861256361,
+    "header": {
+      "hash": "0x8f7590591f81e3e18b4c52be7d048311bc4979537f924cc0ed3596abbdb10843",
+      "number": 65399999,
+      "parent_hash": "0x29a5dca64a561cbe015447456211fd6216dfbe14b025dabbf0a991ebd0078851",
+      "state_root": "0xe21c5bce961fc6a46f31fa493974f50f4f070b51ebea1dbc5e1d86d4dd0af347",
+      "timestamp": 1761050781
+    },
+    "header_rlp": "0xf9037da029a5dca64a561cbe015447456211fd6216dfbe14b025dabbf0a991ebd0078851a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d4934794d3b0d838ccceae7ebf1781d11d1bb741db7fe1a7a0e21c5bce961fc6a46f31fa493974f50f4f070b51ebea1dbc5e1d86d4dd0af347a0500e533d0687944e1686b4bb37dc883cc539e794c0957e126a5878f94bc9686da0d8810220e74884ac2d2db8a272ff80008fe9158c4b1165d7f109828074aa0c8fb90100773defe545de6c32ebdf5f6dbe096d46f7ebf3daebbdf7de3baf73b8f6cf61efbcc5f59ff094f374f3def3396ff7f4e3edb5eaf6b50e7a7d87bae3f777acc0b4eee3d7de6dc73ea823aed1fd891d6f2db5ff0abb537f8c6a7bbe4f5fe0b16de4879b3c70d2c7efdbf57d2ebfa61dd9ff8d77f7e4d37fff039623fcd4e3be9fbbbeb643ff7e1f2f6cdded399dbf9b77dfbff58fb7d14eaaad67feb7f23f6f3ef9b27df6afaddeadb7dbb72ddb2feed7f3723a6ff676f2ef1fd5db567ebdf3b7f3e7dfb5cb87f1ad1d19fe7966b6fedfd360d66fff762d2775f5bb64d7edafba1f7e7bcf997ffffd615dcc7afe2b67617d4e42bebbcda5174afff77a3afbecd7a7028403e5ecbf8405f5e1008402152c8f8468f7809db90118d883010511846765746888676f312e32332e34856c696e7578000000098d24acf8b5831f7fffb860a174dced1bfbb06dbb4db3e16db2ac0f29bfe28e79fd48fc1b269905d5c941737c9d60260d7483109a2815bb3a14ad8f05c86721dea1f7b73c3b064cad2679eae3a374ae27b5afe1dcddcafc8740a71f2685ffbffbdb3cd4832a94a4ad1e3511f84c8403e5ecbda08dbb522fa4373e587ccb1919c4c85899c6d26f9720b58f3d6fe5b54a433f1d488403e5ecbea029a5dca64a561cbe015447456211fd6216dfbe14b025dabbf0a991ebd0078851809888f57954ea169913c130f3d08228c74dba5fc0e7b4bdd2d8ac4809335b6fa2498462c91b1ca72043c402702d95b22c7480f8aa8ea6ea6c1616beba702018e800a000000000000000000000000000000000000000000000000000000000000001f488000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a0e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "maximum_reported_processed_blocks": 400000,
+    "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+    "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+    "peak_reported_running_jobs": 200,
+    "qualification": "Independent historical interval, customer-example filter and frozen package. Shared workload and underlying cache warmth are uncontrolled. Server telemetry measures requested/admitted workers and processing; this is not full-state proof, a linear-scaling claim or customer SLA.",
+    "requested_workers": 200,
+    "run_id": "bed5cbc8dc854c1b8579d6556a257e6e",
+    "sessions": [
+      {
+        "linear_handoff_block": 65400000,
+        "max_parallel_workers": 200,
+        "resolved_start_block": 65000000
+      }
+    ],
+    "start_block": 65000000,
+    "started_ns": 1789238855054937000
+  },
+  "measurement_file_sha256": "a93dd2d57046e357e64a8437d64d2a79f283ca83a331144da3e0f9a6ca06c966",
+  "operator_stop_record_sha256": "80d63855e97e84290889fe068617320c7f47807dfe611538748cbbb4a2b163a6",
+  "checked_resumes": [
+    {
+      "admitted_allocated_bytes": 7564075008,
+      "admitted_sample_finished_ns": 1789239505800999000,
+      "before_stop_durable_block": {
+        "hash": "0xf8faafc853488727a1993865aa3308ac9279a4e8239268931703f7412517cf17",
+        "number": 16626970
+      },
+      "cohort": "wbnb-bootstrap",
+      "compacted_prefix_header": {
+        "hash": "0x3e1cef3d17ec5f7b7b5ec66e22d9673bfbb8956fdb8486152d385ccebab8a2dd",
+        "number": 16645978,
+        "parent_hash": "0x1b749af872b62be870046fdc5d166473cf18ecf82753184736a7b78274b707cd",
+        "state_root": "0x132e97e9293370621ed447f37b59e9da9052ba86d181eca7ace0dece27a02a00",
+        "timestamp": 1649057788
+      },
+      "compacted_prefix_slots": 2635163,
+      "compacted_prefix_state_sha256": "6edf90daa6e43c7ff3c24bbf7e0784767b2106039bdab623fea0295f32995e05",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "new_phase": "host-disk-retry5",
+      "observed_durable_block": {
+        "hash": "0x25a282f5633a348eab9cf8c6479738ff8b25dbd26fec9ba1ea031ad582237555",
+        "number": 16886813
+      },
+      "old_capacity_summary_sha256": "96ab5cf67d16cae496ba7bf5a6fb91f5d75e5606ceb811549ad786ac9b5f26d4",
+      "old_outcome": {
+        "command_exit_code": 1,
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "status": "stopped",
+        "stop_reasons": []
+      },
+      "old_phase": "host-disk-retry4",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "session": {
+        "linear_handoff_block": 17646000,
+        "max_parallel_workers": 200,
+        "resolved_start_block": 16645979,
+        "timestamp": "2026-09-12T14:56:34.325-0400"
+      },
+      "verified_native_blocks_between_prefix_and_session": 0,
+      "verified_pre_session_end_header": {
+        "hash": "0x3e1cef3d17ec5f7b7b5ec66e22d9673bfbb8956fdb8486152d385ccebab8a2dd",
+        "number": 16645978,
+        "parent_hash": "0x1b749af872b62be870046fdc5d166473cf18ecf82753184736a7b78274b707cd",
+        "state_root": "0x132e97e9293370621ed447f37b59e9da9052ba86d181eca7ace0dece27a02a00",
+        "timestamp": 1649057788
+      }
+    },
+    {
+      "admitted_allocated_bytes": 7454482432,
+      "admitted_sample_finished_ns": 1789239514971419000,
+      "before_stop_durable_block": {
+        "hash": "0xcc77c40fe3058c327ee9fdf95b0a6be6248e47615b27f4819ef9e55aed8d978e",
+        "number": 61253990
+      },
+      "cohort": "customer-example",
+      "compacted_prefix_header": {
+        "hash": "0xcc77c40fe3058c327ee9fdf95b0a6be6248e47615b27f4819ef9e55aed8d978e",
+        "number": 61253990,
+        "parent_hash": "0x502b4eec419c36a94d1d0cbe902b4e1cef068bb659cafc038e17f6a1b05faf72",
+        "state_root": "0xb10f510e48f96aa21129c2d9678f71b35f8a7119bae3fb1d8512f194e8f2aa7d",
+        "timestamp": 1757939205
+      },
+      "compacted_prefix_slots": 2090,
+      "compacted_prefix_state_sha256": "f8d1cdf1925d2f12f58a0d4ca37e06b9d4f33669fe5a74a2eef46f382ad2ae70",
+      "module_hash": "c3ae40f8aa6694972b17a3753dff6fe12a63e616",
+      "new_phase": "host-disk-retry4",
+      "observed_durable_block": {
+        "hash": "0x352ebe968f3f145eddaaaffbc872d31115fa23ca63cc7d01eb78efd7f419738f",
+        "number": 62018994
+      },
+      "old_capacity_summary_sha256": "ee31d36c061f06038d4999ae8f78bb362b12515d48aa2e5f3b9c574dbfb59742",
+      "old_outcome": {
+        "command_exit_code": 1,
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "status": "stopped",
+        "stop_reasons": []
+      },
+      "old_phase": "host-disk-retry3",
+      "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+      "run_id": "241fa830acd249b595cb53ccdaecd8b8",
+      "session": {
+        "linear_handoff_block": 62254000,
+        "max_parallel_workers": 200,
+        "resolved_start_block": 61332000,
+        "timestamp": "2026-09-12T14:55:18.727-0400"
+      },
+      "verified_native_blocks_between_prefix_and_session": 78009,
+      "verified_pre_session_end_header": {
+        "hash": "0x85df1de53ae893eb51c01556b47b6915054c734bd173d041d9acae492b4e6a02",
+        "number": 61331999,
+        "parent_hash": "0xe8646704677b0bab88bd907ba6032978cacc01308e95aafba662224a4cb61cd1",
+        "state_root": "0xa8c0230fe04e912d58fc5b60cfb670295b349c22b386b18390e457ea7c74ceba",
+        "timestamp": 1757997799
+      }
+    }
+  ],
+  "customer_spool_recovery_log_prefixes": [
+    "2026-09-12T14:55:15.939-0400 INFO (substreams.spool) recovering the local spool, the stream does not start until this finishes",
+    "2026-09-12T14:55:15.939-0400 INFO (substreams.spool) replaying a spool segment",
+    "2026-09-12T14:55:17.391-0400 INFO (substreams.spool) replaying a spool segment",
+    "2026-09-12T14:55:18.144-0400 INFO (substreams.spool) recovered the local spool"
+  ],
+  "overall_budget_bytes": 100000000000,
+  "live_policy_budget_bytes": 98257164288,
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "spool_limit_bytes_per_source": 1073741824,
+  "chunk_blocks_per_source": 1000000,
+  "qualification": "A completed bounded native update interval and checked 100-to-200-worker resumes on the same source/package/filter identities. Historical ranges and shared load differ from earlier measurements; no linear speedup or full-account completeness is claimed. The ongoing bootstraps still require their saved final account/storage proofs."
+}

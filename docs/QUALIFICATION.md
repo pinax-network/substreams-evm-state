@@ -66,6 +66,13 @@ Native failure tests prove:
   unpublished candidate; restart after publication preserves the old snapshot,
   followed by repaired-cursor replay and a separately verified new snapshot.
 
+A later [real BSC worker-request transition](evidence/bsc-worker-200-2026-09-12.json)
+also verifies recovery after intentionally stopping both long native replays.
+Their source/package/filter identities remain unchanged at 200 requested/admitted
+workers. The customer source drains two local spool segments before its server
+session starts; all 78,009 intervening native blocks and their parent/hash
+continuity verify. This is update/restart evidence, not a final account-root proof.
+
 These are process-crash and torn-file tests, not physical whole-host power-loss
 tests. Acknowledged ClickHouse parts use filesystem sync settings and local
 metadata uses synced atomic replacement; durable storage must honor those writes.
