@@ -10,6 +10,17 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Commands {
+    /// Reconstruct a frozen private account trie under capacity supervision.
+    TrieWorkspace {
+        #[arg(long)]
+        evidence: PathBuf,
+        #[arg(long)]
+        fields: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+        #[arg(long)]
+        reference: Option<PathBuf>,
+    },
     /// Append freshly admitted private-prefix growth observations.
     RecordGrowth {
         #[arg(long, default_value = "localdata/qualification")]
@@ -26,6 +37,20 @@ enum Commands {
 }
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::TrieWorkspace {
+            evidence,
+            fields,
+            output,
+            reference,
+        } => {
+            evm_state::trie_qualification::measure(
+                &evidence,
+                &fields,
+                &output,
+                reference.as_deref(),
+            )?;
+            Ok(())
+        }
         Commands::RecordGrowth {
             root,
             output,

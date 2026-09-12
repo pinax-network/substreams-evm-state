@@ -57,8 +57,9 @@ are linked from [LIFECYCLE.md](LIFECYCLE.md).
 
 The release asset is `evm-state-v0.1.0.spkg`. Build it from the release checkout
 with `make build`, using the pinned Rust 1.88 toolchain and Substreams 1.22.0 CLI.
-The tested ClickHouse version is 26.3.33.24. Install the Python checkpoint tooling
-and follow the [README](../README.md) for native setup, proof capture, replay,
+The tested ClickHouse version is 26.3.33.24. Build the native Rust tools with
+`cargo build --locked --release -p evm-state` and follow the
+[README](../README.md) for native setup, proof capture, replay,
 checkpoint publication and export/restore commands.
 
 Use finalized blocks only. `ingest` defaults to one-block decoding and a 100 ms

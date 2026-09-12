@@ -1,0 +1,68 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "runtime": "Rust 1.88 release profile",
+  "binary_sha256": "8b2c0e86751207e44ac760dfb213c7f8600cf0625b8a76fa2fc4c4c771eaa873",
+  "source_snapshot": "ce69d62957a945a6971d8aa736dfb4c8",
+  "restored_snapshot": "a949a7b452004b65ae466ee8f8f5bccf",
+  "header": {
+    "hash": "0x7d4fc350fa04cb7d9b63ae5435f252301d67ca41363b9273adc6365d7a7a1abe",
+    "number": 121462462,
+    "parent_hash": "0x5f1ea4274ff6589306a60304d0d0ec29de23f0ad27dde6f5c7b8cf5493de054c",
+    "state_root": "0x66840c1ef6ff8840f4f569ab3bc19f0645bf929cd2b99c0b89499227bac35c8e",
+    "timestamp": 1789219970
+  },
+  "nonzero_slots": 46,
+  "state_sha256": "d2faa26dda6d97d1aeefeb136b765a091ab5b3da2a48cb8d7328f0abdc467813",
+  "export_pages": 5,
+  "manifest_content_sha256": "acc1d4bf0138636ad427ce2b22415b2ecd3b6e20ba06871bfd766b72adf9c649",
+  "state_identity_matches": true,
+  "export_capacity": {
+    "status": "completed",
+    "samples": 7,
+    "failed_samples": 0,
+    "guard_samples": 6,
+    "failed_guard_samples": 0,
+    "peak_observed_allocated_bytes": 10928517120,
+    "maximum_sample_gap_ns": 15454522000,
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "import_capacity": {
+    "status": "completed",
+    "samples": 12,
+    "failed_samples": 0,
+    "guard_samples": 14,
+    "failed_guard_samples": 0,
+    "peak_observed_allocated_bytes": 11088355328,
+    "maximum_sample_gap_ns": 18708095000,
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "overall_budget_bytes": 100000000000,
+  "qualification": "A checkpoint created by the previous implementation was read, exported, independently checked from its portable files, restored into a new ClickHouse generation, and fully reverified before publication by Rust. The block hash was pinned during restore. This 46-slot compatibility case does not replace large hot-state publication/export/read or process-crash qualification. Capacity reports cover shared data and sampled intervals, not a hard quota.",
+  "accounts": [
+    {
+      "address": "0x10ed43c718714eb63d5aa57b78b54704e256024e",
+      "exists": true,
+      "nonzero_slots": 0,
+      "storage_root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+      "code_hash": "0x69aef35de7236f9ae83edadff736f01ea40edd8919b2e73d87dea5d3255b8c3e"
+    },
+    {
+      "address": "0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff",
+      "exists": true,
+      "nonzero_slots": 46,
+      "storage_root": "0x979eecf7c7a2cca67f69e54871848cf9259f70a8f7b3912189f2bbecc991180f",
+      "code_hash": "0xb97c57bb57e8ba977b8f93a3be4d4dba747a3d9ca39dbe11ac8559f5972673aa"
+    },
+    {
+      "address": "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a",
+      "exists": true,
+      "nonzero_slots": 0,
+      "storage_root": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+      "code_hash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+    }
+  ]
+}

@@ -41,8 +41,9 @@ checkpoint reads, durable pins, pagination, generation retention, RPC proof
 capture, capacity sampling/supervision, and the private-prefix growth recorder.
 The native CLI exposes reads, pins, retention, capacity, proof capture, native
 preparation/ingestion/cursor recovery and checkpoint publication. It validates
-existing private bootstrap prefixes; compaction/replay and portable export/import
-still need their Rust replacements. The native wrapper has not yet passed the
+existing private bootstrap prefixes and supports portable export/import with
+offline proof verification. Compaction/replay still need their Rust replacements.
+The native wrapper has not yet passed the
 full fault-injection streaming qualification needed to take over the long replays.
 
 The first checks passed locally on Rust 1.88: 29 native unit/integration scenarios
@@ -59,8 +60,24 @@ remain temporarily until all replacement workflows have their required evidence.
 The next Rust checks cover native preparation and source ownership, explicit
 cursor recovery, finalized flush/worker arguments, full checkpoint publication,
 storage clears, bad metadata, missing blocks, filter drift, unexpected accounts,
-and lifecycle resets against a previous ready checkpoint. There are now 34
+and lifecycle resets against a previous ready checkpoint. That phase passed 34
 standalone Rust test functions and 18 opt-in ClickHouse test functions, alongside
 the existing 43 mapper tests. Several tests run multiple corruption scenarios.
 HTTP tests also reject failed queries/inserts returned with HTTP 200, consistent
 with ClickHouse's [HTTP response caveats](https://clickhouse.com/docs/concepts/features/interfaces/http#http-response-codes-caveats).
+
+Portable export/import adds offline corruption checks and ClickHouse round trips,
+including preserving an existing ready checkpoint after a failed restore. The
+current totals are 40 standalone native Rust tests, 22 opt-in ClickHouse tests,
+and 43 mapper tests. A real three-account BSC checkpoint created by the previous
+implementation was exported into five gzip pages and restored into a new database
+by Rust. All 46 nonzero slots, the header and state checksum matched; both runs
+completed under the Rust capacity supervisor without rejected samples. See
+[portable compatibility evidence](evidence/bsc-portable-rust-2026-09-12.json).
+
+The Rust trie implementation also reconstructed the exact frozen WBNB prefix root
+from 1,912,703 slots. It used 19.4 CPU seconds and 32.0 MB peak process memory;
+the trie stage took 163.0 seconds including capacity checks. The prior sorted
+implementation used 84.6 CPU seconds and 73.6 MB on the same input. This is prefix
+parity, not proof acceptance of the final hot-account checkpoint. See
+[trie evidence](evidence/bsc-trie-rust-2026-09-12.json).

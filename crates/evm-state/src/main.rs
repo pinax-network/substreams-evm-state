@@ -15,6 +15,34 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Verify and restore a portable checkpoint into a new generation.
+    ImportExport {
+        directory: PathBuf,
+        #[arg(long)]
+        expected_hash: Option<String>,
+        #[arg(long)]
+        work_dir: Option<PathBuf>,
+        #[arg(long, default_value_t = 100_000_000_000_u64)]
+        budget_bytes: u64,
+    },
+    /// Write a complete paginated checkpoint with offline proofs.
+    Export {
+        snapshot_id: String,
+        #[arg(long)]
+        output: PathBuf,
+        #[arg(long, default_value_t = 10000)]
+        page_size: usize,
+        #[arg(long)]
+        work_dir: Option<PathBuf>,
+    },
+    /// Verify exported files without database or RPC access.
+    VerifyExport {
+        directory: PathBuf,
+        #[arg(long)]
+        expected_hash: Option<String>,
+        #[arg(long)]
+        work_dir: Option<PathBuf>,
+    },
     /// Verify isolated source state and publish an immutable checkpoint.
     Checkpoint {
         #[arg(long)]
@@ -157,6 +185,43 @@ fn run() -> Result<()> {
     let args = Cli::parse();
     let client = ClickHouse::new(&args.database)?;
     let result = match args.command {
+        Commands::ImportExport {
+            directory,
+            expected_hash,
+            work_dir,
+            budget_bytes,
+        } => {
+            let mut record = evm_state::importer::import_checkpoint(
+                &client,
+                &directory,
+                expected_hash.as_deref(),
+                &work_dir.unwrap_or_else(std::env::temp_dir),
+                budget_bytes,
+            )?;
+            record.as_object_mut().unwrap().remove("proof_bundle");
+            record
+        }
+        Commands::Export {
+            snapshot_id,
+            output,
+            page_size,
+            work_dir,
+        } => evm_state::export::export_checkpoint(
+            &client,
+            &snapshot_id,
+            &output,
+            page_size,
+            &work_dir.unwrap_or_else(std::env::temp_dir),
+        )?,
+        Commands::VerifyExport {
+            directory,
+            expected_hash,
+            work_dir,
+        } => evm_state::export::verify_export(
+            &directory,
+            expected_hash.as_deref(),
+            &work_dir.unwrap_or_else(std::env::temp_dir),
+        )?,
         Commands::Checkpoint {
             proofs,
             sources,

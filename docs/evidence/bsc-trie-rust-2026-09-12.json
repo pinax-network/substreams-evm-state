@@ -1,0 +1,70 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "implementation": "Rust 1.88 release profile; Alloy trie with disk-sorted SQLite slots",
+  "measurement": {
+    "account": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "backend": "rust-sorted-alloy",
+    "binary_sha256": "fecc223a6e7cf94854cc9dc257482947ebf9c32e3dcc769346a008a822200ca9",
+    "crate_version": "0.1.0",
+    "database": "evm_wbnb_aggregation_retry3",
+    "evidence_sha256": "47f12ffb6aac74d9555598f919c40e5d208241348fcafb6fa13da4ed6aae505e",
+    "fields_sha256": "8cbd2ec8d2b11dc03ca1fcc5f153c79f8ccea9c51e7f2f9c2d16cf37221ea477",
+    "format_version": 2,
+    "generation": "e02f65b3dc7044e8aa34c4ee1b711ec9",
+    "header": {
+      "hash": "0xbc76479ac68845c5a89470206d95d87dd57710fa089d05d5fc389ad11ff3f08b",
+      "number": 13120981,
+      "parent_hash": "0x0946a0d4ecbb4fac2fcf65bdf7e92a2de5e23c44dd111b7b29974fe0ac1de3cd",
+      "state_root": "0x6b0733de65d4a57e88601b49727131e63ce84e996004b76b0205bef4f8e8a319",
+      "timestamp": 1638418625
+    },
+    "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+    "nonzero_slots": 1912703,
+    "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+    "process_cpu_seconds_during_trie": 19.413974000000003,
+    "qualification": "Resource measurement of a checksummed private account state. No account proof, independently accepted storage root or ready checkpoint is claimed.",
+    "reconstructed_storage_root": "0xd672105a8c3dfc77d33324fa8d8881000bacc3e83de76c5cceced2b7edab99ca",
+    "reference_root_matches": true,
+    "reference_sha256": "29710f52cde14794878c955dcc277193018629000f380e65b942300bd1dc1f20",
+    "run_id": "62b4938ec1554bc093644232ef4b469d",
+    "state_sha256": "54152c1af63f611f0a67c290148e56da1c39863235287570aded7cd7db6b64ca",
+    "status": "unproven-trie-resource-measurement",
+    "streamed_input_checksum_matches": true,
+    "trie_seconds_including_progress_guards": 162.973848375,
+    "whole_process_peak_rss_bytes": 31997952,
+    "workspace_allocated_bytes": 135061504,
+    "workspace_entries": 1912703,
+    "workspace_entry_kind": "hashed storage slots",
+    "workspace_file_bytes": 126369792,
+    "workspace_note": "Disposable SQLite workspace is not a portable trie export. Sorted slots are committed before hashing; workspace file sizes are measured after closing the database. RSS covers this Rust process, not the ClickHouse server or other processes."
+  },
+  "previous_sorted": {
+    "backend": "sorted",
+    "trie_seconds_including_progress_guards": 200.6320142922923,
+    "process_cpu_seconds_during_trie": 84.60902399999999,
+    "whole_process_peak_rss_bytes": 73596928,
+    "workspace_allocated_bytes": 135061504
+  },
+  "comparison": {
+    "same_input_and_root": true,
+    "cpu_speedup": 4.358150680535576,
+    "wall_speedup_including_guards": 1.2310687652821546,
+    "peak_rss_reduction_fraction": 0.565227070347284
+  },
+  "capacity": {
+    "status": "completed",
+    "samples": 22,
+    "failed_samples": 0,
+    "guard_samples": 21,
+    "failed_guard_samples": 0,
+    "peak_observed_allocated_bytes": 9899851776,
+    "maximum_sample_gap_ns": 22095395000,
+    "stop_reasons": [],
+    "termination_error": null,
+    "config_sha256": "f4e2c0313355685b697e6d50357582654ec1c4cef793d25d2a0158cc42af7ed5"
+  },
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "overall_budget_bytes": 100000000000,
+  "interpretation": "Exact parity on a checksummed frozen 1,912,703-slot WBNB prefix. This is not a finalized target account proof or ready checkpoint. Wall time includes whole-directory capacity scans during concurrent backfills; CPU and peak RSS refer only to the measured Rust process. The sampled shared footprint is not a hard retained-data bound. The measurement records its actual binary hash; later runtime ports must retain the same root."
+}
