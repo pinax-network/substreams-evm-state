@@ -244,6 +244,61 @@ publishes a checkpoint. Query-log completion is awaited because it can become
 visible after the HTTP response. The evidence retains the earlier boundary,
 measurement-syntax and logging-race failures as unsuccessful attempts.
 
+## Full trie reconstruction workspace
+
+The [real WBNB trie workspace measurement](evidence/bsc-trie-workspace-2026-09-12.json)
+uses the same isolated 1,912,703-slot result from the aggregation comparison.
+Before reconstruction, its storage and archive-supplied nonce/balance/code fields
+reproduce the previously recorded state checksum. The complete stream also
+reproduces that checksum while the production `storage_root` and `TrieDB` code
+construct the trie.
+
+| Measurement | Observed result |
+|---|---|
+| Nonzero slots / stored trie nodes | 1,912,703 / 2,660,563 |
+| Trie reconstruction wall time, including progress guards | 1,280.79 s (21.35 min) |
+| Python process CPU time during reconstruction | 986.43 s |
+| Whole measurement process peak resident memory | 578,240,512 bytes |
+| Trie file length / allocated space before close | 388,513,792 / 403,693,568 bytes |
+| Shared-server and declared-local-root allocated peak | 9,374,461,952 bytes |
+
+The separate original-volume reserve is 1,742,835,712 bytes. All 116 periodic and
+21 guard samples pass; the maximum periodic gap is 29.74 seconds. Progress guards
+run every 100,000 slots and before closing the temporary SQLite transaction.
+RSS covers the Python process, including its preliminary checksum scan, rather
+than all processes on the machine. The disposable SQLite file is measured before
+close; it is not a portable trie export or a retained verified checkpoint.
+
+The reconstructed root is
+`0xd672105a8c3dfc77d33324fa8d8881000bacc3e83de76c5cceced2b7edab99ca`
+at block 13,120,981. **This is not an accepted account storage root:** the RPC
+provider rejected `eth_getProof` because the historical block is outside its proof
+window. This exercise establishes measured reconstruction cost and input parity,
+not complete account-state acceptance. The long replays retain their separately
+captured recent proofs as final readiness targets.
+
+The 21-minute reconstruction makes full-root verification a material publication
+and export cost even at this intermediate size. Larger state, checkpoint/export
+latency and sustained growth remain qualification gates. Do not extrapolate a
+fixed per-slot memory or time bound from this one shared-machine measurement.
+
+To reproduce on the retained isolated comparison database, provide a JSON object
+mapping its account to the matching observed fields (`nonce`, decimal-string
+`balance`, `code_hash` and `code`). The script rejects metadata or storage that
+does not reproduce the comparison's recorded checksum:
+
+```bash
+.venv/bin/evm-state --database <comparison-db> capacity-run \
+  --config <runtime>/capacity.json --output <runtime>/trie-capacity --interval 5 -- \
+  .venv/bin/python scripts/qualify_trie_workspace.py \
+    --evidence docs/evidence/bsc-aggregation-memory-2026-09-12.json \
+    --fields <runtime>/matching-fields.json --output <runtime>/trie-work
+```
+
+Both output directories must be new and inside the measured roots. The evidence
+selects the frozen database and generation; the workload never reads or modifies
+the advancing native source and never publishes a ready manifest.
+
 ## Reproduce the state/retention stress fixture
 
 With the pinned CLI, Python test dependencies and local ClickHouse running, use a

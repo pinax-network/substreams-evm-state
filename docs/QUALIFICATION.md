@@ -203,6 +203,13 @@ exercised the tested server's default spill behavior. This qualifies the observe
 prefix and query shape; larger retained state, full proofs and sustained growth
 remain pending.
 
+The [full trie workspace run](CAPACITY.md#full-trie-reconstruction-workspace)
+reconstructs all 1,912,703 slots from that isolated result with matching streamed
+input checksum. It measures 21.35 minutes including progress guards, 578 MB peak
+Python resident memory and 404 MB allocated trie workspace, with no rejected
+capacity samples. A historical account proof is unavailable outside the provider's
+proof window, so this is resource evidence, not complete-account acceptance.
+
 The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
 account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps
 storage. Checkpoint tests remove untouched inherited slots, preserve later

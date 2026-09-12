@@ -1,0 +1,316 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "runtime": {
+    "platform": "darwin",
+    "python_version": "3.14.4",
+    "trie_version": "4.0.0",
+    "sqlite_version": "3.53.0"
+  },
+  "measurement": {
+    "account": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "database": "evm_wbnb_aggregation_retry3",
+    "evidence_sha256": "47f12ffb6aac74d9555598f919c40e5d208241348fcafb6fa13da4ed6aae505e",
+    "fields_sha256": "8cbd2ec8d2b11dc03ca1fcc5f153c79f8ccea9c51e7f2f9c2d16cf37221ea477",
+    "format_version": 1,
+    "generation": "e02f65b3dc7044e8aa34c4ee1b711ec9",
+    "header": {
+      "hash": "0xbc76479ac68845c5a89470206d95d87dd57710fa089d05d5fc389ad11ff3f08b",
+      "number": 13120981,
+      "parent_hash": "0x0946a0d4ecbb4fac2fcf65bdf7e92a2de5e23c44dd111b7b29974fe0ac1de3cd",
+      "state_root": "0x6b0733de65d4a57e88601b49727131e63ce84e996004b76b0205bef4f8e8a319",
+      "timestamp": 1638418625
+    },
+    "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+    "nonzero_slots": 1912703,
+    "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+    "process_cpu_seconds_during_trie": 986.432495,
+    "qualification": "Resource measurement of a checksummed private account state. No account proof, independently accepted storage root or ready checkpoint is claimed.",
+    "reconstructed_storage_root": "0xd672105a8c3dfc77d33324fa8d8881000bacc3e83de76c5cceced2b7edab99ca",
+    "run_id": "62b4938ec1554bc093644232ef4b469d",
+    "script_sha256": "cbec31986149a2f0e2c06814eefebdc8d6229f2f30bb32f56c7bc33e04a91fb7",
+    "state_sha256": "54152c1af63f611f0a67c290148e56da1c39863235287570aded7cd7db6b64ca",
+    "status": "unproven-trie-resource-measurement",
+    "streamed_input_checksum_matches": true,
+    "trie_allocated_bytes_before_close": 403693568,
+    "trie_file_bytes_before_close": 388513792,
+    "trie_nodes": 2660563,
+    "trie_seconds_including_progress_guards": 1280.785875541158,
+    "whole_process_peak_rss_bytes": 578240512,
+    "workspace_note": "Disposable SQLite transaction is not a portable trie export; close may roll it back. RSS covers this Python process, not the ClickHouse server or other processes."
+  },
+  "progress": [
+    {
+      "elapsed_seconds": 33.2880495833233,
+      "observed_ns": 1789238710397262000,
+      "process_cpu_seconds": 32.611963,
+      "process_peak_rss_bytes": 111378432,
+      "slots": 100000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 20963328,
+      "trie_file_bytes": 20008960
+    },
+    {
+      "elapsed_seconds": 81.17978679109365,
+      "observed_ns": 1789238758290019000,
+      "process_cpu_seconds": 72.94942999999999,
+      "process_peak_rss_bytes": 153288704,
+      "slots": 200000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 40882176,
+      "trie_file_bytes": 40304640
+    },
+    {
+      "elapsed_seconds": 133.37971999961883,
+      "observed_ns": 1789238810491063000,
+      "process_cpu_seconds": 116.814124,
+      "process_peak_rss_bytes": 230850560,
+      "slots": 300000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 59760640,
+      "trie_file_bytes": 59207680
+    },
+    {
+      "elapsed_seconds": 185.81432716641575,
+      "observed_ns": 1789238862926787000,
+      "process_cpu_seconds": 162.457119,
+      "process_peak_rss_bytes": 239452160,
+      "slots": 400000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 84926464,
+      "trie_file_bytes": 78168064
+    },
+    {
+      "elapsed_seconds": 238.07032791618258,
+      "observed_ns": 1789238915183899000,
+      "process_cpu_seconds": 209.294483,
+      "process_peak_rss_bytes": 263323648,
+      "slots": 500000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 101703680,
+      "trie_file_bytes": 97435648
+    },
+    {
+      "elapsed_seconds": 307.93854491598904,
+      "observed_ns": 1789238985053603000,
+      "process_cpu_seconds": 257.59820299999996,
+      "process_peak_rss_bytes": 265551872,
+      "slots": 600000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 118480896,
+      "trie_file_bytes": 116981760
+    },
+    {
+      "elapsed_seconds": 360.2137644579634,
+      "observed_ns": 1789239037329936000,
+      "process_cpu_seconds": 305.35641899999996,
+      "process_peak_rss_bytes": 269746176,
+      "slots": 700000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 152035328,
+      "trie_file_bytes": 136740864
+    },
+    {
+      "elapsed_seconds": 418.26477937493473,
+      "observed_ns": 1789239095382186000,
+      "process_cpu_seconds": 355.63589199999996,
+      "process_peak_rss_bytes": 269746176,
+      "slots": 800000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 168812544,
+      "trie_file_bytes": 157470720
+    },
+    {
+      "elapsed_seconds": 476.6109277913347,
+      "observed_ns": 1789239153729576000,
+      "process_cpu_seconds": 407.063724,
+      "process_peak_rss_bytes": 338771968,
+      "slots": 900000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 185589760,
+      "trie_file_bytes": 177848320
+    },
+    {
+      "elapsed_seconds": 536.84867199976,
+      "observed_ns": 1789239213968603000,
+      "process_cpu_seconds": 458.674783,
+      "process_peak_rss_bytes": 338771968,
+      "slots": 1000000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 202366976,
+      "trie_file_bytes": 198795264
+    },
+    {
+      "elapsed_seconds": 588.2062722500414,
+      "observed_ns": 1789239265327296000,
+      "process_cpu_seconds": 507.70352599999995,
+      "process_peak_rss_bytes": 435027968,
+      "slots": 1100000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 235921408,
+      "trie_file_bytes": 219238400
+    },
+    {
+      "elapsed_seconds": 645.2944460827857,
+      "observed_ns": 1789239322416685000,
+      "process_cpu_seconds": 560.2141340000001,
+      "process_peak_rss_bytes": 441581568,
+      "slots": 1200000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 252698624,
+      "trie_file_bytes": 240222208
+    },
+    {
+      "elapsed_seconds": 729.4526998326182,
+      "observed_ns": 1789239406576730000,
+      "process_cpu_seconds": 615.235053,
+      "process_peak_rss_bytes": 441581568,
+      "slots": 1300000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 269475840,
+      "trie_file_bytes": 261099520
+    },
+    {
+      "elapsed_seconds": 788.0352454995736,
+      "observed_ns": 1789239465160522000,
+      "process_cpu_seconds": 668.6446970000001,
+      "process_peak_rss_bytes": 441581568,
+      "slots": 1400000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 286253056,
+      "trie_file_bytes": 282107904
+    },
+    {
+      "elapsed_seconds": 875.3263297500089,
+      "observed_ns": 1789239552454523000,
+      "process_cpu_seconds": 730.172997,
+      "process_peak_rss_bytes": 441581568,
+      "slots": 1500000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 303030272,
+      "trie_file_bytes": 302690304
+    },
+    {
+      "elapsed_seconds": 972.6913163326681,
+      "observed_ns": 1789239649824317000,
+      "process_cpu_seconds": 792.4592110000001,
+      "process_peak_rss_bytes": 441581568,
+      "slots": 1600000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 336584704,
+      "trie_file_bytes": 323903488
+    },
+    {
+      "elapsed_seconds": 1057.7345668328926,
+      "observed_ns": 1789239734869482000,
+      "process_cpu_seconds": 852.136107,
+      "process_peak_rss_bytes": 578240512,
+      "slots": 1700000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 353361920,
+      "trie_file_bytes": 344834048
+    },
+    {
+      "elapsed_seconds": 1120.451563124545,
+      "observed_ns": 1789239797587886000,
+      "process_cpu_seconds": 907.2648280000001,
+      "process_peak_rss_bytes": 578240512,
+      "slots": 1800000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 370139136,
+      "trie_file_bytes": 365129728
+    },
+    {
+      "elapsed_seconds": 1256.593068790622,
+      "observed_ns": 1789239933732447000,
+      "process_cpu_seconds": 976.7651010000001,
+      "process_peak_rss_bytes": 578240512,
+      "slots": 1900000,
+      "stage": "trie-workspace-progress",
+      "trie_allocated_bytes": 386916352,
+      "trie_file_bytes": 385822720
+    },
+    {
+      "elapsed_seconds": 1280.7858947906643,
+      "observed_ns": 1789239957925817000,
+      "process_cpu_seconds": 986.4325130000001,
+      "process_peak_rss_bytes": 578240512,
+      "slots": 1912703,
+      "stage": "trie-workspace-finished",
+      "trie_allocated_bytes": 403693568,
+      "trie_file_bytes": 388513792
+    }
+  ],
+  "capacity": {
+    "command_exit_code": 0,
+    "config": {
+      "budget_bytes": 98257164288,
+      "clickhouse_container": "substreams-evm-state-ch",
+      "components": {
+        "native": [
+          "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap/native"
+        ],
+        "spool": [
+          "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap/native/spool"
+        ],
+        "verification": [
+          "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap/verification"
+        ]
+      },
+      "databases": [
+        "evm_wbnb_bootstrap",
+        "evm_wbnb_checkpoints",
+        "evm_wbnb_aggregation_retry3"
+      ],
+      "format_version": 1,
+      "headroom_bytes": 10000000000,
+      "local_paths": [
+        "/Users/denis/Github/substreams-evm-state/localdata/qualification/wbnb-bootstrap",
+        "/Users/denis/Github/substreams-evm-state/localdata/qualification/customer-example",
+        "/Users/denis/Github/substreams-evm-state/localdata/qualification/storage-migration"
+      ],
+      "min_free_bytes": 1073741824
+    },
+    "config_sha256": "f4e2c0313355685b697e6d50357582654ec1c4cef793d25d2a0158cc42af7ed5",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789239968614902000,
+    "format_version": 1,
+    "guard_samples": 21,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 29742312000,
+    "peak_observed_allocated_bytes": 9374461952,
+    "rejected_guard_stages": [],
+    "samples": 116,
+    "started_ns": 1789238636608721000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "historical_account_proof_capability": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "block": 13120981,
+    "elapsed_seconds": 0.29904933273792267,
+    "error_type": "VerificationError",
+    "format_version": 1,
+    "hash": "0xbc76479ac68845c5a89470206d95d87dd57710fa089d05d5fc389ad11ff3f08b",
+    "reason": "RPC eth_getProof failed: {'code': -32602, 'message': 'distance to target block exceeds maximum proof window'}",
+    "status": "unavailable"
+  },
+  "result_sha256": "2aabaada6a38b02014ee03af28f420dc1996664c01752e16caba43855004ac4f",
+  "capacity_summary_sha256": "503ce1ce37c24a9772f183b9f3497f338ea57faf3f201571aeafc924dcc979f3",
+  "progress_file_sha256": "0aae952420916fea6ae6405df09ed7a4adc410e7f84ed653ef354da41d2bedf4",
+  "overall_budget_bytes": 100000000000,
+  "live_policy_budget_bytes": 98257164288,
+  "retained_original_volume_reserved_bytes": 1742835712,
+  "interpretation": [
+    "The reconstructed root is derived from the checked private input. The provider rejected an account proof outside its proof window, so root reconstruction does not establish complete account storage at this block.",
+    "Both the preflight and streamed account-field/storage checksums match the previously recorded real aggregation comparison. Archive nonce, balance and code supplied the matching metadata; they are not a substitute for account proofs.",
+    "The reconstruction uses the production storage_root and TrieDB implementation, with additional progress/capacity guards every 100000 slots. Wall time includes those guards and shared-machine contention; CPU time is recorded separately.",
+    "Peak RSS covers the complete Python measurement process. It does not include ClickHouse, native clients or other processes.",
+    "SQLite allocated space is measured before closing the disposable transaction. The retained working file is not a portable or persistent verified trie export.",
+    "Shared-directory capacity includes concurrent native replays and retained comparison databases. Add the original-volume reserve separately. Larger hot state and final account/storage-root acceptance remain pending."
+  ]
+}
