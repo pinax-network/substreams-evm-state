@@ -254,3 +254,63 @@ fn captured_v3_storage_between_recreation_cycles_keeps_last_committed_write() {
     assert_eq!(out.storage[1].ordinal, 3234);
     assert!(out.lifecycle.is_empty());
 }
+
+#[test]
+fn captured_v5_reverted_repeated_authorizations_keep_accepted_nonce_and_code() {
+    let block = sample!("v5-failed-repeated-authority", 5, 121468046);
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.status(), eth::TransactionTraceStatus::Reverted);
+    assert!(tx.calls[0].state_reverted);
+    assert_eq!(tx.calls[0].begin_ordinal, 2334);
+    assert_eq!(tx.set_code_authorizations.iter().map(|a| a.discarded).collect::<Vec<_>>(),
+               vec![true, false, false]);
+    let sender = "0x1a222f9b072aed5e9e815849de5a11b0fe3958ab";
+    let authority = "0x7f7f5004b2fb7ede48fd8b326b30b71bd476479b";
+    let filter = format!("{sender},{authority}");
+    let changes = crate::collect(&filter, &block).unwrap();
+    assert_eq!(changes.nonce_changes.iter().map(|c|
+        (c.new_value, c.origin.as_ref().unwrap().scope)).collect::<Vec<_>>(),
+        vec![(38853, Scope::TxFailedPersistent as i32), (166, Scope::Tx7702 as i32), (167, Scope::Tx7702 as i32)]);
+    assert_eq!(changes.code_changes.len(), 1);
+    assert_eq!(changes.code_changes[0].origin.as_ref().unwrap().scope, Scope::Tx7702 as i32);
+    let out = project(&filter, &block).unwrap();
+    assert_eq!(out.nonces.len(), 2);
+    let nonce = out.nonces.iter().find(|v| v.address == authority).unwrap();
+    assert_eq!((nonce.value, nonce.ordinal), (167, 2333));
+    assert_eq!(out.codes[0].code, "0xef01002c6f01799fa9db1e7f2797e5ba892b72b865571d");
+    assert_eq!(out.codes[0].hash, "0xa6af382bc82af1d985fae744c8d392a6f22a0ddf94d9ebed305860a5416bf2e7");
+    assert_eq!(out.codes[0].ordinal, 2332);
+    assert_eq!(out.balances.iter().find(|v| v.address == sender).unwrap().value, "69709153906374907");
+    assert!(out.storage.is_empty() && out.lifecycle.is_empty());
+}
+
+#[test]
+fn captured_v5_three_accepted_authorizations_increment_one_authority_three_times() {
+    let block = sample!("v5-three-accepted-repeated", 5, 121468057);
+    let authority = "0x952c6e846a50d4533bfdf0f144ed7d6cf3e06eae";
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.set_code_authorizations.len(), 3);
+    assert!(tx.set_code_authorizations.iter().all(|a| !a.discarded));
+    let changes = crate::collect(authority, &block).unwrap();
+    assert_eq!(changes.nonce_changes.iter().map(|c| c.new_value).collect::<Vec<_>>(), vec![80, 81, 82]);
+    let out = project(authority, &block).unwrap();
+    assert_eq!(out.nonces.len(), 1);
+    assert_eq!((out.nonces[0].value, out.nonces[0].ordinal), (82, 1868));
+    // The already-installed delegation is unchanged; no code patch is needed.
+    assert!(out.codes.is_empty() && out.storage.is_empty() && out.lifecycle.is_empty());
+}
+
+#[test]
+fn captured_v5_discarded_higher_nonces_do_not_replace_the_accepted_nonce() {
+    let block = sample!("v5-discarded-repeated-authority", 5, 121468236);
+    let tx = &block.transaction_traces[0];
+    assert_eq!(tx.set_code_authorizations.len(), 13);
+    assert_eq!(tx.set_code_authorizations[0].nonce, 30829);
+    assert!(tx.set_code_authorizations[..12].iter().all(|a| a.discarded));
+    assert!(!tx.set_code_authorizations[12].discarded);
+    assert_eq!(tx.set_code_authorizations[12].nonce, 30817);
+    let out = project("0xaadf24cd8aa8ba3c98c0bca989552f79401e98a5", &block).unwrap();
+    assert_eq!(out.nonces.len(), 1);
+    assert_eq!((out.nonces[0].value, out.nonces[0].ordinal), (30818, 5490));
+    assert!(out.codes.is_empty() && out.storage.is_empty() && out.lifecycle.is_empty());
+}

@@ -8,7 +8,7 @@ make an entire deliverable complete.
 |---|---|---|
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication; 15-minute finalized follow; measured complete pinned reads; fixed finalized decode/spool latency; persistent OS host identity and explicit legacy hostname recovery | Customer latency targets and deployment conditions; storage must honor sync writes (physical host power loss is not emulated) |
 | Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage; real three-account cutover with a killed publisher, unchanged old reader and combined-filter continuation | Broader nonempty hot-account bootstrap and customer account qualification |
-| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; fifteen additional captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases, including failed self-delegation with persistent code, with RPC parity; eight-account native interval verifies 24 observed fields against saved proofs; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers fail on unknown/wrong metadata | Captured repeated/failed multiple-authority/code-clear combinations, post-Cancun existing-account destruction, broader representative lifecycle replay |
+| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; eighteen additional captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases, including failed self-delegation with persistent code, with RPC parity; eight-account native interval verifies 24 observed fields against saved proofs; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers fail on unknown/wrong metadata | Captured failed distinct-authority/code-clear combinations, post-Cancun existing-account destruction, broader representative lifecycle replay |
 | Retention/cost qualification and release | Whole-directory capacity monitoring, sampled headroom enforcement and publication/trie guards; measured 64-account synthetic checkpoint/export/restore/churn/retention; observed active merge space and real BSC spool; checkpoint/candidate cleanup preserving readers; native history cleanup and bounded bootstrap chunks; pinned toolchain and package-producing build; separated cold/cached/live results, current price model and old-contract cohort addition | Nonempty hot-account initial state and sustained-growth qualification, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
@@ -18,15 +18,17 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 258 tests (115 offline, 141 ClickHouse
+The Python suite currently contains 259 tests (116 offline, 141 ClickHouse
 integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. All 258 Python tests passed locally in 113.65
-seconds, all 32 Rust tests passed, and `make build` produced the package. The
-current suite covers stable host identity/recovery and captured recreation with
-storage clearing. A process-kill
+configured development database. The previous 258-test Python baseline passed
+locally in 113.65 seconds. Current local checks pass 116 offline Python tests,
+35 Rust tests, the native chunked bootstrap/restart test with a separate metrics
+listener, and `make build`. CI also runs the complete integration suite. The
+current suite includes stable host identity/recovery, captured recreation/storage
+clearing and repeated authorization proof checks. A process-kill
 test waits for the killed native child to release its inherited writer lock before recovery; reaping its
 wrapper alone was a timing race. The earlier 159-test lifecycle baseline also
 passed on GitHub CI at `41bc101`.
@@ -193,10 +195,10 @@ transaction changed code; this does not complete the broader authorization or
 historical lifecycle matrix, and the parity check is not a complete storage proof.
 
 The [expanded captured matrix](../tests/fixtures/lifecycle/manifest.json) now adds
-fifteen original transaction/header pairs: v3 WBNB creation, CREATE2 with
+eighteen original transaction/header pairs: v3 WBNB creation, CREATE2 with
 delegated initialization, pre-Cancun deletion/recreation and storage clearing,
 post-Cancun same-transaction creation/destruction, v4 delegation installation and
-failed self-delegation, and v5 self/multiple/discarded/cleared authorizations. Literal Rust expectations are cross-checked with before/after
+failed self-delegation, and v5 self/multiple/discarded/cleared/repeated authorizations. Literal Rust expectations are cross-checked with before/after
 archive RPC metadata and touched slots. RPC `callTracer` independently identifies
 the CREATE2 opcode; the Firehose model uses CREATE for both creation opcodes.
 
@@ -209,6 +211,13 @@ same-address destruction/recreation cycles, replacement bytecode and clearing a
 nonzero slot written between cycles. This historical diagnostic uses archive RPC
 field/slot comparisons because account proofs exceed the provider's proof window. Capture
 limitations and the remaining matrix are detailed in [LIFECYCLE.md](LIFECYCLE.md).
+
+A further [five-account native interval](evidence/bsc-authorization-edges-2026-09-12.json)
+covers 121468046–121477785, including accepted and discarded repeated authorities
+and a reverted transaction with persistent nonce/code changes. All 9,740 blocks
+and the durable cursor verify; nine observed metadata fields match saved account
+proofs. No storage patches occur in this interval, and no complete-state
+checkpoint is claimed for this filter.
 
 ## BSC evidence
 
@@ -404,3 +413,22 @@ sidecar writes. The [operations guide](CHECKPOINTS.md) explains this explicit
 operator attestation and its limits. WBNB remains unverified until its complete
 storage matches the saved final account proof; this recovery is not completion
 of the hot-account qualification.
+
+## Supplied customer example
+
+The customer supplied `0x32c59d556b16db81dfc32525efb3cb257f7e493d` as an example,
+although the full 19-account/76-slot list remains unavailable. Archive RPC located
+a code-presence boundary at 48261373, and the captured v4 Extended block confirms
+CREATE in transaction
+`0xdbd9845e36fff38c42f082763ce2ed0e6aa4932602fcef243c92bb30827c4793`.
+The current bytecode has 16,415 bytes. The two constructor-written keys alone,
+and a larger set of 137 keys observed in the existing native samples, both fail
+to reconstruct its storage root at saved proof target 121478038. These are
+incomplete initial-state candidates, not ready exports.
+
+An isolated creation-to-target replay now runs with its own database, controller,
+frozen package, cursor, spool and capacity guard. Its first 200,000 blocks retain
+22 nonzero slots in a private prefix. Final completeness, export and continuation
+remain pending. This is one actual customer example, not qualification of the
+missing complete pilot set. `bootstrap-replay --prometheus-addr` now permits a
+separate metrics listener for each concurrent cohort, as `ingest` already did.

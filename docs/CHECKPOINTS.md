@@ -281,6 +281,10 @@ generation back does it remove covered native history and older private state.
 Final checkpoint verification still reconstructs every complete storage trie
 and verifies all metadata/code against the target's account proofs.
 
+For concurrent cohorts, set `--prometheus-addr` to a distinct listener for each
+`bootstrap-replay` or `ingest` process. Qualification can use `127.0.0.1:0` to
+allocate an ephemeral port. Each cohort still needs its own source/run directory.
+
 Repeat the same command to resume. Use the frozen `<state-dir>/package.spkg` if
 the repository package has changed. The original start, account list, endpoint
 and checkpoint destination remain bound to the run. If interrupted after the

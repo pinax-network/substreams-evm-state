@@ -42,7 +42,7 @@ def main(argv=None):
                                 help="blocks decoded together (ingest: 1 for finalized follow; bootstrap: 32)")
             native.add_argument("--spool-max-idle-ms", type=int, default=1000 if name == "bootstrap-replay" else 100,
                                 help="seal idle spool after this many milliseconds (ingest: 100; bootstrap: 1000)")
-        if name == "ingest":
+        if name in {"ingest", "bootstrap-replay"}:
             native.add_argument("--prometheus-addr", help="native metrics listener; use a distinct port for concurrent cohorts")
         if name == "bootstrap-replay":
             native.add_argument("--chunk-blocks", type=int, default=100000)
@@ -121,7 +121,7 @@ def main(argv=None):
             if args.command == "bootstrap-replay":
                 result = bootstrap_replay(*values, args.stop_block, args.chunk_blocks, args.budget_bytes,
                                           args.max_retries, args.checkpoint_database, args.decode_batch_size,
-                                          args.spool_max_idle_ms)
+                                          args.spool_max_idle_ms, args.prometheus_addr)
             elif args.command == "ingest":
                 result = ingest(*values, args.stop_block, args.max_retries, args.checkpoint_database,
                                 args.decode_batch_size, args.spool_max_idle_ms, args.prometheus_addr)

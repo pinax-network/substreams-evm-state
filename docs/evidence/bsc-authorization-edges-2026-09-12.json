@@ -1,0 +1,54 @@
+{
+  "blocks": 9740,
+  "chain_id": 56,
+  "database": "evm_auth_edges",
+  "final_touched_slots_verified_against_archive_rpc": {},
+  "format_version": 1,
+  "header": {
+    "hash": "0x352f27ef9341ca0976bdba3f3f444ddfc40ed27d434996168f8c13a58eb9ba11",
+    "number": 121477785,
+    "parent_hash": "0x61bbffb843a9abe465bd74e8525adacc52865c7b285fb5d2a92d7fbf48c762ec",
+    "state_root": "0x1b667c4498bc2459fa071fb77db875cc71508150aeeed8da58d9448928488cc2",
+    "timestamp": 1789226868
+  },
+  "header_trust": "provider-finalized-header",
+  "metadata_verified_against_account_proofs": {
+    "0x1a222f9b072aed5e9e815849de5a11b0fe3958ab": {
+      "balance": "62229160735021905",
+      "nonce": 38880
+    },
+    "0x7f7f5004b2fb7ede48fd8b326b30b71bd476479b": {
+      "code": "0xef01002c6f01799fa9db1e7f2797e5ba892b72b865571d",
+      "code_hash": "0xa6af382bc82af1d985fae744c8d392a6f22a0ddf94d9ebed305860a5416bf2e7",
+      "nonce": 167
+    },
+    "0x952c6e846a50d4533bfdf0f144ed7d6cf3e06eae": {
+      "nonce": 82
+    },
+    "0xaadf24cd8aa8ba3c98c0bca989552f79401e98a5": {
+      "nonce": 30824
+    },
+    "0xfb79b004f43419b19a763163ede57cdda9290e69": {
+      "balance": "6186635550000000",
+      "nonce": 803
+    }
+  },
+  "module_hash": "a2bb56fe2a37ebaed54631b3e3a5ca7ae5724c51",
+  "ordered_slot_values_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "package_sha256": "62fa04db937577bd1c2c49788dd36b4c7e3e42fe428726b18aaba3295da02715",
+  "proof_bundle_sha256": "4357e1f573712de3e4c336de6827b71d99b0668f3da6d9d2b3aae5250ae89b4c",
+  "qualification": "Observed updates only; untouched storage completeness and BSC consensus are not verified.",
+  "run_id": "a6a7e7c0496f4ae4a18cf378647e7a3a",
+  "slot_digest_encoding": "ascending address/slot, concatenated 20-byte address and 32-byte slot/value",
+  "start_block": 121468046,
+  "capacity": {
+    "status": "completed",
+    "command_exit_code": 0,
+    "samples": 39,
+    "guard_samples": 36,
+    "failed_samples": 0,
+    "peak_observed_allocated_bytes": 2492231680,
+    "maximum_sample_gap_ns": 1437907000,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report"
+  }
+}

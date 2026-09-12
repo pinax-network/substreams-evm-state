@@ -13,7 +13,7 @@ FIXTURES = ROOT / "tests/fixtures/lifecycle"
 def test_captured_lifecycle_messages_and_headers_match_provenance():
     evidence = json.loads((FIXTURES / "manifest.json").read_text())
     assert evidence["chain_id"] == 56
-    assert len(evidence["records"]) == 15
+    assert len(evidence["records"]) == 18
     assert {record["producer_version"] for record in evidence["records"]} == {3, 4, 5}
     for record in evidence["records"]:
         raw = (FIXTURES / record["filename"]).read_bytes()
@@ -69,3 +69,21 @@ def test_native_recreation_parity_matches_captured_fields_and_slot_reset():
         if comparison["block"] in {37741077, 37741218}:
             assert any(v["kind"] == "storage_reset" and v["ordinal"] == record["tx_end_ordinal"]
                        for v in comparison["lifecycle"])
+
+
+def test_repeated_authority_native_updates_match_saved_account_proofs():
+    evidence = json.loads((ROOT / "docs/evidence/bsc-authorization-edges-2026-09-12.json").read_text())
+    raw = (FIXTURES / "authorization-edge-proofs.json").read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == evidence["proof_bundle_sha256"]
+    bundle = json.loads(raw)
+    assert bundle["header"] == evidence["header"]
+    verify_header(bundle["header_rlp"], bundle["header"],
+                  "0x352f27ef9341ca0976bdba3f3f444ddfc40ed27d434996168f8c13a58eb9ba11")
+    assert evidence["blocks"] == 9740
+    fields = evidence["metadata_verified_against_account_proofs"]
+    assert len(fields) == 5 and sum(map(len, fields.values())) == 9
+    for address, value in bundle["accounts"].items():
+        account = verify_account(bundle["header"]["state_root"], address, value["proof"])
+        assert keccak256(unhex(value["code"])) == account.code_hash
+        expected = {**account.json(), "code": value["code"]}
+        assert all(expected[key] == actual for key, actual in fields[address].items())

@@ -31,14 +31,15 @@ manifest only after verification. See ClickHouse's
 
 We are developing against the conservative end of your budget: 100 GB of retained
 data, with headroom for ingestion, merges, verification and checkpoints. Small
-real-account and larger synthetic tests have passed; a full historical WBNB
-bootstrap is still being qualified. We cannot yet confirm the footprint or
+real-account and larger synthetic tests have passed. Full historical bootstraps
+for WBNB and your supplied example contract are still being qualified. We cannot yet confirm the footprint or
 bootstrap time for your account set. This remains technical qualification, with
 no purchase or subscription change requested.
 
 To make the next test useful, could you share:
 
-1. **Pilot input:** the 19 account addresses and 76 named slots, and any candidate
+1. **Pilot input:** beyond the example `0x32c59d556b16db81dfc32525efb3cb257f7e493d`,
+   the full 19 account addresses and 76 named slots, and any candidate
    additions for the 64-account test. Known creation blocks and a few expected
    values at a specific block/hash would help. We will treat the named slots as
    validation samples, not as the complete storage requirement.
