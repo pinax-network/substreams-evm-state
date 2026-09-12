@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import sys
 import time
+from types import SimpleNamespace
 
 import pytest
 
@@ -238,3 +239,54 @@ def test_finished_child_with_rejected_final_sample_still_writes_an_honest_report
     assert report["status"] == "stopped"
     assert report["command_exit_code"] == 0
     assert report["termination_error"] == "could_not_confirm_process_group_termination"
+
+
+def test_failed_internal_guard_records_rejection_without_a_partial_byte_total(tmp_path, monkeypatch):
+    meter = ProcessMeter(tmp_path)
+    policy = tmp_path / "config.json"
+    policy.write_text(json.dumps(meter.config))
+    events = tmp_path / "guards"
+    events.mkdir()
+    monkeypatch.setenv("EVM_STATE_CAPACITY_CONFIG", str(policy))
+    monkeypatch.setenv("EVM_STATE_CAPACITY_EVENTS", str(events))
+    monkeypatch.setattr(capacity, "Meter", lambda *args: meter)
+    def incomplete():
+        raise capacity.DockerCapacityError("data-directory scan")
+    meter.sample = incomplete
+    with pytest.raises(capacity.DockerCapacityError, match="data-directory scan"):
+        capacity.check(Client(), [tmp_path / "native"], "bootstrap-compact")
+    event_file, = events.glob("*.json")
+    event = json.loads(event_file.read_text())
+    assert event["stage"] == "bootstrap-compact" and not event["admitted"]
+    assert event["reasons"] == ["incomplete_capacity_sample"]
+    assert event["error_type"] == "DockerCapacityError"
+    assert event["inspection_operation"] == "data-directory scan"
+    assert "accounted_allocated_bytes" not in event
+
+
+@pytest.mark.parametrize("arguments,operation", [(["inspect", "container"], "container inspection"),
+                                                (["exec", "container", "du"], "data-directory scan")])
+def test_docker_failure_identifies_operation_without_echoing_third_party_output(monkeypatch, arguments, operation):
+    monkeypatch.setattr(capacity.subprocess, "run", lambda *args, **kwargs:
+                        SimpleNamespace(returncode=1, stdout=b"partial total", stderr=b"dummy-secret"))
+    with pytest.raises(capacity.DockerCapacityError) as caught:
+        capacity._docker(arguments)
+    assert caught.value.operation == operation
+    assert operation in str(caught.value) and "dummy-secret" not in str(caught.value)
+
+
+def test_supervisor_includes_internal_scan_failure_even_when_periodic_samples_pass(tmp_path):
+    # The child catches the guard error and exits zero: publication still cannot
+    # turn the rejected internal measurement into a successful capacity report.
+    code = """import json,os,pathlib
+event = {'sample_finished_ns': 1, 'admitted': False, 'stage': 'bootstrap-compact',
+         'reasons': ['incomplete_capacity_sample'], 'error_type': 'RuntimeError'}
+(pathlib.Path(os.environ['EVM_STATE_CAPACITY_EVENTS']) / 'failed.json').write_text(json.dumps(event))
+"""
+    report = capacity.supervise(ProcessMeter(tmp_path), [sys.executable, "-c", code], tmp_path / "run", 0.1)
+    assert report["status"] == "stopped" and report["command_exit_code"] == 0
+    assert report["failed_samples"] == 0 and report["failed_guard_samples"] == 1
+    assert report["guard_samples"] == 1
+    assert report["stop_reasons"] == ["incomplete_capacity_sample"]
+    assert report["rejected_guard_stages"] == ["bootstrap-compact"]
+    assert report["peak_observed_allocated_bytes"] == 123

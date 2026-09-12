@@ -18,13 +18,13 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 260 tests (117 offline, 141 ClickHouse
+The Python suite currently contains 264 tests (121 offline, 141 ClickHouse
 integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
 configured development database. The previous 258-test Python baseline passed
-locally in 113.65 seconds. Current local checks pass 117 offline Python tests,
+locally in 113.65 seconds. Current local checks pass 121 offline Python tests,
 36 Rust tests, the native chunked bootstrap/restart test with a separate metrics
 listener, and `make build`. CI also runs the complete integration suite. The
 current suite includes stable host identity/recovery, captured recreation/storage
@@ -457,3 +457,14 @@ new capacity checks and compacted their preserved suffixes through 8449994 and
 48539979 respectively. They remain unverified historical prefixes, with final
 root verification and sustained-growth qualification still pending. This recovery
 does not establish host-bind performance or a customer footprint bound.
+
+The first resumed WBNB run subsequently [stopped](evidence/wbnb-capacity-inspection-stop-2026-09-12.json) after an incomplete Docker
+capacity inspection, retaining its compacted prefix through 8749994 (894,868 slots).
+Its periodic samples were all complete, but an internal scan failure was only
+visible in the command log. That old message does not distinguish container
+inspection from directory traversal. New Docker diagnostics distinguish those
+operations without including third-party output. The capacity report records failed scans as
+rejected guard events with no byte estimate, counts them separately, and includes
+their stage and reason in the final summary. Regression checks preserve the stop
+even if a child catches the failure and exits zero. A fresh complete capacity
+check admitted the next WBNB resume; no capacity threshold was reduced.

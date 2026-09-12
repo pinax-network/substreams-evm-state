@@ -139,6 +139,14 @@ Results are written as:
 - `summary.json`: child exit status, stop reasons, sample counts, maximum observed
   sample gap, and the largest allocation seen in either periodic or guard samples.
 
+Incomplete internal scans also write rejected guard events with their operation
+stage and error type, without a fabricated byte total or third-party error text.
+`failed_samples` counts incomplete periodic scans; `failed_guard_samples` counts
+incomplete internal scans. The summary includes internal rejection reasons even
+when every periodic sample passed. These events cover scans after policy/target
+and event-directory validation; failures that prevent initializing the meter or
+writing its event still fail the command and require its local error log.
+
 A missing summary means the monitor did not complete. A healthy supervisor is
 required for continuous sampling. Use the guarded project commands for ingestion
 and publication; an arbitrary child executable does not implement the internal

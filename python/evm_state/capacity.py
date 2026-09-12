@@ -62,14 +62,22 @@ def local_usage(paths):
     return {"allocated_bytes": allocated, "logical_bytes": logical, "files": files}
 
 
+class DockerCapacityError(RuntimeError):
+    def __init__(self, operation, timed_out=False):
+        self.operation = operation
+        outcome = "timed out" if timed_out else "failed"
+        super().__init__(f"Docker capacity {operation} {outcome}; the sample is incomplete")
+
+
 def _docker(arguments, timeout=30):
+    operation = "container inspection" if arguments[0] == "inspect" else "data-directory scan"
     try:
         result = subprocess.run(["docker", *arguments], capture_output=True, timeout=timeout)
     except subprocess.TimeoutExpired:
-        raise RuntimeError("Docker capacity inspection timed out; the sample is incomplete") from None
+        raise DockerCapacityError(operation, timed_out=True) from None
     if result.returncode:
         # Do not echo inspect environment values or third-party command errors.
-        raise RuntimeError("Docker capacity inspection failed; the sample is incomplete")
+        raise DockerCapacityError(operation)
     return result.stdout
 
 
@@ -231,12 +239,28 @@ def check(client, required_paths=(), stage="operation"):
         resolved = Path(path).resolve()
         if not any(resolved == root or root in resolved.parents for root in meter.paths):
             raise VerificationError("operation uses a directory outside the declared capacity roots")
-    measured = meter.sample()
     events = os.environ.get("EVM_STATE_CAPACITY_EVENTS")
+    destination = None
     if events:
         destination = Path(events).resolve()
         if not any(destination == root or root in destination.parents for root in meter.paths):
             raise VerificationError("capacity events directory is outside declared roots")
+    started = time.time_ns()
+    try:
+        measured = meter.sample()
+    except (OSError, RuntimeError, ValueError, KeyError, subprocess.TimeoutExpired) as error:
+        if destination is not None:
+            # Keep a rejected event even when the scan has no trustworthy byte
+            # total. Do not record third-party errors, paths or credentials.
+            failure = {
+                "format_version": 1, "sample_started_ns": started, "sample_finished_ns": time.time_ns(),
+                "stage": stage, "admitted": False, "reasons": ["incomplete_capacity_sample"],
+                "error_type": type(error).__name__}
+            if isinstance(error, DockerCapacityError):
+                failure["inspection_operation"] = error.operation
+            atomic_json(destination / (uuid.uuid4().hex + ".json"), failure)
+        raise
+    if destination is not None:
         atomic_json(destination / (uuid.uuid4().hex + ".json"), {**measured, "stage": stage})
     if not measured["admitted"]:
         raise VerificationError("capacity guard rejected operation: " + ", ".join(measured["reasons"]))
@@ -273,6 +297,8 @@ def supervise(meter, command, output, interval=1.0):
                 failures += 1
                 value = {"sample_finished_ns": time.time_ns(), "admitted": False,
                          "reasons": ["incomplete_capacity_sample"], "error_type": type(error).__name__}
+                if isinstance(error, DockerCapacityError):
+                    value["inspection_operation"] = error.operation
                 if isinstance(error, VerificationError):
                     # Meter verification errors are our fixed diagnostic text;
                     # third-party/HTTP/Docker error bodies remain excluded.
@@ -328,13 +354,17 @@ def supervise(meter, command, output, interval=1.0):
                 process.wait(timeout=10)
                 result = process.returncode
     guards = [json.loads(path.read_text()) for path in (output / "guards").glob("*.json")]
-    peak = max([peak, *[guard["accounted_allocated_bytes"] for guard in guards]])
+    peak = max([peak, *[guard["accounted_allocated_bytes"] for guard in guards
+                       if "accounted_allocated_bytes" in guard]])
     rejected = [guard["stage"] for guard in guards if not guard["admitted"]]
+    guard_failures = sum("incomplete_capacity_sample" in guard["reasons"] for guard in guards)
+    stop_reasons = sorted(set(reason or []) | {cause for guard in guards if not guard["admitted"]
+                                              for cause in guard["reasons"]})
     report = {"format_version": 1, "started_ns": started, "finished_ns": time.time_ns(),
         "config_sha256": config_hash, "config": meter.config, "samples": samples, "failed_samples": failures,
         "peak_observed_allocated_bytes": peak, "maximum_sample_gap_ns": max_gap,
-        "guard_samples": len(guards), "rejected_guard_stages": rejected,
-        "command_exit_code": result, "stop_reasons": reason or [], "termination_error": termination_error,
+        "guard_samples": len(guards), "failed_guard_samples": guard_failures, "rejected_guard_stages": rejected,
+        "command_exit_code": result, "stop_reasons": stop_reasons, "termination_error": termination_error,
         "status": "completed" if result == 0 and not reason and not rejected and not termination_error else "stopped",
         "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report"}
     atomic_json(output / "summary.json", report)

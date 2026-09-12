@@ -1,0 +1,61 @@
+{
+  "format_version": 1,
+  "date": "2026-09-12",
+  "run_id": "62b4938ec1554bc093644232ef4b469d",
+  "old_capacity_report_sha256": "7f73dc9950e1cd5db08ba612cdf679dcf1741d9423d015f9a65095c9788f469c",
+  "old_capacity_report": {
+    "command_exit_code": 1,
+    "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+    "failed_samples": 0,
+    "finished_ns": 1789229687368327000,
+    "format_version": 1,
+    "guard_samples": 103,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 13214655000,
+    "peak_observed_allocated_bytes": 4144746496,
+    "rejected_guard_stages": [],
+    "samples": 58,
+    "started_ns": 1789229227149163000,
+    "status": "stopped",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "old_fixed_diagnostic": "Docker capacity inspection failed; the sample is incomplete",
+  "old_diagnostic_cannot_distinguish_container_inspection_from_directory_scan": true,
+  "stopped_compacted_prefix": {
+    "header": {
+      "hash": "0x5f9e70295692e46bccdcb1170e469bb211ba919efdd075ae7a93f685be8a392c",
+      "number": 8749994,
+      "parent_hash": "0xc570bef078d44c52d2f41ae87b0638ae44c199b144d5c9ff20912f9d0c9ce740",
+      "state_root": "0x5f9ebebab3ef3959b05e8e1e35efbd1bee3b3fd59e87b43baf7a04ae3e37d002",
+      "timestamp": 1625062886
+    },
+    "nonzero_slots": 894868,
+    "state_sha256": "36feb5206ea564920b45a092e20bcbb12ad601ee0ffe64bf7e54454f39f90621",
+    "status": "unverified-bootstrap"
+  },
+  "fresh_preflight": {
+    "sample_finished_ns": 1789230178804712000,
+    "admitted": true,
+    "reasons": [],
+    "accounted_allocated_bytes": 4200017920,
+    "budget_bytes": 98257164288,
+    "headroom_bytes": 10000000000,
+    "min_free_bytes": 1073741824
+  },
+  "resumed_compacted_prefix": {
+    "header": {
+      "hash": "0xd63fb2e240a7ec17e542a05ddb18746058d104022fc075e33c572c8792e9cd38",
+      "number": 8910979,
+      "parent_hash": "0x7b177433141b3414665726128b5dea0e0389358ba1a6eb9c6c019a38bbfef3bd",
+      "state_root": "0x4edde567991293500e31c0b4b989badf4c7a9482ce1ec770aae73d0548775aa4",
+      "timestamp": 1625550320
+    },
+    "nonzero_slots": 929183,
+    "state_sha256": "298b96d92686c3813f7bf0cf8961f1da7e826dcea5c0f353817415b7d42de3d0",
+    "status": "unverified-bootstrap"
+  },
+  "overall_budget_bytes": 100000000000,
+  "retained_original_volume_reserve_bytes": 1742835712,
+  "qualification": "The failed guard previously produced no structured event. Its command still exited nonzero and retained cursor/state. Fresh guarded resume checked ownership, cursor coverage and prefix checksum; this is not full-state proof or hot-account capacity qualification."
+}
