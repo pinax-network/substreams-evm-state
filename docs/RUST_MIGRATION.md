@@ -126,3 +126,19 @@ queries and concurrent writer consistency in isolated schemas. The native retry
 CLI also retains `--max-retries -1`; a parser regression test checks this before
 any ingestion starts. This brings the standalone native total to 60; CI includes
 32 ClickHouse and two PostgreSQL tests alongside the 43 mapper tests.
+
+The Rust loopback gRPC fixture now decodes the pinned sink's compressed S2
+requests directly, using the package's protobuf descriptors. It retains only
+the worker header under test, not provider credentials. A real sink run verified
+that requests used compressed frames, preserved all block rows, and produced a
+fully proven checkpoint. Chunked bootstrap resumed private prefixes with changed
+worker requests. Forced SIGKILL recovery passed in both follow and spooled modes;
+a data write followed by cursor-file failure replayed from the previous durable
+cursor and still produced the exact complete state.
+
+Transport tests cover compression/frame corruption and nested-array alignment.
+The Go cursor generator is removed; Rust reproduces its unchanged independent
+vectors byte for byte. The old Go adapter and Python server remain only for the
+remaining migration baseline scenarios until those assertions have Rust coverage.
+This phase passes 63 standalone native tests, 36 ClickHouse tests and the 43
+mapper tests locally; the two PostgreSQL tests passed in the preceding CI run.

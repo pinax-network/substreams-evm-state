@@ -10,6 +10,11 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Commands {
+    /// Reproduce public cursor compatibility fixtures without provider credentials.
+    CursorFixtures {
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Time pinned pagination and prove the complete returned account state.
     CheckpointReads {
         #[arg(long)]
@@ -54,6 +59,24 @@ enum Commands {
 }
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::CursorFixtures { output } => {
+            let mut values = serde_json::json!({});
+            for step in [1, 17] {
+                values[step.to_string()] = serde_json::json!({});
+                for n in 100..=110 {
+                    values[step.to_string()][n.to_string()] =
+                        serde_json::json!(evm_state::cursor::encode_public(&format!(
+                            "c1:{step}:{n}:{n:064x}:{n}:{n:064x}"
+                        ))?);
+                }
+            }
+            evm_state::files::atomic_json(&output, &values, false)?;
+            println!(
+                "{}",
+                serde_json::json!({"output":output,"public_test_cursors":22})
+            );
+            Ok(())
+        }
         Commands::CheckpointReads {
             database,
             snapshot_id,

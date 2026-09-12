@@ -105,6 +105,9 @@ struct Native {
 }
 impl Native {
     fn new() -> Result<Self> {
+        Self::at("http://127.0.0.1:1")
+    }
+    fn at(endpoint: &str) -> Result<Self> {
         let root = tempfile::tempdir()?;
         let client = ClickHouse::new(&format!("evm_test_rust_{}", new_id()))?
             .with_control_home(root.path().join("control"));
@@ -112,7 +115,7 @@ impl Native {
         let options = NativeOptions {
             package: PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .join("../../spkg/evm-state-v0.1.0.spkg"),
-            endpoint: "http://127.0.0.1:1".into(),
+            endpoint: endpoint.into(),
             accounts: json!([A]),
             start_block: 100,
             state_dir: root.path().join("native"),
@@ -663,5 +666,337 @@ fn legacy_host_recovery_rejects_mismatched_state_before_writing_sidecars() -> Re
         assert!(!db.options.state_dir.join("host-rebinding.json").exists());
         assert!(!control.join("host-rebinding.json").exists());
     }
+    Ok(())
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn rust_s2_server_drives_real_native_sink_and_complete_proof_publication() -> Result<()> {
+    use evm_state::native_stream::{NativeStream, StreamOptions};
+    let package =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../spkg/evm-state-v0.1.0.spkg");
+    let blocks = vec![
+        block(100, &slots()?)?,
+        block(101, &[])?,
+        block(102, &[])?,
+        block(103, &[])?,
+    ];
+    let stream = NativeStream::new(
+        &package,
+        &blocks,
+        StreamOptions {
+            backfill: true,
+            ..Default::default()
+        },
+    )?;
+    let db = Native::at(&stream.endpoint)?;
+    let options = IngestOptions {
+        stop_block: Some(104),
+        max_retries: 0,
+        decode_batch_size: 1,
+        spool_max_idle_ms: 100,
+        prometheus_addr: Some("127.0.0.1:0".into()),
+        parallel_workers: Some(100),
+    };
+    let result = ingest::ingest(&db.client, &db.options, &options);
+    assert!(stream.errors().is_empty(), "{:?}", stream.errors());
+    result?;
+    assert_eq!(db.numbers("state_blocks")?, vec![100, 101, 102, 103]);
+    let requests = stream.requests();
+    assert_eq!(requests.len(), 1);
+    assert_eq!(requests[0]["compression"], "s2");
+    assert_eq!(requests[0]["compressed_frame"], true);
+    assert_eq!(requests[0]["workers"], "100");
+    assert_eq!(db.publish(103, 100, None)?["nonzero_slots"], 2);
+    Ok(())
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn native_chunked_bootstrap_resumes_private_prefix_and_worker_changes() -> Result<()> {
+    use evm_state::native_stream::{NativeStream, StreamOptions};
+    let package =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../spkg/evm-state-v0.1.0.spkg");
+    let mut blocks = vec![block(100, &slots()?)?];
+    for n in 101..106 {
+        blocks.push(block(n, &[])?);
+    }
+    let stream = NativeStream::new(
+        &package,
+        &blocks,
+        StreamOptions {
+            backfill: true,
+            ..Default::default()
+        },
+    )?;
+    let db = Native::at(&stream.endpoint)?;
+    let mut options = IngestOptions {
+        stop_block: None,
+        max_retries: 0,
+        decode_batch_size: 1,
+        spool_max_idle_ms: 100,
+        prometheus_addr: Some("127.0.0.1:0".into()),
+        parallel_workers: Some(50),
+    };
+    let partial = bootstrap::replay(&db.client, &db.options, &options, 104, 2, BUDGET)?;
+    assert_eq!(partial["status"], "unverified-bootstrap");
+    assert_eq!(partial["header"]["number"], 103);
+    options.parallel_workers = Some(100);
+    let final_prefix = bootstrap::replay(&db.client, &db.options, &options, 106, 2, BUDGET)?;
+    assert_eq!(
+        bootstrap::replay(&db.client, &db.options, &options, 106, 2, BUDGET)?,
+        final_prefix
+    );
+    assert_eq!(db.numbers("state_blocks")?, vec![105]);
+    assert_eq!(db.numbers("_blocks_")?, vec![105]);
+    let requests = stream.requests();
+    assert_eq!(requests.len(), 3);
+    assert_eq!(
+        requests
+            .iter()
+            .map(|r| r["workers"].clone())
+            .collect::<Vec<_>>(),
+        vec![json!("50"), json!("50"), json!("100")]
+    );
+    for request in &requests[1..] {
+        assert!(!request["start_cursor"].as_str().unwrap().is_empty());
+    }
+    assert!(stream.errors().is_empty(), "{:?}", stream.errors());
+    assert_eq!(db.publish(105, 100, None)?["nonzero_slots"], 2);
+    Ok(())
+}
+
+fn start_wrapper(db: &Native, stop: u64) -> Result<evm_state::process::OwnedGroup> {
+    use std::process::{Command, Stdio};
+    let log = fs::File::create(db.root.path().join(format!("wrapper-{}.log", new_id())))?;
+    let mut command = Command::new(env!("CARGO_BIN_EXE_evm-state"));
+    command
+        .args(["--database", &db.client.database, "ingest", "--package"])
+        .arg(&db.options.package)
+        .args([
+            "--endpoint",
+            &db.options.endpoint,
+            "--accounts",
+            A,
+            "--start-block",
+            "100",
+            "--stop-block",
+            &stop.to_string(),
+            "--state-dir",
+        ])
+        .arg(&db.options.state_dir)
+        .args([
+            "--checkpoint-database",
+            &db.target.database,
+            "--max-retries",
+            "0",
+            "--decode-batch-size",
+            "1",
+            "--spool-max-idle-ms",
+            "100",
+            "--prometheus-addr",
+            "127.0.0.1:0",
+        ]);
+    // The private fixture server never needs provider/RPC credentials.
+    for (key, _) in std::env::vars_os() {
+        if key
+            .to_str()
+            .is_some_and(|k| k.starts_with("SUBSTREAMS_") || k.starts_with("RPC_"))
+        {
+            command.env_remove(key);
+        }
+    }
+    command
+        .env("SUBSTREAMS_SINK_DSN", &db.options.dsn)
+        .env("EVM_STATE_HOME", &db.target.control_home)
+        .stdout(Stdio::from(log.try_clone()?))
+        .stderr(Stdio::from(log));
+    evm_state::process::OwnedGroup::spawn(&mut command)
+}
+fn wait_progress(
+    db: &Native,
+    process: &mut evm_state::process::OwnedGroup,
+    number: u64,
+) -> Result<()> {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(20);
+    loop {
+        if let Ok(progress) = cursor::load_progress(&db.client, &db.run, &db.options.state_dir) {
+            if progress["position"]["block"]["number"] == number {
+                return Ok(());
+            }
+        }
+        anyhow::ensure!(
+            process.child.try_wait()?.is_none(),
+            "native wrapper exited before durable progress"
+        );
+        anyhow::ensure!(
+            std::time::Instant::now() < deadline,
+            "native wrapper did not advance its durable progress"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+}
+fn finish_wrapper(process: &mut evm_state::process::OwnedGroup) -> Result<()> {
+    use wait_timeout::ChildExt;
+    let status = process
+        .child
+        .wait_timeout(std::time::Duration::from_secs(30))?
+        .ok_or_else(|| anyhow::anyhow!("native wrapper did not finish"))?;
+    anyhow::ensure!(status.success(), "native wrapper failed");
+    process.complete();
+    Ok(())
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn killed_rust_wrapper_and_native_sink_resume_live_and_spooled_progress() -> Result<()> {
+    use evm_state::native_stream::{NativeStream, StreamOptions};
+    use std::sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    };
+    let package =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../spkg/evm-state-v0.1.0.spkg");
+    for backfill in [false, true] {
+        let paused = Arc::new(AtomicBool::new(true));
+        let pause = paused.clone();
+        let blocks = vec![
+            block(100, &slots()?)?,
+            block(101, &[])?,
+            block(102, &[])?,
+            block(103, &[])?,
+        ];
+        let stream = NativeStream::new(
+            &package,
+            &blocks,
+            StreamOptions {
+                backfill,
+                before_block: Some(Arc::new(move |number, context| {
+                    if number == 102 && pause.load(Ordering::Relaxed) {
+                        context.hold();
+                    }
+                    Ok(())
+                })),
+                ..Default::default()
+            },
+        )?;
+        let db = Native::at(&stream.endpoint)?;
+        let mut process = start_wrapper(&db, 104)?;
+        wait_progress(&db, &mut process, 101)?;
+        let before = cursor::load_progress(&db.client, &db.run, &db.options.state_dir)?;
+        // SAFETY: this positive process-group ID belongs to the still-running
+        // wrapper created by OwnedGroup, including its native sink child.
+        assert_eq!(
+            unsafe { libc::kill(-(process.child.id() as i32), libc::SIGKILL) },
+            0
+        );
+        process.child.wait()?;
+        process.complete();
+        paused.store(false, Ordering::Relaxed);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+        loop {
+            match files::file_lock(&db.options.state_dir.join("run.lock"), true, false) {
+                Ok(_) => break,
+                Err(e) if std::time::Instant::now() >= deadline => return Err(e),
+                Err(_) => std::thread::sleep(std::time::Duration::from_millis(20)),
+            }
+        }
+        let mut resumed = start_wrapper(&db, 104)?;
+        finish_wrapper(&mut resumed)?;
+        let requests = stream.requests();
+        assert_eq!(requests.len(), 2);
+        assert_eq!(requests[1]["start_cursor"], before["cursor"]);
+        assert_eq!(db.numbers("state_blocks")?, vec![100, 101, 102, 103]);
+        assert_eq!(db.publish(103, 100, None)?["nonzero_slots"], 2);
+        assert!(stream.errors().is_empty(), "{:?}", stream.errors());
+    }
+    Ok(())
+}
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn native_data_write_before_cursor_failure_replays_from_previous_progress() -> Result<()> {
+    use evm_state::native_stream::{NativeStream, StreamOptions};
+    use std::sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    };
+    use wait_timeout::ChildExt;
+    let package =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../spkg/evm-state-v0.1.0.spkg");
+    let target = Arc::new(Mutex::new(None::<(ClickHouse, Value, PathBuf)>));
+    let native = target.clone();
+    let restarted = Arc::new(AtomicBool::new(false));
+    let resumed = restarted.clone();
+    let blocks = vec![
+        block(100, &slots()?)?,
+        block(101, &[])?,
+        block(102, &[])?,
+        block(103, &[])?,
+    ];
+    let stream = NativeStream::new(
+        &package,
+        &blocks,
+        StreamOptions {
+            before_block: Some(Arc::new(move |number, context| {
+                if resumed.load(Ordering::Relaxed) {
+                    return Ok(());
+                }
+                let (client, run, directory) = native.lock().unwrap().clone().unwrap();
+                if number == 101 {
+                    context.wait_until(
+                        || {
+                            Ok(cursor::load_progress(&client, &run, &directory)
+                                .is_ok_and(|p| p["position"]["block"]["number"] == 100))
+                        },
+                        std::time::Duration::from_secs(15),
+                    )?;
+                    fs::rename(
+                        directory.join("cursor.txt"),
+                        directory.join("saved-cursor.txt"),
+                    )?;
+                    fs::create_dir(directory.join("cursor.txt"))?;
+                }
+                if number == 102 {
+                    context.hold();
+                }
+                Ok(())
+            })),
+            ..Default::default()
+        },
+    )?;
+    let db = Native::at(&stream.endpoint)?;
+    *target.lock().unwrap() = Some((
+        db.client.clone(),
+        db.run.clone(),
+        db.options.state_dir.clone(),
+    ));
+    let mut process = start_wrapper(&db, 104)?;
+    let status = process
+        .child
+        .wait_timeout(std::time::Duration::from_secs(30))?
+        .ok_or_else(|| anyhow::anyhow!("wrapper did not fail after cursor write failure"))?;
+    assert!(!status.success());
+    process.complete();
+    assert_eq!(db.numbers("state_blocks")?, vec![100, 101]);
+    let saved = fs::read_to_string(db.options.state_dir.join("saved-cursor.txt"))?;
+    assert_eq!(
+        cursor::load_progress(&db.client, &db.run, &db.options.state_dir)?["cursor"],
+        saved
+    );
+    fs::remove_dir(db.options.state_dir.join("cursor.txt"))?;
+    fs::rename(
+        db.options.state_dir.join("saved-cursor.txt"),
+        db.options.state_dir.join("cursor.txt"),
+    )?;
+    restarted.store(true, Ordering::Relaxed);
+    let mut process = start_wrapper(&db, 104)?;
+    finish_wrapper(&mut process)?;
+    let requests = stream.requests();
+    assert_eq!(requests.len(), 2);
+    assert_eq!(requests[1]["start_cursor"], saved);
+    assert_eq!(db.numbers("state_blocks")?, vec![100, 101, 102, 103]);
+    assert_eq!(db.publish(103, 100, None)?["nonzero_slots"], 2);
+    assert!(stream.errors().is_empty(), "{:?}", stream.errors());
     Ok(())
 }

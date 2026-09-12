@@ -14,6 +14,7 @@ pub mod host_recovery;
 pub mod importer;
 pub mod ingest;
 pub mod installer;
+pub mod native_stream;
 pub mod postgres;
 pub mod process;
 pub mod proof;

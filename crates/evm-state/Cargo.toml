@@ -30,5 +30,14 @@ libc = "0.2"
 signal-hook = "0.3"
 flate2 = "1"
 tar = "0.4"
+minlz = { version = "1.2.3", default-features = false, features = ["std", "s2"] }
+prost = "0.14"
+prost-types = "0.14"
+prost-reflect = { version = "0.16", features = ["serde"] }
+http-body-util = "0.1"
+tokio-stream = "0.1"
+hyper = { version = "1", features = ["server", "http2"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+tokio = { version = "1", features = ["rt-multi-thread", "net", "time", "sync", "macros"] }
 
 [dev-dependencies]
