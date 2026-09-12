@@ -92,6 +92,7 @@ def validate_interval(client, source, header):
 
 def _union_storage(sources, base, client, params):
     queries = []
+    resets = []
     for i, source in enumerate(sources):
         database = identifier(source["database"])
         params[f"start{i}"] = source["start_block"]
@@ -99,6 +100,11 @@ def _union_storage(sources, base, client, params):
             f"SELECT storage.address AS address, storage.slot AS slot, storage.value AS value, "
             f"tuple(number, storage.ordinal) AS position FROM {database}.state_blocks FINAL ARRAY JOIN storage "
             f"WHERE number >= {{start{i}:UInt64}} AND number <= {{end:UInt64}}"
+        )
+        resets.append(
+            f"SELECT lifecycle.address AS address, tuple(number, lifecycle.ordinal) AS position "
+            f"FROM {database}.state_blocks FINAL ARRAY JOIN lifecycle "
+            f"WHERE number >= {{start{i}:UInt64}} AND number <= {{end:UInt64}} AND lifecycle.kind='storage_reset'"
         )
     if base:
         params["base"], params["base_number"] = base["snapshot_id"], base["header"]["number"]
@@ -108,7 +114,15 @@ def _union_storage(sources, base, client, params):
         )
     if not queries:
         raise VerificationError("checkpoint has no source state")
-    return " UNION ALL ".join(queries)
+    union = " UNION ALL ".join(queries)
+    if not resets:
+        return union
+    # A transaction-end account deletion invalidates EVERY older slot, including
+    # slots absent from this interval and inherited from the base checkpoint.
+    # Later recreation writes survive; clearing code alone is not a storage reset.
+    return (f"SELECT address,slot,value,position FROM ({union}) AS changes LEFT JOIN "
+            f"(SELECT address,max(position) AS reset,count() AS reset_count FROM ({' UNION ALL '.join(resets)}) "
+            "GROUP BY address) AS deletions USING(address) WHERE reset_count=0 OR position > reset")
 
 
 def _observed_fields(client, sources, base, params):

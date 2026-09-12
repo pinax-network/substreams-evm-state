@@ -1,6 +1,6 @@
 # ClickHouse qualification evidence
 
-Status: prototype, 2026-09-11. **Do not publish v0.1.0 yet.** This records current
+Status: prototype, 2026-09-12. **Do not publish v0.1.0 yet.** This records current
 evidence and preserves the four original deliverables; partial coverage does not
 make an entire deliverable complete.
 
@@ -8,7 +8,7 @@ make an entire deliverable complete.
 |---|---|---|
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication | Sustained follow and agreed read/publication latency; storage must honor sync writes (physical host power loss is not emulated) |
 | Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage | Exercise representative multi-account onboarding and interrupted operational cutover |
-| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass | Producer/fork fixtures, persistent failed transaction and full 7702 matrix, CREATE/CREATE2 and deletion/recreation reconciliation; repair legacy verifier false-positive behavior |
+| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; BSC fork-aware SELFDESTRUCT and delegated execution; deletion/recreation across native patches and inherited checkpoint storage | Captured producer/fork fixtures and full 7702 matrix, historical CREATE/CREATE2 parity, representative lifecycle replay; repair legacy verifier false-positive behavior |
 | Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate cleanup preserving readers and latest account state; native history partition cleanup preserving every retained checkpoint's continuation and the durable cursor; pinned toolchain; package-producing `make build`; CI integration job | Bounded initial-history replay, peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
@@ -18,11 +18,13 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 153 tests (54 offline, 99 integration).
+The Python suite currently contains 159 tests (54 offline, 105 integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. The full suite passed locally in 61.60 seconds.
+configured development database. All 159 Python tests passed locally in 69.42
+seconds, and all 19 Rust tests passed. The earlier 153-test recovery baseline
+also passed on GitHub CI at `eceb7ad`.
 The native fixtures serve real packaged protobuf types over local gRPC. The test
 transport adapter translates the CLI's S2 request compression using its upstream
 library. These tests cover sink behavior; they do not execute the WASM mapper.
@@ -94,6 +96,23 @@ after cleanup, then rotate the old checkpoint and reclaim more history. Active
 source writers/readers exclude cleanup. A failure between data and marker
 partition drops can resume without deleting the durable cursor's own rows.
 This does not yet bound an initial replay before its first verified checkpoint.
+
+The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
+account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps
+storage. Checkpoint tests remove untouched inherited slots, preserve later
+recreation and retain the old immutable checkpoint. Rust tests cover BSC's fork
+boundary, delegated account context and failed authorization/execution separation.
+These synthetic fixtures are not a substitute for producer-captured historical
+qualification or customer execution parity.
+
+Two captured BSC v5 failed/reverted EIP-7702 transactions now supplement the
+synthetic cases, with immutable protobuf fixtures, block/transaction hashes,
+checksums and RPC failure-status confirmation. A fresh native replay of the
+61-block interval containing both transactions matched the observed sender
+balance/nonce and authority nonce against RPC at block 121114160. See the
+[parity evidence](evidence/bsc-lifecycle-parity-2026-09-12.json). Neither captured
+transaction changed code; this does not complete the broader authorization or
+historical lifecycle matrix, and the parity check is not a complete storage proof.
 
 ## BSC evidence
 

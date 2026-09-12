@@ -91,19 +91,33 @@ pub fn project(params: &str, block: &eth::Block) -> Result<BlockState, Error> {
         });
     }
 
-    // SELFDESTRUCT's storage semantics depend on the fork and creation context.
-    // Preserve the signal for proof reconciliation; never silently infer a wipe.
-    let committed_calls = block.system_calls.iter().chain(
-        block.transaction_traces.iter()
-            .filter(|tx| tx.status() == eth::TransactionTraceStatus::Succeeded)
-            .flat_map(|tx| tx.calls.iter())
-    );
-    for call in committed_calls {
-        if call.suicide && !call.state_reverted && filter.matches(&call.address) {
-            let address = hex(&call.address);
-            lifecycle.insert((address.clone(), call.end_ordinal, "selfdestruct"), LifecycleEffect {
-                address, kind: "selfdestruct".into(), ordinal: call.end_ordinal,
-            });
+    for tx in block.transaction_traces.iter().filter(|tx| tx.status() == eth::TransactionTraceStatus::Succeeded) {
+        for call in tx.calls.iter().filter(|call| call.suicide && !call.state_reverted) {
+            let account = crate::lifecycle::execution_address(call, &tx.calls)?;
+            if filter.matches(account) {
+                let address = hex(account);
+                lifecycle.insert((address.clone(), call.end_ordinal, "selfdestruct"), LifecycleEffect {
+                    address, kind: "selfdestruct".into(), ordinal: call.end_ordinal,
+                });
+            }
+        }
+    }
+
+    for (account, ordinal) in crate::lifecycle::deletions(block, timestamp.seconds as u64)? {
+        if !filter.matches(&account) { continue; }
+        let address = hex(&account);
+        lifecycle.insert((address.clone(), ordinal, "storage_reset"), LifecycleEffect {
+            address: address.clone(), kind: "storage_reset".into(), ordinal,
+        });
+        storage.retain(|(owner, _), value| owner != &address || value.ordinal > ordinal);
+        if balances.get(&address).is_none_or(|value| value.ordinal < ordinal) {
+            balances.insert(address.clone(), BalanceValue { address: address.clone(), value: "0".into(), ordinal });
+        }
+        if nonces.get(&address).is_none_or(|value| value.ordinal < ordinal) {
+            nonces.insert(address.clone(), NonceValue { address: address.clone(), value: 0, ordinal });
+        }
+        if codes.get(&address).is_none_or(|value| value.ordinal < ordinal) {
+            codes.insert(address.clone(), CodeValue { address, hash: EMPTY_CODE_HASH.into(), code: "0x".into(), ordinal });
         }
     }
 
@@ -187,9 +201,120 @@ mod tests {
         let mut call = eth::Call {
             address: vec![4; 20], suicide: true, end_ordinal: 5, ..Default::default()
         };
-        b.system_calls.push(call.clone());
+        b.transaction_traces.push(eth::TransactionTrace {
+            status: eth::TransactionTraceStatus::Succeeded as i32, end_ordinal: 9,
+            calls: vec![call.clone()], ..Default::default()
+        });
         assert_eq!(project(&account(), &b).unwrap().lifecycle[0].kind, "selfdestruct");
-        call.state_reverted = true; b.system_calls[0] = call;
+        call.state_reverted = true; b.transaction_traces[0].calls[0] = call;
+        assert!(project(&account(), &b).unwrap().lifecycle.is_empty());
+    }
+
+    fn destruction_block(timestamp: u64, created_here: bool) -> eth::Block {
+        let mut b = block();
+        b.header.as_mut().unwrap().timestamp.as_mut().unwrap().seconds = timestamp as i64;
+        b.transaction_traces.push(eth::TransactionTrace {
+            status: eth::TransactionTraceStatus::Succeeded as i32, end_ordinal: 40,
+            calls: vec![eth::Call {
+                index: 1, address: vec![4; 20], suicide: true,
+                call_type: if created_here { eth::CallType::Create as i32 } else { eth::CallType::Call as i32 },
+                begin_ordinal: 3, end_ordinal: 30,
+                storage_changes: vec![eth::StorageChange {
+                    address: vec![4; 20], key: vec![1], new_value: vec![7], ordinal: 25, ..Default::default()
+                }],
+                ..Default::default()
+            }], ..Default::default()
+        });
+        b
+    }
+
+    #[test]
+    fn bsc_selfdestruct_fork_boundary_clears_only_deleted_accounts() {
+        let fork = crate::lifecycle::BSC_CANCUN_TIME;
+        // Both CREATE and CREATE2 use the model's CREATE call type. Producer v3's
+        // missing initcode/beginOrdinal is irrelevant to this deletion decision.
+        for version in 3..=5 {
+            for (time, created, deleted) in [(fork - 1, false, true), (fork, false, false), (fork, true, true)] {
+                let mut b = destruction_block(time, created);
+                b.ver = version;
+                if version == 3 { b.transaction_traces[0].calls[0].begin_ordinal = 0; }
+                let out = project(&account(), &b).unwrap();
+                assert_eq!(out.lifecycle.iter().any(|event| event.kind == "storage_reset"), deleted);
+                assert_eq!(out.storage.is_empty(), deleted);
+                if deleted {
+                    assert_eq!(out.nonces[0].value, 0);
+                    assert_eq!(out.balances[0].value, "0");
+                    assert_eq!(out.codes[0].code, "0x");
+                    assert_eq!(out.codes[0].hash, EMPTY_CODE_HASH);
+                    assert_eq!(out.nonces[0].ordinal, 40);
+                } else {
+                    assert!(out.nonces.is_empty() && out.codes.is_empty());
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn delegated_selfdestruct_deletes_execution_account_not_code_provider() {
+        for kind in [eth::CallType::Delegate, eth::CallType::Callcode] {
+            let mut b = destruction_block(crate::lifecycle::BSC_CANCUN_TIME - 1, false);
+            b.transaction_traces[0].calls[0].suicide = false;
+            b.transaction_traces[0].calls.push(eth::Call {
+                index: 2, parent_index: 1, depth: 1, address: vec![8; 20],
+                call_type: kind as i32, suicide: true, begin_ordinal: 10, end_ordinal: 20,
+                ..Default::default()
+            });
+            let out = project(&format!("{},{}", account(), hex(&[8; 20])), &b).unwrap();
+            assert!(out.storage.is_empty());
+            assert_eq!(out.codes.len(), 1);
+            assert_eq!(out.codes[0].address, account());
+            assert!(out.lifecycle.iter().all(|effect| effect.address == account()));
+            // An incomplete tree cannot establish the execution account.
+            b.transaction_traces[0].calls[1].parent_index = 99;
+            assert!(project(&account(), &b).is_err());
+        }
+    }
+
+    #[test]
+    fn recreation_later_in_block_survives_old_transaction_deletion() {
+        let mut b = destruction_block(crate::lifecycle::BSC_CANCUN_TIME - 1, false);
+        b.transaction_traces.push(eth::TransactionTrace {
+            status: eth::TransactionTraceStatus::Succeeded as i32, end_ordinal: 80,
+            calls: vec![eth::Call {
+                index: 1, call_type: eth::CallType::Create as i32, address: vec![4; 20],
+                begin_ordinal: 50, end_ordinal: 79,
+                storage_changes: vec![eth::StorageChange {
+                    address: vec![4; 20], key: vec![2], new_value: vec![9], ordinal: 60, ..Default::default()
+                }],
+                nonce_changes: vec![eth::NonceChange { address: vec![4; 20], new_value: 1, ordinal: 55, ..Default::default() }],
+                code_changes: vec![eth::CodeChange { address: vec![4; 20], new_hash: vec![9; 32],
+                    new_code: vec![0x60, 0], ordinal: 75, ..Default::default() }],
+                ..Default::default()
+            }], ..Default::default()
+        });
+        let out = project(&account(), &b).unwrap();
+        assert_eq!(out.storage.len(), 1);
+        assert_eq!(out.storage[0].slot, word(&[2]).unwrap());
+        assert_eq!(out.nonces[0].value, 1);
+        assert_eq!(out.codes[0].code, "0x6000");
+        assert_eq!(out.balances[0].value, "0");
+    }
+
+    #[test]
+    fn earlier_transaction_creation_and_reverted_destruction_do_not_wipe() {
+        let fork = crate::lifecycle::BSC_CANCUN_TIME;
+        let mut b = destruction_block(fork, false);
+        b.transaction_traces.insert(0, eth::TransactionTrace {
+            status: eth::TransactionTraceStatus::Succeeded as i32, end_ordinal: 2,
+            calls: vec![eth::Call { call_type: eth::CallType::Create as i32, address: vec![4; 20],
+                                   ..Default::default() }], ..Default::default()
+        });
+        assert!(!project(&account(), &b).unwrap().lifecycle.iter().any(|e| e.kind == "storage_reset"));
+        b = destruction_block(fork - 1, false);
+        b.transaction_traces[0].status = eth::TransactionTraceStatus::Reverted as i32;
+        assert!(project(&account(), &b).unwrap().lifecycle.is_empty());
+        b.transaction_traces[0].status = eth::TransactionTraceStatus::Succeeded as i32;
+        b.transaction_traces[0].calls[0].state_reverted = true;
         assert!(project(&account(), &b).unwrap().lifecycle.is_empty());
     }
 }

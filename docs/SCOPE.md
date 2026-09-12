@@ -86,7 +86,7 @@ fields. This avoids the native sink's lack of transactions across multiple table
 | Balance version | address, block identity | Final balance |
 | Nonce version | address, block identity | Final nonce |
 | Code version | address, block identity | Final code hash, explicit empty code |
-| Lifecycle | address, ordinal | Destruction, nonce reset and code-clear signals |
+| Lifecycle | address, ordinal | Confirmed transaction-end storage reset; diagnostic SELFDESTRUCT, nonce reset and code-clear signals |
 
 The native generated DDL uses `ORDER BY (number, hash)`, a `number` primary key,
 and a daily partition. Integration tests create their tables with the real
@@ -114,6 +114,10 @@ Start with finalized blocks only. Deduplicate native sink retries (`FINAL` or
 equivalent), then select the latest version at or below an explicitly published
 block/hash. Apply the zero-slot filter **after** selecting the latest version,
 otherwise old nonzero values can reappear. Resolve account fields independently.
+The native mapper applies BSC's SELFDESTRUCT fork/creation-context rules. A
+confirmed deletion removes all earlier slot versions, including inherited
+checkpoint storage, while later recreation writes survive. Code clearing alone
+does not erase storage. See [lifecycle evidence and remaining coverage](LIFECYCLE.md).
 
 The one-row block envelope supplies block-level atomicity. Checkpoint candidates
 are built separately and receive a ready manifest only after complete storage,

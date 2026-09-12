@@ -6,14 +6,16 @@
 //! * `SUCCEEDED` tx: every change of every call with `state_reverted == false`.
 //! * `FAILED` / `REVERTED` tx: only the root call is consulted. Balance
 //!   changes with reason `GAS_BUY`, `GAS_REFUND`, `REWARD_TRANSACTION_FEE`
-//!   persist; the sender nonce change (smallest ordinal) persists.
+//!   persist; the sender's transaction nonce increment persists.
 //! * EIP-7702 (`TRX_TYPE_SET_CODE`): nonce + code changes of every
-//!   non-discarded `authority` persist even when the tx fails.
+//!   non-discarded `authority` before root-call execution persist even when
+//!   the tx fails. Reverted execution can change the same authority again.
 //! * `Block.system_calls`: calls with `state_reverted == false`.
 //! * `Block.balance_changes`, `Block.code_changes`: always.
 //! * No-op records (`old == new`) are dropped everywhere.
 
 use std::collections::HashSet;
+use substreams::errors::Error;
 
 use substreams_ethereum::pb::eth::v2::{
     balance_change::Reason, transaction_trace::Type as TxType, BalanceChange, Block, Call,
@@ -108,7 +110,7 @@ fn emit_call_all(call: &Call, ctx: Ctx, out: &mut impl Sink) {
     }
 }
 
-pub fn collect_transaction(trx: &TransactionTrace, out: &mut impl Sink) {
+pub fn collect_transaction(trx: &TransactionTrace, out: &mut impl Sink) -> Result<(), Error> {
     let status = trx.status() as i32;
     let base = |scope: Scope, call_index: u32| Ctx {
         scope,
@@ -125,11 +127,11 @@ pub fn collect_transaction(trx: &TransactionTrace, out: &mut impl Sink) {
             }
             emit_call_all(call, base(Scope::Tx, call.index), out);
         }
-        return;
+        return Ok(());
     }
 
     // Failed or reverted: only the root call carries persisted effects.
-    let Some(root) = trx.calls.first() else { return };
+    let Some(root) = trx.calls.first() else { return Ok(()) };
     let ctx = base(Scope::TxFailedPersistent, root.index);
 
     for bc in &root.balance_changes {
@@ -138,35 +140,46 @@ pub fn collect_transaction(trx: &TransactionTrace, out: &mut impl Sink) {
         }
     }
 
-    // Sender nonce: the smallest-ordinal nonce change of the root call.
-    if let Some(sender_nonce) = root.nonce_changes.iter().min_by_key(|n| n.ordinal) {
-        if sender_nonce.old_value != sender_nonce.new_value {
-            out.nonce(sender_nonce, ctx);
-        }
+    // Reverted execution records may have ordinal zero. Neither array order nor
+    // the smallest ordinal across all accounts identifies the sender. Match the
+    // transaction's actual sender and nonce increment instead.
+    let sender_nonce = root.nonce_changes.iter().filter(|n|
+        n.ordinal > 0 && n.address == trx.from && n.old_value == trx.nonce
+            && Some(n.new_value) == trx.nonce.checked_add(1)
+    ).min_by_key(|n| n.ordinal);
+    if let Some(change) = sender_nonce {
+        out.nonce(change, ctx);
     }
 
     // EIP-7702: authorization nonce/code changes persist for non-discarded authorities.
     let auths = authorities(trx);
     if !auths.is_empty() {
+        if root.begin_ordinal == 0 {
+            return Err(Error::msg("failed SetCode transaction has no authorization/execution ordinal boundary"));
+        }
         let ctx7702 = base(Scope::Tx7702, root.index);
-        let sender_ord = root.nonce_changes.iter().map(|n| n.ordinal).min();
+        // Geth and Reth emit the auth-list changes before the root call begins.
+        // An authority can execute CREATE (nonce change), or other reverted code,
+        // later in that same root call. Address membership is not persistence.
+        let before_execution = |ordinal| ordinal > 0 && ordinal < root.begin_ordinal;
         for nc in &root.nonce_changes {
-            if Some(nc.ordinal) == sender_ord {
+            if sender_nonce.is_some_and(|sender| std::ptr::eq(nc, sender)) {
                 continue; // already emitted above
             }
-            if auths.contains(&nc.address) && nc.old_value != nc.new_value {
+            if before_execution(nc.ordinal) && auths.contains(&nc.address) && nc.old_value != nc.new_value {
                 out.nonce(nc, ctx7702);
             }
         }
         for cc in &root.code_changes {
-            if auths.contains(&cc.address) && cc.old_hash != cc.new_hash {
+            if before_execution(cc.ordinal) && auths.contains(&cc.address) && cc.old_hash != cc.new_hash {
                 out.code(cc, ctx7702);
             }
         }
     }
+    Ok(())
 }
 
-pub fn collect_block(block: &Block, out: &mut impl Sink) {
+pub fn collect_block(block: &Block, out: &mut impl Sink) -> Result<(), Error> {
     for call in &block.system_calls {
         if call.state_reverted {
             continue;
@@ -185,13 +198,15 @@ pub fn collect_block(block: &Block, out: &mut impl Sink) {
         }
     }
     for trx in &block.transaction_traces {
-        collect_transaction(trx, out);
+        collect_transaction(trx, out)?;
     }
+    Ok(())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use prost::Message;
     use substreams_ethereum::pb::eth::v2::{BigInt, SetCodeAuthorization};
 
     #[derive(Default)]
@@ -244,7 +259,7 @@ mod tests {
             ..Default::default()
         };
         let mut r = Rec::default();
-        collect_transaction(&trx, &mut r);
+        collect_transaction(&trx, &mut r).unwrap();
         assert_eq!(r.storage, vec![(vec![0xA; 20], 10, Scope::Tx)]);
     }
 
@@ -252,6 +267,7 @@ mod tests {
     fn failed_tx_keeps_gas_and_sender_nonce_only() {
         let trx = TransactionTrace {
             status: TransactionTraceStatus::Reverted as i32,
+            from: vec![0xA; 20], nonce: 7,
             calls: vec![
                 Call {
                     index: 0,
@@ -272,7 +288,7 @@ mod tests {
             ..Default::default()
         };
         let mut r = Rec::default();
-        collect_transaction(&trx, &mut r);
+        collect_transaction(&trx, &mut r).unwrap();
         assert!(r.storage.is_empty());
         assert_eq!(r.balance.len(), 3);
         assert!(r.balance.iter().all(|(_, reason, s)| *s == Scope::TxFailedPersistent && *reason != Reason::Transfer as i32));
@@ -283,6 +299,7 @@ mod tests {
     fn failed_7702_tx_keeps_authority_nonce_and_code() {
         let trx = TransactionTrace {
             status: TransactionTraceStatus::Failed as i32,
+            from: vec![0xA; 20], nonce: 7,
             r#type: TxType::TrxTypeSetCode as i32,
             set_code_authorizations: vec![
                 SetCodeAuthorization { authority: Some(vec![0xB; 20]), discarded: false, ..Default::default() },
@@ -290,6 +307,7 @@ mod tests {
             ],
             calls: vec![Call {
                 index: 0,
+                begin_ordinal: 6,
                 state_reverted: true,
                 balance_changes: vec![bal(0xA, Reason::GasBuy, 1, 100, 90)],
                 nonce_changes: vec![nonce(0xA, 1, 7), nonce(0xB, 2, 3), nonce(0xC, 3, 0)],
@@ -300,10 +318,105 @@ mod tests {
             ..Default::default()
         };
         let mut r = Rec::default();
-        collect_transaction(&trx, &mut r);
+        collect_transaction(&trx, &mut r).unwrap();
         assert_eq!(r.nonce, vec![(vec![0xA; 20], 8, Scope::TxFailedPersistent), (vec![0xB; 20], 4, Scope::Tx7702)]);
         assert_eq!(r.code, vec![(vec![0xB; 20], Scope::Tx7702)]);
         assert!(r.storage.is_empty());
+    }
+
+    #[test]
+    fn failed_sender_selection_ignores_zero_ordinals_and_other_accounts() {
+        let trx = TransactionTrace {
+            status: TransactionTraceStatus::Reverted as i32,
+            from: vec![0xA; 20], nonce: 7,
+            calls: vec![Call {
+                state_reverted: true,
+                nonce_changes: vec![nonce(0xB, 0, 0), nonce(0xC, 1, 0),
+                    nonce(0xA, 0, 8), nonce(0xA, 2, 7), nonce(0xA, 20, 8)],
+                ..Default::default()
+            }], ..Default::default()
+        };
+        let mut r = Rec::default();
+        collect_transaction(&trx, &mut r).unwrap();
+        assert_eq!(r.nonce, vec![(vec![0xA; 20], 8, Scope::TxFailedPersistent)]);
+    }
+
+    #[test]
+    fn failed_self_and_multiple_authorizations_exclude_reverted_execution() {
+        // Auth-list effects precede root begin (10); the same delegated account
+        // then attempts CREATE in reverted execution (20). Also include a
+        // zero-ordinal reverted record, a discarded auth and explicit code clear.
+        let mut clear = code(0xB, 8);
+        clear.old_hash = vec![8; 32];
+        clear.new_hash = vec![];
+        clear.new_code = vec![];
+        let trx = TransactionTrace {
+            status: TransactionTraceStatus::Failed as i32,
+            r#type: TxType::TrxTypeSetCode as i32,
+            from: vec![0xA; 20], nonce: 7,
+            set_code_authorizations: vec![
+                SetCodeAuthorization { authority: Some(vec![0xA; 20]), nonce: 8, ..Default::default() },
+                SetCodeAuthorization { authority: Some(vec![0xB; 20]), nonce: 3, ..Default::default() },
+                SetCodeAuthorization { authority: Some(vec![0xB; 20]), nonce: 4, ..Default::default() },
+                SetCodeAuthorization { authority: Some(vec![0xC; 20]), discarded: true, ..Default::default() },
+            ],
+            calls: vec![Call {
+                begin_ordinal: 10, end_ordinal: 30, state_reverted: true,
+                nonce_changes: vec![nonce(0xA, 2, 7), nonce(0xA, 3, 8), nonce(0xB, 5, 3),
+                    nonce(0xB, 7, 4), nonce(0xC, 9, 0), nonce(0xA, 20, 9), nonce(0xB, 0, 5)],
+                code_changes: vec![code(0xA, 4), code(0xB, 6), clear, code(0xC, 9),
+                    code(0xA, 21), code(0xB, 0)],
+                storage_changes: vec![storage(0xA, 25, 0, 1)],
+                ..Default::default()
+            }], ..Default::default()
+        };
+        let mut r = Rec::default();
+        collect_transaction(&trx, &mut r).unwrap();
+        assert_eq!(r.nonce, vec![(vec![0xA; 20], 8, Scope::TxFailedPersistent),
+            (vec![0xA; 20], 9, Scope::Tx7702), (vec![0xB; 20], 4, Scope::Tx7702),
+            (vec![0xB; 20], 5, Scope::Tx7702)]);
+        assert_eq!(r.code, vec![(vec![0xA; 20], Scope::Tx7702),
+            (vec![0xB; 20], Scope::Tx7702), (vec![0xB; 20], Scope::Tx7702)]);
+        assert!(r.storage.is_empty());
+    }
+
+    #[test]
+    fn ambiguous_failed_authorization_boundary_is_rejected() {
+        let trx = TransactionTrace {
+            status: TransactionTraceStatus::Failed as i32,
+            r#type: TxType::TrxTypeSetCode as i32,
+            set_code_authorizations: vec![SetCodeAuthorization {
+                authority: Some(vec![0xA; 20]), ..Default::default()
+            }],
+            calls: vec![Call::default()], ..Default::default()
+        };
+        assert!(collect_transaction(&trx, &mut Rec::default()).is_err());
+    }
+
+    #[test]
+    fn captured_bsc_failed_setcode_transactions_keep_sender_and_authority_nonces() {
+        // Unmodified TransactionTrace messages fetched from BSC Extended v5.
+        // Provenance, block/transaction hashes and checksums are next to the files.
+        let samples: [(&[u8], u64, u64, i32); 2] = [
+            (include_bytes!("../tests/fixtures/bsc-121114122-failed-setcode.pb"), 27164, 4308, 3),
+            (include_bytes!("../tests/fixtures/bsc-121114153-failed-setcode.pb"), 27167, 4311, 2),
+        ];
+        let sender = hex::decode("d52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a").unwrap();
+        let authority = hex::decode("417204ea716dfc4427bf9883521c820b036cdb7a").unwrap();
+        for (bytes, sender_nonce, authority_nonce, status) in samples {
+            let tx = TransactionTrace::decode(bytes).unwrap();
+            assert_eq!(tx.status, status);
+            assert_eq!(tx.r#type(), TxType::TrxTypeSetCode);
+            assert!(tx.calls[0].state_reverted);
+            let mut r = Rec::default();
+            collect_transaction(&tx, &mut r).unwrap();
+            assert_eq!(r.nonce, vec![(sender.clone(), sender_nonce, Scope::TxFailedPersistent),
+                (authority.clone(), authority_nonce, Scope::Tx7702)]);
+            assert!(r.storage.is_empty() && r.code.is_empty());
+            assert!(!r.balance.is_empty());
+            assert!(r.balance.iter().all(|(_, reason, scope)| *scope == Scope::TxFailedPersistent &&
+                [Reason::GasBuy as i32, Reason::GasRefund as i32, Reason::RewardTransactionFee as i32].contains(reason)));
+        }
     }
 
     #[test]
@@ -317,7 +430,7 @@ mod tests {
             ..Default::default()
         };
         let mut r = Rec::default();
-        collect_block(&block, &mut r);
+        collect_block(&block, &mut r).unwrap();
         assert_eq!(r.storage, vec![(vec![0x29; 20], 2, Scope::SystemCall)]);
         assert_eq!(r.balance, vec![(vec![0xF; 20], Reason::RewardTransactionFee as i32, Scope::Block)]);
     }

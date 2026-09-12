@@ -1,0 +1,49 @@
+{
+  "start_block": 121114100,
+  "stop_block": 121114161,
+  "blocks": 61,
+  "header": {
+    "number": 121114160,
+    "hash": "0x2868e46f4b9e0bdecf7c92a9d910c7bedec73c0e0c454de82e4e846d6fa57dd7",
+    "state_root": "0x8886cbddece4c0788ccdc89a871a27dfb53b309ecf3c68c0ea03cfca9a8e6baa"
+  },
+  "source": {
+    "database": "evm_lifecycle_bsc",
+    "accounts": [
+      "0x417204ea716dfc4427bf9883521c820b036cdb7a",
+      "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a"
+    ],
+    "start_block": 121114100,
+    "module_hash": "ac86d4717e6d4cd0f968f09fb29e4ec3d96f7290",
+    "final_blocks_only": true
+  },
+  "package_sha256": "b56c391a9ad8e2838864a61168e8c83807f8ca59c0852ab0a1171cc7d1c75d3d",
+  "database_uuid": "1622db43-1248-40bb-9ce1-47c920bcc500",
+  "native_run_id": "43437355b1834681b2ee9ee9d234fb68",
+  "checks": {
+    "0xd52573f6d4f68d8e7f8fe2ed50a1023c5f6fe82a": {
+      "balance": {
+        "local": "67705809545047776",
+        "rpc": "67705809545047776",
+        "match": true
+      },
+      "nonce": {
+        "local": 27167,
+        "rpc": 27167,
+        "match": true
+      }
+    },
+    "0x417204ea716dfc4427bf9883521c820b036cdb7a": {
+      "nonce": {
+        "local": 4311,
+        "rpc": 4311,
+        "match": true
+      }
+    }
+  },
+  "qualification": "Observed account fields versus archive RPC at the exact block. This is not a complete-account bootstrap or root proof.",
+  "failed_transaction_hashes": [
+    "0x506ed58269d602c120995e4048f46c20f925344139279e1b352a0200b6f12ce9",
+    "0x9929e0a0e67ce8836982fb70756c94caf72c0dc38a5780177cfdbae1aa211169"
+  ]
+}

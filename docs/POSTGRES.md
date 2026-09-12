@@ -158,12 +158,15 @@ confirmed on BSC Firehose):
 1. **`SUCCEEDED` tx** — record every change of every call with `state_reverted == false`.
 2. **`FAILED` / `REVERTED` tx** — consult only the root call. Keep balance
    changes with reason `GAS_BUY`, `GAS_REFUND`, `REWARD_TRANSACTION_FEE`
-   (`scope = tx_failed_persistent`) and the smallest-ordinal nonce change (the
-   sender). Everything else is dropped.
+   (`scope = tx_failed_persistent`) and the transaction sender's nonce increment,
+   matched by sender, transaction nonce and nonzero ordinal. Everything else is dropped.
 3. **EIP-7702** (`TRX_TYPE_SET_CODE`) — for each authorization with
    `discarded == false`, the `authority`'s nonce and code changes persist even
-   when the tx fails (`scope = tx_7702`). On BSC the root call of a failed
-   set-code tx carries both the sender and the authority nonce; both are kept.
+   when the tx fails (`scope = tx_7702`), provided their nonzero ordinal precedes
+   root-call execution. Later reverted execution changes to the same authority
+   are excluded. Missing execution boundaries fail closed. On BSC the root call
+   carries both sender and authority nonce effects; self-authorization does not
+   duplicate the sender increment. See [persistence evidence](LIFECYCLE.md).
 4. **`Block.system_calls`** — calls with `state_reverted == false` (`scope = system_call`).
 5. **`Block.balance_changes`, `Block.code_changes`** — always (`scope = block`).
 6. No-op records (`old == new`) are dropped.

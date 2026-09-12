@@ -128,3 +128,51 @@ def test_pinned_hash_claim_requires_header_commitment(databases):
     insert_blocks(stream, [block(100, bundle)])
     with pytest.raises(VerificationError, match="encoded header"):
         build(target, bundle, [source(stream, 100, target=target)])
+
+
+def test_account_deletion_removes_untouched_storage_inherited_from_base(databases):
+    target, base = initial(databases)
+    stream = databases()
+    bundle = proof_bundle(102, {A: state({}, nonce=0, balance=0, code="0x", exists=False)})
+    # No per-slot clears: deleting an account removes ALL storage at transaction
+    # end, including slot 2 which never appears in the new native interval.
+    row = block(102, bundle, storage={(A, 1): 99}, nonces={A: 0}, balances={A: 0}, codes={A: "0x"},
+                lifecycle=[{"address": A, "kind": "storage_reset", "ordinal": 5}])
+    insert_blocks(stream, [row])
+    ready = build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"])
+    assert storage(target, ready["snapshot_id"]) == {}
+    assert not read_account(target, ready["snapshot_id"], A)["exists"]
+    assert storage(target, base["snapshot_id"]) == {word(1): word(7), word(2): word(8)}
+
+
+@pytest.mark.parametrize("same_block", [False, True])
+def test_recreated_account_contains_only_writes_after_last_deletion(databases, same_block):
+    target, base = initial(databases)
+    stream = databases()
+    bundle = proof_bundle(103, {A: state({3: 11}, nonce=1, balance=0, code="0x6001")})
+    deleted = block(102, bundle, storage={(A, 1): 99}, nonces={A: 0}, balances={A: 0}, codes={A: "0x"},
+                    lifecycle=[{"address": A, "kind": "storage_reset", "ordinal": 5}])
+    recreated = block(102 if same_block else 103, bundle, storage={(A, 3): 11}, nonces={A: 1}, codes={A: "0x6001"})
+    if same_block:
+        recreated["storage"][0]["ordinal"] = 6
+        deleted["storage"] += recreated["storage"]
+        deleted["nonces"] = recreated["nonces"]
+        deleted["codes"] = recreated["codes"]
+        rows = [deleted, block(103, bundle)]
+    else:
+        rows = [deleted, recreated]
+    insert_blocks(stream, rows)
+    ready = build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"])
+    assert storage(target, ready["snapshot_id"]) == {word(3): word(11)}
+    assert read_account(target, ready["snapshot_id"], A)["code"] == "0x6001"
+
+
+@pytest.mark.parametrize("kind", ["selfdestruct", "code_cleared", "nonce_reset"])
+def test_lifecycle_signal_without_confirmed_deletion_does_not_wipe_storage(databases, kind):
+    target, base = initial(databases)
+    stream = databases()
+    bundle = proof_bundle(102, {A: state({1: 7, 2: 8}, nonce=2, code="0x")})
+    insert_blocks(stream, [block(102, bundle, nonces={A: 2}, codes={A: "0x"},
+                                lifecycle=[{"address": A, "kind": kind, "ordinal": 5}])])
+    ready = build(target, bundle, [source(stream, 102, target=target)], base["snapshot_id"])
+    assert storage(target, ready["snapshot_id"]) == storage(target, base["snapshot_id"])

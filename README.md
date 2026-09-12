@@ -245,9 +245,12 @@ hash. By default, finality is trusted to the RPC provider. `capture-proofs
 BSC consensus. Older prototype provider-trusted bundles without the encoded
 header remain readable, but cannot claim operator-pinned hash verification.
 
-SELFDESTRUCT, nonce resets and code clearing are surfaced for verification.
-Automatic deletion/recreation reconciliation and the full producer/fork/7702
-matrix are not yet qualified. A mismatch leaves the candidate unpublished.
+The native mapper applies BSC's SELFDESTRUCT fork rules at transaction end,
+clears inherited storage on deletion and preserves later recreation writes.
+Failed EIP-7702 handling separates authorization changes from reverted execution
+using the root-call boundary. Synthetic regression cases pass; the full captured
+producer/fork/7702 matrix remains unqualified. See [lifecycle semantics and
+evidence](docs/LIFECYCLE.md). A mismatch leaves the candidate unpublished.
 
 The default checkpoint budget is 100,000,000,000 bytes. Current checks reject an
 already exhausted database budget and check again during verification; they do

@@ -10,6 +10,7 @@
 
 mod db_out;
 mod block_state;
+mod lifecycle;
 mod params;
 pub mod pb;
 mod persist;
@@ -122,7 +123,7 @@ pub fn collect(params: &str, block: &eth::Block) -> Result<StateChanges, Error> 
         },
     };
 
-    persist::collect_block(block, &mut col);
+    persist::collect_block(block, &mut col)?;
 
     // EIP-7702 authorization list (informational; the persisted effects are
     // already in nonce_changes / code_changes). Kept when authority OR
