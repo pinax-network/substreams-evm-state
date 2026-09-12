@@ -10,6 +10,23 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Commands {
+    /// Run bounded native ingestion while measuring RPC finality lag.
+    Throughput(evm_state::throughput_qualification::ThroughputOptions),
+    /// Verify complete native rows and measure their logical protobuf output.
+    NativeOutput {
+        #[arg(long)]
+        database: String,
+        #[arg(long)]
+        state_dir: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+    },
+    /// Validate completed cold/warm/live evidence and summarize declared telemetry.
+    SummarizeThroughput {
+        root: PathBuf,
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Reproduce public cursor compatibility fixtures without provider credentials.
     CursorFixtures {
         #[arg(long)]
@@ -59,6 +76,42 @@ enum Commands {
 }
 fn run() -> Result<()> {
     match Cli::parse().command {
+        Commands::Throughput(options) => {
+            anyhow::ensure!(
+                std::env::var_os("EVM_STATE_CAPACITY_CONFIG").is_some(),
+                "run this workload under capacity-run"
+            );
+            let result = evm_state::throughput_qualification::measure(
+                &evm_state::ch::ClickHouse::new(&options.database)?,
+                &evm_state::rpc::Rpc::new(None, None)?,
+                &options,
+                &std::env::var("SUBSTREAMS_SINK_DSN")?,
+            )?;
+            println!("{}", serde_json::to_string_pretty(&result)?);
+            Ok(())
+        }
+        Commands::NativeOutput {
+            database,
+            state_dir,
+            output,
+        } => {
+            let result = evm_state::output_qualification::measure(
+                &evm_state::ch::ClickHouse::new(&database)?,
+                &evm_state::rpc::Rpc::new(None, None)?,
+                &state_dir,
+                &output,
+            )?;
+            println!(
+                "{}",
+                serde_json::json!({"output":output,"blocks":result["blocks"],"logical_protobuf_bytes":result["logical_protobuf_bytes"],"ordered_output_sha256":result["ordered_output_sha256"]})
+            );
+            Ok(())
+        }
+        Commands::SummarizeThroughput { root, output } => {
+            evm_state::throughput_qualification::summarize(&root, &output)?;
+            println!("{}", serde_json::json!({"output":output}));
+            Ok(())
+        }
         Commands::CursorFixtures { output } => {
             let mut values = serde_json::json!({});
             for step in [1, 17] {

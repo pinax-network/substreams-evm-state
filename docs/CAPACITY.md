@@ -310,13 +310,13 @@ shared-machine measurements.
 
 To reproduce on the retained isolated comparison database, provide a JSON object
 mapping its account to the matching observed fields (`nonce`, decimal-string
-`balance`, `code_hash` and `code`). The script rejects metadata or storage that
+`balance`, `code_hash` and `code`). The Rust qualifier rejects metadata or storage that
 does not reproduce the comparison's recorded checksum:
 
 ```bash
-.venv/bin/evm-state --database <comparison-db> capacity-run \
+target/release/evm-state --database <comparison-db> capacity-run \
   --config <runtime>/capacity.json --output <runtime>/trie-capacity --interval 5 -- \
-  .venv/bin/python scripts/qualify_trie_workspace.py \
+  target/release/evm-state-qualify trie-workspace \
     --evidence docs/evidence/bsc-aggregation-memory-2026-09-12.json \
     --fields <runtime>/matching-fields.json --output <runtime>/trie-work
 ```
@@ -324,8 +324,8 @@ does not reproduce the comparison's recorded checksum:
 Both output directories must be new and inside the measured roots. The evidence
 selects the frozen database and generation; the workload never reads or modifies
 the advancing native source and never publishes a ready manifest.
-To compare the sorted builder, repeat with fresh output directories and add
-`--backend sorted --reference <previous-trie-work>/result.json`. The script
+To compare with a retained prior measurement, use fresh output directories and add
+`--reference <previous-trie-work>/result.json`. The Rust qualifier
 requires the same source identity, header, input count/checksum and reconstructed
 root. Unit tests compare both assemblers on seeded random keys, deep shared
 paths, full branches and the 31/32/33-byte child-reference boundary; malformed,

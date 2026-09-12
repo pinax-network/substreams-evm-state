@@ -1000,3 +1000,124 @@ fn native_data_write_before_cursor_failure_replays_from_previous_progress() -> R
     assert!(stream.errors().is_empty(), "{:?}", stream.errors());
     Ok(())
 }
+
+#[test]
+#[ignore = "requires ClickHouse and pinned substreams CLI"]
+fn throughput_runner_samples_real_native_progress_and_bounded_timeout_resumes() -> Result<()> {
+    use evm_state::{
+        native_stream::{NativeStream, StreamOptions},
+        rpc::RpcCall,
+        throughput_qualification::{self, ThroughputOptions},
+    };
+    use std::sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    };
+    struct Rpc;
+    impl RpcCall for Rpc {
+        fn call(&self, method: &str, _: Value) -> Result<Value> {
+            Ok(match method {
+                "eth_chainId" => json!("0x38"),
+                "eth_getBlockByNumber" => json!({"number":"0x100","hash":word(256)}),
+                _ => anyhow::bail!("unexpected fixture method"),
+            })
+        }
+    }
+    let package =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../spkg/evm-state-v0.1.0.spkg");
+    // Hold after two blocks: the normal finalized defaults must flush and expose
+    // progress before another decode batch arrives, then the bounded run stops.
+    let held = Arc::new(AtomicBool::new(true));
+    let paused = held.clone();
+    let stream = NativeStream::new(
+        &package,
+        &[
+            block(100, &slots()?)?,
+            block(101, &[])?,
+            block(102, &[])?,
+            block(103, &[])?,
+        ],
+        StreamOptions {
+            before_block: Some(Arc::new(move |number, context| {
+                if number == 102 && paused.load(Ordering::Relaxed) {
+                    context.hold();
+                }
+                Ok(())
+            })),
+            ..Default::default()
+        },
+    )?;
+    let db = Native::at(&stream.endpoint)?;
+    let mut ingest_options = IngestOptions {
+        stop_block: Some(104),
+        prometheus_addr: Some("127.0.0.1:0".into()),
+        ..Default::default()
+    };
+    let error = ingest::ingest_bounded(
+        &db.client,
+        &db.options,
+        &ingest_options,
+        Some(std::time::Instant::now() + std::time::Duration::from_secs(4)),
+        None,
+    )
+    .unwrap_err();
+    assert!(error.to_string().contains("timed out"));
+    assert_eq!(
+        cursor::load_progress(&db.client, &db.run, &db.options.state_dir)?["position"]["block"]
+            ["number"],
+        101
+    );
+    // The wrapper has reaped the native child and released its writer lock.
+    {
+        let _lock = files::file_lock(&db.options.state_dir.join("run.lock"), true, false)?;
+    }
+    held.store(false, Ordering::Relaxed);
+    ingest_options.max_retries = 0;
+    assert_eq!(
+        ingest::ingest(&db.client, &db.options, &ingest_options)?["position"]["block"]["number"],
+        103
+    );
+    assert_eq!(db.publish(103, 100, None)?["nonzero_slots"], 2);
+
+    // A distinct empty source is timed by the full Rust qualifier, including its
+    // real native setup, RPC sampling, rows/cursor check and retained run report.
+    let root = tempfile::tempdir()?;
+    let client = ClickHouse::new(&format!("evm_test_rust_{}", new_id()))?
+        .with_control_home(root.path().join("control"));
+    let options = ThroughputOptions {
+        database: client.database.clone(),
+        root: root.path().join("run"),
+        package,
+        accounts: A.into(),
+        endpoint: stream.endpoint.clone(),
+        start_block: Some(100),
+        stop_block: Some(104),
+        live_blocks: None,
+        interval: 1.,
+        timeout: 30,
+        decode_batch_size: 1,
+        spool_max_idle_ms: 100,
+    };
+    let dsn = format!(
+        "clickhouse://evm_state:local-development-only@localhost:19000/{}",
+        client.database
+    );
+    let measured = (|| -> Result<()> {
+        let report = throughput_qualification::measure(&client, &Rpc, &options, &dsn)?;
+        assert_eq!(report["blocks"], 4);
+        assert_eq!(report["failed_lag_samples"], 0);
+        assert!(uint(&report["lag_samples"])? > 0);
+        assert!(report["duration_seconds"].as_f64().unwrap() > 0.);
+        assert_eq!(report["final_position"]["number"], 103);
+        assert!(options.root.join("lag-samples.jsonl").is_file());
+        assert!(throughput_qualification::measure(&client, &Rpc, &options, &dsn).is_err());
+        Ok(())
+    })();
+    client.execute(
+        &format!("DROP DATABASE IF EXISTS {}", client.database),
+        &Default::default(),
+    )?;
+    measured?;
+    assert!(stream.errors().is_empty(), "{:?}", stream.errors());
+    Ok(())
+}

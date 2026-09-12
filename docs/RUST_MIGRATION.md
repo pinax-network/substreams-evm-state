@@ -142,3 +142,18 @@ vectors byte for byte. The old Go adapter and Python server remain only for the
 remaining migration baseline scenarios until those assertions have Rust coverage.
 This phase passes 63 standalone native tests, 36 ClickHouse tests and the 43
 mapper tests locally; the two PostgreSQL tests passed in the preceding CI run.
+
+Native output measurement, timed throughput, evidence summaries and trie
+qualification now have Rust entry points; their four Python scripts and the old
+throughput tests are removed. Rust reproduces the retained 10,000-block BSC
+sample's 45,533,529 protobuf bytes and ordered checksum exactly, and the complete
+retained throughput summary has matching run, live-window and read results;
+see the [Rust output evidence](evidence/bsc-output-rust-2026-09-12.json).
+The summary additionally binds periodic capacity samples and cache-design inputs
+by checksum and rejects raw lag failures hidden by a summary counter.
+
+The timed runner keeps its child within the capacity supervisor's process group.
+A real native test verifies timeout, durable progress, child reaping and a
+successful restart, plus the complete timed collection path. Proof capture also
+requires the RPC header to match an explicitly requested block number. This phase
+passes 73 standalone native tests, 37 ClickHouse tests and 43 mapper tests.

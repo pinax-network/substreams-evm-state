@@ -61,17 +61,9 @@ impl RpcCall for Rpc {
     }
 }
 
-pub fn capture(
-    rpc: &impl RpcCall,
-    accounts: impl IntoIterator<Item = impl AsRef<str>>,
-    block: Option<u64>,
-    expected_hash: Option<&str>,
-) -> Result<Value> {
-    let accounts = accounts
-        .into_iter()
-        .map(|a| crate::proof::address(a.as_ref()))
-        .collect::<Result<BTreeSet<_>>>()?;
-    ensure!(!accounts.is_empty(), "at least one account is required");
+/// Fetch the exact requested finalized header; a provider cannot substitute a
+/// different, otherwise valid block for an explicit target.
+pub fn finalized_header(rpc: &impl RpcCall, block: Option<u64>) -> Result<Value> {
     let finalized = rpc.call("eth_getBlockByNumber", json!(["finalized", false]))?;
     let header = if let Some(block) = block {
         rpc.call(
@@ -83,9 +75,30 @@ pub fn capture(
     };
     let number = quantity(string(&header, "number")?, 64)?.to::<u64>();
     ensure!(
+        block.is_none_or(|requested| requested == number),
+        "RPC returned a different block number than requested"
+    );
+    ensure!(
         number <= quantity(string(&finalized, "number")?, 64)?.to::<u64>(),
         "checkpoint block is not finalized"
     );
+    encode_rpc_header(&header)?;
+    Ok(header)
+}
+
+pub fn capture(
+    rpc: &impl RpcCall,
+    accounts: impl IntoIterator<Item = impl AsRef<str>>,
+    block: Option<u64>,
+    expected_hash: Option<&str>,
+) -> Result<Value> {
+    let accounts = accounts
+        .into_iter()
+        .map(|a| crate::proof::address(a.as_ref()))
+        .collect::<Result<BTreeSet<_>>>()?;
+    ensure!(!accounts.is_empty(), "at least one account is required");
+    let header = finalized_header(rpc, block)?;
+    let number = quantity(string(&header, "number")?, 64)?.to::<u64>();
     if let Some(hash) = expected_hash {
         ensure!(
             fixed::<32>(hash)? == fixed::<32>(string(&header, "hash")?)?,
@@ -124,7 +137,8 @@ pub fn capture(
         json!([format!("0x{number:x}"), false]),
     )?;
     ensure!(
-        string(&after, "hash")?.eq_ignore_ascii_case(string(&header, "hash")?),
+        quantity(string(&after, "number")?, 64)?.to::<u64>() == number
+            && string(&after, "hash")?.eq_ignore_ascii_case(string(&header, "hash")?),
         "checkpoint header changed during proof capture"
     );
     Ok(bundle)

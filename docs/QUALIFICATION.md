@@ -176,7 +176,7 @@ Logical native output for that BSC interval was 45,103,529 protobuf bytes
 (4,510.35 bytes/block on average; maximum 23,861), reconstructed with the frozen
 package descriptor from deduplicated native rows. It contained 219,692 storage
 patches and 9,936 balance patches. This excludes transport framing, retries and
-billing adjustments. `scripts/measure_native_output.py` reproduces the measurement
+billing adjustments. `target/release/evm-state-qualify native-output` reproduces the measurement
 and verifies interval/header/cursor identity; it does not claim complete initial
 storage. Separate cold/cached/live results and a current price model now appear
 in [THROUGHPUT.md](THROUGHPUT.md).

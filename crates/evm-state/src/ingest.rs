@@ -20,7 +20,7 @@ use std::{
         atomic::{AtomicBool, Ordering},
         Arc,
     },
-    time::Duration,
+    time::{Duration, Instant},
 };
 use wait_timeout::ChildExt;
 
@@ -431,11 +431,36 @@ pub fn ingest(
     options: &NativeOptions,
     ingest: &IngestOptions,
 ) -> Result<Value> {
+    ingest_bounded(client, options, ingest, None, None)
+}
+
+/// Optional qualification deadline/cancellation. The native child remains in
+/// its supervisor's process group and is always reaped before returning.
+pub fn ingest_bounded(
+    client: &ClickHouse,
+    options: &NativeOptions,
+    ingest: &IngestOptions,
+    deadline: Option<Instant>,
+    cancelled: Option<&AtomicBool>,
+) -> Result<Value> {
+    let check_bound = || -> Result<()> {
+        ensure!(
+            deadline.is_none_or(|end| Instant::now() < end),
+            "bounded native ingestion timed out; retain cursor and spool"
+        );
+        ensure!(
+            !cancelled.is_some_and(|flag| flag.load(Ordering::Relaxed)),
+            "native qualification cancelled; retain cursor and spool"
+        );
+        Ok(())
+    };
+    check_bound()?;
     ingest.validate(options.start_block)?;
     let directory = resolve(&options.state_dir)?;
     let lock = file_lock(&directory.join("run.lock"), true, false)?;
     capacity::check(client, &[directory.clone()], "native-start")?;
     let record = prepare_unlocked(client, options, &directory)?;
+    check_bound()?;
     let cursor_path = directory.join("cursor.txt");
     let blocks = uint(
         &client.one(
@@ -492,7 +517,10 @@ pub fn ingest(
         .collect::<std::io::Result<Vec<_>>>()?;
     let run = (|| -> Result<()> {
         loop {
-            if let Some(status) = child.wait_timeout(Duration::from_secs(1))? {
+            check_bound()?;
+            let status = child.wait_timeout(Duration::from_secs(1))?;
+            check_bound()?;
+            if let Some(status) = status {
                 ensure!(
                     status.success(),
                     "native sink exited with status {}; retain its cursor and spool for recovery",

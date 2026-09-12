@@ -1,0 +1,90 @@
+{
+  "format_version": 1,
+  "qualification": "Rust output and throughput-summary compatibility over retained BSC observations",
+  "runtime_binary_sha256": "f9c6565516b000383099b3cbc2db74dac9ce2862fc1b0cf4625d01a358581f57",
+  "native_output": {
+    "accounts": [
+      "0x0000f90827f1c53a10cb7a02335b175320002935",
+      "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+      "0xc1223ab58372ba5338673c0cc778b7662dbf156c"
+    ],
+    "blocks": 10000,
+    "changed_rows": {
+      "balances": 9936,
+      "codes": 0,
+      "lifecycle": 0,
+      "nonces": 0,
+      "storage": 219692
+    },
+    "database": "evm_throughput_cold_20260912",
+    "digest_encoding": "ascending blocks; deterministic protobuf; each prefixed by its uint64 big-endian byte length",
+    "end_block": 121309999,
+    "first_block_timestamp": 1789146826,
+    "format_version": 1,
+    "header": {
+      "hash": "0x2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10",
+      "number": 121309999,
+      "parent_hash": "0x22f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130",
+      "state_root": "0xd646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93f",
+      "timestamp": 1789151326
+    },
+    "header_rlp": "0xf9037ca022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347945009317fd4f6f8feea9dae41e5f0a4737bb7a7d5a0d646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93fa0bf4f5e2c61570198e04c4128b878f837b40a492e5f34cd20330e057abfe563c8a09d59e61aeaac5cb196e6df32ea14cf4394431e0953d79a1099cb8a6bb6f69daab9010020210ac080e80d5309231055a69c8001900006200c24448014021009200081843778500019c101000623a129402e0000000908024436219507900a010f28108064c00290a45280a80d021019222400a32c7018291d680030f0141c0ad0cb0d4011a80b2a428b0000bc442002040408081806c6530004964060098852e90846002470305c2840a040c1c8000840000aca61a4848521802819081001410108042002b42042190402782fcc2a90ab0405000560884042a02b884097224f088082090006c1d7067c044940a1503004b4b00020d432224ec000993e104006003ca0066a502e170a6d480025c8064da04413648800a128c61005584402900ac00145100284073b0b2f84042c1b6b835d3fde846aa4485eb90118db8301070888636462373534386289676f312e32352e3132836c696ed38cc282f8b5831dffffb860884b45353a73360d145ea9701db285595f7a506acd9d819bfff30e3a8031b531fc64c7c4cbf7457336c8bd7e292f99ee127f0f4c004570ac36976002f4caf592eb3ce34e4a9f6c49e0bc77c18add19b16fcf36444ac993e650a8d0bd1abb7963f84c84073b0b2da05b357ff8476e2a1617f0c56e571c35de3319b7c6fd7a7f4402f0019c1f27ab5384073b0b2ea022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130800c5186f3731ea1445f0056cbaa7cf337360e7b83404cd93758471699533cfad8027ff223dd47c16d3973253ff9bcd2dc38f814a85baf3d0b5ed1358fc0c48fb601a000000000000000000000000000000000000000000000000000000000000003b688000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000020557e8cb169f90f6ef421a54e29d7dd0629ca597",
+    "header_trust": "provider-finalized-header",
+    "limitations": [
+      "account storage completeness is not established by this update sample",
+      "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",
+      "cache warmth and wall time are separate measurements"
+    ],
+    "logical_protobuf_bytes": 45533529,
+    "max_protobuf_bytes_per_block": 23904,
+    "mean_block_interval_seconds": 0.45004500450045004,
+    "mean_protobuf_bytes_per_block": 4553.3529,
+    "module_hash": "d7842af0f32665ec5f6f61d695c668862d5f8822",
+    "ordered_output_sha256": "d12d9e54a90653bb811c011029d1ec4a64906e34479de1d8e5563990fda67910",
+    "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+    "run_id": "f623ef789c66459e8358a48498ba8239",
+    "start_block": 121300000,
+    "validation": "encoded header, native interval and durable cursor verified"
+  },
+  "complete_output_record_matches_previous_implementation": true,
+  "throughput_summary": {
+    "runs_match": true,
+    "overlapping_live_windows_match": true,
+    "read_records_match": true,
+    "input_artifact_sha256": {
+      "cache-design.json": "40b4aed27a77b6ae50039f5f05aed6284f03e50050cde3330d1c22e697a3d51c",
+      "cold/capacity/samples.jsonl": "524650046b1e24bb4e545da0626976a634f0bffcbcedbaa21672654eb3f8f095",
+      "cold/capacity/summary.json": "2921132ccb4fcc26e4e8eede3d5b457dc40937ceb258ba65257c5e0fa9c6abcb",
+      "cold/lag-samples.jsonl": "0e70f3010a5b22c415fadbdd3d805dffc8ff1798e4c954e85f3a2d6537772c7b",
+      "cold/output.json": "fcf5ff3cd45ed67db7c4d1e5ca69c02f3e19e0e3d40119e28f51d90b96bd57a5",
+      "cold/result.json": "00404a5f05e424901bc0f9b6aaf8d0f1a1f6b47620e57dd6d8288def70c16782",
+      "cold/run.log": "2d9f9591e478080f39b0c3bdcfd4ccdce700a83d028c529a734c2ff8c4fbd105",
+      "large-reads.json": "8c02ee0c0601b93707132ca97e6b0ece2b1747c4ca946a09c00e16a62744f46e",
+      "live-tuned/capacity/samples.jsonl": "b30394023db15d33812153ebfb98bd1d8ac75806a7d2ef38e4507014c86608fd",
+      "live-tuned/capacity/summary.json": "9f6275a853a4412b3941f230e1b30d85330c472aa6b849f5426fbc77619329cb",
+      "live-tuned/lag-samples.jsonl": "c0b951be108d56aa28c7d738e1529da2a1f66af7f7dd1963e3faa03650f587af",
+      "live-tuned/output.json": "ffb4fa555dee0a3a2043e738c22d068183f9c3207c4da4a884a3750db0535f79",
+      "live-tuned/result.json": "1ce0cdb377380057bf95236afd69161ab733f4a5cb56c78abefbecd2117d0f1e",
+      "live-tuned/run.log": "3fc7892236d0200a5cde99affb8e12a4c1e65e9db5944f976f4e4e2c6522980b",
+      "live/capacity/samples.jsonl": "67007db474367ead46e1bdc06d0924adf2649ceaa1e411f795314acbc2f1c7e0",
+      "live/capacity/summary.json": "596330ce7fc1f8a55d6bcd3bafe6593e67de94f7c4c127a7141a64100e4f7cf0",
+      "live/lag-samples.jsonl": "e199192764eb01ddb0218877bcaff41e504e6cf858b6106a81b5d8ff12e6ab8a",
+      "live/output.json": "1e87ae655ddaaabbdca55083d22537582aa9476c2574a82a44ad9a2febda98e5",
+      "live/result.json": "5328609e2b8fb3cc22aca37df1a77473f878366a36079c18e257a94a42d3594d",
+      "live/run.log": "870ab3f547385642f2e62d9c08ab69c19c3e465002f1d7ed7c58fd9257295118",
+      "quiet-reads.json": "de1ccd9a2f9f63d7a85cc3ed54a6578354136d92e4f388cf20cdec1b0db18189",
+      "warm/capacity/samples.jsonl": "d88e6310c2294b826eb2028b8741ac908e6dffc61b27bf55f7ea48399f852e0b",
+      "warm/capacity/summary.json": "e9b5e6be6123977141a4a565f7fb371158aaae6cf6fdbc0a86c60efecdbdf975",
+      "warm/lag-samples.jsonl": "bb574f67024452d46a5617ef43648358ce83554e8d9bfc7f4f60dfb0ffbbc7e3",
+      "warm/output.json": "59d0cfcd7f7608d9317ab844f9f4b862f4ee9d04a72b108a14e26aca5f1965c8",
+      "warm/result.json": "05683142982e126a8970f2953735b3265af865d4b94964c748e1c0ce273d6dbb",
+      "warm/run.log": "590b7e20f26dbfb876784d899b43748a33963d3aa3c1e8c21d00958ae7574a88"
+    }
+  },
+  "limitations": [
+    "This reruns output reconstruction and summary validation, not the original timed ingestion.",
+    "The prior captured timing and read measurements retain their original implementation and environment.",
+    "Logical protobuf output excludes framing, retries and billable adjustments; it does not establish complete initial storage."
+  ]
+}

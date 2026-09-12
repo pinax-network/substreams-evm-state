@@ -188,9 +188,9 @@ as a full replay timing.
 
 ```bash
 # Set SUBSTREAMS_SINK_DSN for the new measurement database first.
-.venv/bin/evm-state --database <new-source> capacity-run \
+target/release/evm-state --database <new-source> capacity-run \
   --config <capacity.json> --output <run>/capacity --interval 1 -- \
-  .venv/bin/python scripts/qualify_throughput.py \
+  target/release/evm-state-qualify throughput \
     --database <new-source> --root <run> --package <frozen-package.spkg> \
     --accounts <public-filter> --start-block 121300000 --stop-block 121310000 \
     --decode-batch-size 32 --spool-max-idle-ms 1000 > <run>/run.log 2>&1
@@ -199,7 +199,7 @@ as a full replay timing.
 # explicit start/stop and historical batching above with --live-blocks 2000.
 # Current ingest defaults supply one-block decoding and 100 ms spool idle.
 
-.venv/bin/python scripts/measure_native_output.py \
+target/release/evm-state-qualify native-output \
   --database <new-source> --state-dir <run>/native --output <run>/output.json
 
 # Uses the checkpoint database's existing EVM_STATE_HOME; creates and releases
@@ -220,7 +220,7 @@ visible and never count as zero lag. The live summary excludes the first 60
 seconds by elapsed time, independent of whether a sample is fast or slow.
 
 After all four named runs (`cold`, `warm`, `live`, `live-tuned`) and their output
-measurements complete, `scripts/summarize_throughput.py <common-parent> --output
+measurements complete, `target/release/evm-state-qualify summarize-throughput <common-parent> --output
 <new-evidence.json>` validates their identity, output equality, server processing
 observations and growing live windows. Its input also includes `cache-design.json`
 and the two pinned-read reports. Raw logs remain local; the summary includes their
