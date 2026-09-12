@@ -9,7 +9,7 @@ make an entire deliverable complete.
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication | Sustained follow and agreed read/publication latency; storage must honor sync writes (physical host power loss is not emulated) |
 | Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage | Exercise representative multi-account onboarding and interrupted operational cutover |
 | Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; synthetic failed sender/self/multiple/discarded 7702 cases; BSC fork-aware SELFDESTRUCT and delegated execution; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers use consistent snapshots and fail on unknown/wrong metadata | Captured producer/fork fixtures and full 7702 matrix, historical CREATE/CREATE2 parity, representative lifecycle replay |
-| Retention/cost qualification and release | Local sample disk/throughput evidence; early database-budget rejection; checkpoint/candidate cleanup preserving readers and latest account state; native history partition cleanup preserving every retained checkpoint's continuation and the durable cursor; initial replay compaction between bounded chunks; pinned toolchain; package-producing `make build`; CI integration job | Peak merge/spool/trie/export space accounting, representative hot/old/growing-account measurements, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
+| Retention/cost qualification and release | Whole-directory capacity monitoring, sampled headroom enforcement and publication/trie guards; measured 64-account synthetic checkpoint/export/restore/churn/retention; observed active merge space and real BSC spool; checkpoint/candidate cleanup preserving readers; native history cleanup and bounded bootstrap chunks; pinned toolchain and package-producing build | Representative hot/old/growing-account and sustained-growth measurements, separated cold/cached/live throughput and current cost estimates, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
 
 ## Reproducible local checks
 
@@ -18,12 +18,12 @@ running, `make test-integration` also exercises the **published Substreams
 1.22.0 binary**, not an emulated SQL writer. The tested release commit is
 `be35ad36f63a52ff49d3e15cf993de4cad6bfbd9`; ClickHouse is `26.3.33.24`.
 
-The Python suite currently contains 209 tests (81 offline, 126 ClickHouse
+The Python suite currently contains 232 tests (97 offline, 133 ClickHouse
 integration and two PostgreSQL integration).
 Integration databases have random `evm_test_` names and are deleted afterward.
 One fault test creates its own `evm-crash-` Docker container, kills/restarts that
 database process and removes the container afterward. It never restarts the
-configured development database. The 208-test baseline passed locally in 84.84
+configured development database. All 232 tests passed locally in 91.58
 seconds, and all 19 Rust tests passed. A process-kill test now waits for the killed
 native child to release its inherited writer lock before recovery; reaping its
 wrapper alone was a timing race. The earlier 159-test lifecycle baseline also
@@ -116,6 +116,61 @@ nonce, while the other checks coherent reads during concurrent committed updates
 The sampled RPC command labels its result as incomplete storage coverage; neither
 legacy command publishes a ready checkpoint. The old custom trie implementation
 and success-on-metadata-mismatch behavior have been removed.
+
+Capacity tests validate whole-directory accounting, local allocated bytes and
+component breakdowns without duplicate totals, container/endpoint identity,
+persistent mounts, symlink rejection, independent budget and free-space reserves,
+and incomplete-sample failure. The supervisor rejects unsafe initial work and
+stops descendants that ignore SIGTERM. A final rejected sample cannot report a
+successful run just because its child exited zero. Native ingestion resumes after
+capacity stops during the first batch and after a durable cursor; checkpoint,
+bootstrap, export and import candidates remain unpublished if their final guard
+fails. Cursor observation after native shutdown captures a valid newly flushed
+position when present.
+
+## Capacity qualification
+
+The [capacity operations guide](CAPACITY.md) describes the measured scope,
+headroom policy, recovery and sampling limits. The
+[machine-readable evidence](evidence/capacity-qualification-2026-09-12.json)
+records three completed runs, all using a 100 GB data budget, 10 GB budget reserve
+and 1 GiB minimum available/unreserved filesystem space:
+
+| Workload | Result | Observed allocated peak, including shared server data |
+|---|---|---|
+| 64 synthetic accounts, 104,032 nonzero slots; one account holds 100,000 slots | Complete checkpoint, portable export, verified restore, 50,000 slot clears/replacements and pinned-reader retention all pass | 1,074,298,880 bytes |
+| Eight incompressible parts, 256 MiB payload, forced final merge | Three samples observed an active merge; part catalog grew from 269,764,725 to 809,286,373 bytes including retained intermediate/old parts | 1,893,478,400 bytes |
+| Real BSC native output, blocks 121300000–121309999, three public accounts including WBNB | 10,000 contiguous finalized block envelopes and cursor verified against the encoded RPC header; spool peak 23,080,960 allocated bytes | 1,823,137,792 bytes |
+
+The state workload recorded 275 periodic and 531 in-operation guard samples, with
+no failed samples. Its largest periodic gap was 1.587 seconds; trie guards run
+before temporary files disappear. Local allocation peaked at 29,786,112 bytes.
+The first complete checkpoint took 56.49 seconds, export 45.57 seconds, verified
+restore 108.51 seconds, and the next checkpoint after slot churn 58.50 seconds.
+The portable export was 4,744,344 bytes. Pruning respected the pinned old
+checkpoint and removed it after release. These are real SQL/proof operations over
+synthetic state, not a customer simulation or a producer replay.
+
+The merge fixture sampled every 0.1 seconds plus measurement overhead; its largest
+gap was 0.490 seconds. It illustrates why active part sizes alone understate
+transient/retained merge space. The native BSC run recorded 48 periodic and 26
+guard samples, with no failed samples and a largest gap of 0.756 seconds. It took
+31.97 seconds including guarded setup/ingestion. Cache warmth was not established.
+
+Logical native output for that BSC interval was 45,103,529 protobuf bytes
+(4,510.35 bytes/block on average; maximum 23,861), reconstructed with the frozen
+package descriptor from deduplicated native rows. It contained 219,692 storage
+patches and 9,936 balance patches. This excludes transport framing, retries and
+billing adjustments. `scripts/measure_native_output.py` reproduces the measurement
+and verifies interval/header/cursor identity; it does not claim complete initial
+storage. Pricing and separate cold/cached/live measurements still require work.
+
+These totals deliberately include other databases/system data sharing the server
+disks and all declared local files. They are conservative workload observations,
+not per-account storage bounds. No sample exceeded the operating thresholds, but
+sampling cannot prove an absolute disk ceiling between observations. Hard limits
+require storage quotas. The customer's absent account set, acceptable publication
+latency and long-term growth remain unqualified.
 
 The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
 account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps

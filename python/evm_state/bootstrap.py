@@ -17,6 +17,7 @@ from .files import atomic_json, exclusive_lock
 from .history import partitions_before
 from .proof import VerificationError, unhex
 from .source import verified_source
+from .capacity import check as capacity_check
 
 
 def _digest(client, generation, fields, accounts):
@@ -115,6 +116,8 @@ def compact(client, directory, end_block=None, budget_bytes=100_000_000_000):
             if checked["state_directory"] != str(directory) or checked["run_id"] != run["run_id"]:
                 raise VerificationError("bootstrap directory does not own this source")
         with exclusive_lock(directory / "source_readers.lock"):
+            capacity_paths = [directory, control(checkpoints).path]
+            capacity_check(client, capacity_paths, "bootstrap-start")
             # Initial-state compaction intentionally drops explicit zero slots.
             # It cannot compact a continuation of an already-ready account: those
             # zeros may be needed to clear values inherited from an older base.
@@ -157,6 +160,7 @@ def compact(client, directory, end_block=None, budget_bytes=100_000_000_000):
                       "generation": generation, "start_block": identity["start_block"], "header": header,
                       "accounts": identity["accounts"], "fields": fields, **measured}
             client.insert("bootstrap_generations", [{"generation": generation, "manifest": json.dumps(record, sort_keys=True)}])
+            capacity_check(client, capacity_paths, "bootstrap-commit")
             atomic_json(directory / "bootstrap.json", record, overwrite=True)
             # Re-read the committed data before irreversible local history cleanup.
             load_prefix(client, directory, run)

@@ -7,8 +7,9 @@ verify the result, and publish an immutable checkpoint for local execution.
 **Prototype; v0.1.0 is not released yet.** Native ingestion, isolated checkpoint
 construction, proof verification, portable exports/restores, reader pins,
 cursor recovery and checkpoint/native-history cleanup are implemented and tested.
-Lifecycle qualification and peak disk accounting remain unfinished. Initial
-replay supports private compaction between bounded native chunks.
+Initial replay supports private compaction between bounded native chunks. Capacity
+monitoring covers data directories and temporary work; broader lifecycle,
+throughput and account-set qualification remain unfinished.
 The customer's actual 19/64-account lists have not been supplied, so their
 capacity, latency and cost are not qualified. See [scope](docs/SCOPE.md) and
 [current evidence](docs/QUALIFICATION.md).
@@ -259,14 +260,19 @@ using the root-call boundary. Synthetic regression cases pass; the full captured
 producer/fork/7702 matrix remains unqualified. See [lifecycle semantics and
 evidence](docs/LIFECYCLE.md). A mismatch leaves the candidate unpublished.
 
-The default checkpoint budget is 100,000,000,000 bytes. Current checks reject an
-already exhausted database budget and check again during verification; they do
-**not yet bound peak merges, pending spool, temporary trie files or all future
-growth**. Bootstrap compaction limits replay history to a chunk plus partition
-granularity and private state generations; the complete current state can still
-grow. Export files require separate space. This prototype has no proven 100 GB
-operating limit. Peak-space accounting and representative capacity measurements
-remain release requirements.
+The default checkpoint table budget is 100,000,000,000 bytes. Use
+[`capacity-run`](docs/CAPACITY.md) to additionally measure whole ClickHouse data
+directories, pending spool, temporary trie work and exports. It records periodic
+and publication/trie guard samples, enforces configured operating headroom and
+rejects untracked work directories. A capacity-stopped native run remains resumable.
+It is a sampled guard, **not a hard filesystem quota**; shared server data is
+included conservatively and excursions between samples remain possible.
+
+Bootstrap compaction limits replay history to a chunk plus partition granularity
+and private state generations. Complete current state, pinned checkpoints and
+backups can still grow. The recorded synthetic and public BSC workloads fit the
+100 GB target, but the customer's account set and sustained growth are not yet
+qualified. See [capacity methodology](docs/CAPACITY.md) and [evidence](docs/QUALIFICATION.md).
 
 ## Tests and release
 

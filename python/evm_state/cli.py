@@ -16,6 +16,7 @@ from .retention import plan as retention_plan, prune
 from .importer import import_checkpoint
 from .history import cleanup as cleanup_history
 from .bootstrap import compact as compact_bootstrap, replay as bootstrap_replay
+from .capacity import Meter, supervise, check as capacity_check
 
 
 def main(argv=None):
@@ -45,6 +46,13 @@ def main(argv=None):
     compact.add_argument("--state-dir", type=Path, required=True)
     compact.add_argument("--end-block", type=int, help="inclusive end (default: durable cursor)")
     compact.add_argument("--budget-bytes", type=int, default=100_000_000_000)
+    for name in ["capacity-report", "capacity-run"]:
+        capacity = commands.add_parser(name, help="measure data directories and enforce sampled operating headroom")
+        capacity.add_argument("--config", type=Path, required=True)
+        if name == "capacity-run":
+            capacity.add_argument("--output", type=Path, required=True)
+            capacity.add_argument("--interval", type=float, default=1.0)
+            capacity.add_argument("child_command", nargs=argparse.REMAINDER)
     capture = commands.add_parser("capture-proofs", help="capture a finalized header, account proofs and code before replay")
     capture.add_argument("--accounts", required=True)
     capture.add_argument("--block", default="finalized")
@@ -115,15 +123,28 @@ def main(argv=None):
                     *values, checkpoint_database=args.checkpoint_database)
         elif args.command == "compact-bootstrap":
             result = compact_bootstrap(client, args.state_dir, args.end_block, args.budget_bytes)
+        elif args.command in {"capacity-report", "capacity-run"}:
+            meter = Meter(client, json.loads(args.config.read_text()))
+            if args.command == "capacity-report":
+                result = meter.sample()
+            else:
+                command = args.child_command[1:] if args.child_command[:1] == ["--"] else args.child_command
+                result = supervise(meter, command, args.output, args.interval)
+                if result["status"] != "completed":
+                    print(json.dumps(result, sort_keys=True, indent=2))
+                    parser.exit(1, "capacity-run stopped; inspect the capacity report and retained run state\n")
         elif args.command == "capture-proofs":
             if args.output.exists():
                 raise ValueError("proof output already exists; choose a new capture file")
+            capacity_check(client, [args.output.parent], "proof-capture")
             result = RPC().capture(canonical_accounts(args.accounts), args.block, args.expected_hash)
             atomic_json(args.output, result)
             result = {"output": str(args.output), "header": result["header"], "header_trust": result["header_trust"]}
         elif args.command == "checkpoint":
             if args.output and args.output.exists():
                 raise ValueError("checkpoint output already exists; choose a new output file")
+            capacity_check(client, [args.proofs, args.sources, *([args.output.parent] if args.output else [])],
+                           "checkpoint-files")
             result = build(client, json.loads(args.proofs.read_text()), json.loads(args.sources.read_text()),
                            args.base, args.budget_bytes, args.work_dir)
             if args.output:

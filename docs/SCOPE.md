@@ -58,8 +58,9 @@ checkpoint publication and account/header/storage proof verification are now
 implemented. Portable exports, verified restores, persistent reader pins and
 whole-checkpoint cleanup are also implemented. Cursor validation/backup/recovery
 and native history partition cleanup are implemented. Initial replay can compact
-private state between bounded chunks; peak disk accounting and representative
-capacity qualification remain unfinished.
+private state between bounded chunks. Whole-directory capacity monitoring and
+publication guards are implemented; representative customer-set capacity and
+sustained growth qualification remain unfinished.
 
 ## Native ClickHouse route
 
@@ -135,8 +136,10 @@ publication requires durable native progress covering its target. A source binds
 to one checkpoint destination so history cleanup can preserve all of its retained
 checkpoint continuation intervals. Tests kill the native and database processes;
 physical host power loss is not emulated and storage must honor sync writes.
-Initial replay compaction has adversarial and native-sink tests; representative
-initial replay capacity and peak disk usage still require qualification.
+Initial replay compaction has adversarial and native-sink tests. The capacity
+monitor includes source/server data, spool, trie work and exports, with configured
+headroom and incomplete-sample rejection. Recorded workloads remain samples;
+representative initial replay, sustained growth and latency still need qualification.
 
 ## Bootstrap and growing account sets
 

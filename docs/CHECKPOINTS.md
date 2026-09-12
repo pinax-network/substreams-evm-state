@@ -220,9 +220,10 @@ than the requested minimum. Interrupted cleanup can be repeated; it recomputes
 the plan and verifies the cursor still has its data and marker afterward.
 
 This operation bounds already-checkpointed history at partition granularity.
-Use the initial replay path below before the first verified checkpoint. Spool,
-exports, temporary verification files and peak merge space need separate
-accounting. A proven 100 GB operating cap remains an open release gate.
+Use the initial replay path below before the first verified checkpoint.
+[`capacity-run`](CAPACITY.md) additionally accounts for spool, exports, temporary
+verification files and whole data-directory space during merges. Its measured
+workloads do not establish a universal or customer-specific 100 GB operating cap.
 
 ## Initial replay compaction
 
@@ -283,5 +284,6 @@ Compaction keeps the final native block and removes only whole daily data and
 monthly marker partitions. Space includes that retained partition history, the
 next chunk, the complete current state, and temporarily both old and new private
 generations. The database budget is checked before and after candidate creation;
-it is **not a hard allocation limit**. Pending spool, merge headroom, trie work,
-exports and external backups still need capacity planning and measurement.
+it is **not a hard allocation limit**. Enable the [capacity policy](CAPACITY.md)
+to include pending spool, merge headroom, trie work, exports and declared backups
+in the measured operating budget.

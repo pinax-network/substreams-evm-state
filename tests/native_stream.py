@@ -18,10 +18,10 @@ from conftest import SPKG, native_env, native_setup
 CURSORS = json.loads((Path(__file__).parent / "fixtures/cursors.json").read_text())
 
 
-def messages():
+def messages(package=SPKG):
     # Package.proto field 1 is repeated FileDescriptorProto, also the complete
     # FileDescriptorSet wire format. Use the exact packaged RPC/output schemas.
-    descriptors = list(descriptor_pb2.FileDescriptorSet.FromString(SPKG.read_bytes()).file)
+    descriptors = list(descriptor_pb2.FileDescriptorSet.FromString(package.read_bytes()).file)
     pool = descriptor_pool.DescriptorPool()
     while descriptors:
         pending = []

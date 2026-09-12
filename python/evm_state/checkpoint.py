@@ -13,6 +13,7 @@ from .triedb import TrieDB
 from .header import verify_header
 from .control import control, object_id
 from .source import verified_source
+from .capacity import check as capacity_check
 
 ZERO = "0x" + "00" * 32
 
@@ -216,6 +217,9 @@ def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, 
             source_bytes += db.disk_usage()
     if seen != set(accounts):
         raise VerificationError("source account coverage differs from proof bundle")
+    work_dir = Path(work_dir or tempfile.gettempdir())
+    capacity_paths = [control(client).path, work_dir, *[source["state_directory"] for source in sources]]
+    capacity_check(client, capacity_paths, "checkpoint-start")
     if client.disk_usage() + source_bytes >= budget_bytes:
         raise VerificationError("retained-data budget already exhausted")
 
@@ -229,7 +233,6 @@ def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, 
     )
     observed = _observed_fields(client, sources, base, params)
     account_rows, verification = [], {}
-    work_dir = Path(work_dir or tempfile.gettempdir())
     work_dir.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256()
     for account_address in accounts:
@@ -249,6 +252,7 @@ def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, 
             trie_db = TrieDB(Path(directory) / "nodes.sqlite")
             try:
                 count = verify_complete(proven, slots(), code, metadata, trie_db)
+                capacity_check(client, capacity_paths, "checkpoint-trie")
             finally:
                 trie_db.close()
         row = {"snapshot_id": snapshot_id, **proven.json(), "code": code, "nonzero_slots": count}
@@ -258,6 +262,7 @@ def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, 
         verification[account_address] = {"nonzero_slots": count, "account_proof": "verified", "storage_root": "verified"}
         if client.disk_usage() + source_bytes >= budget_bytes:
             raise VerificationError("checkpoint exceeds retained-data budget; candidate remains unpublished")
+        capacity_check(client, capacity_paths, "checkpoint-account")
     expected_slots = sum(v["nonzero_slots"] for v in verification.values())
     actual_slots = int(client.one("SELECT count() AS count FROM checkpoint_storage FINAL "
                                  "WHERE snapshot_id={id:String}", params)["count"])
@@ -276,6 +281,7 @@ def _build(client, bundle, sources, base_id=None, budget_bytes=100_000_000_000, 
     }
     # No public ready row exists before every account passes. One insert publishes
     # the complete immutable generation; a failed candidate cannot change the head.
+    capacity_check(client, capacity_paths, "checkpoint-publish")
     client.insert("checkpoints", [{"snapshot_id": snapshot_id, "block_number": target,
         "block_hash": header["hash"], "created_at": record["created_at"],
         "manifest": json.dumps(record, sort_keys=True, separators=(",", ":"))}])

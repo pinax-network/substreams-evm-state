@@ -1,0 +1,244 @@
+{
+  "format_version": 1,
+  "measured_on": "2026-09-12",
+  "clickhouse": "26.3.33.24",
+  "substreams_cli": "1.22.0",
+  "coverage": "Whole ClickHouse data disks plus declared local runtime roots; other databases and system data on those disks are included.",
+  "workloads": {
+    "capacity-stress": {
+      "summary": {
+        "command_exit_code": 0,
+        "config_sha256": "b45dd29ae93d794b284076a61b9d9ab71903ee4843a3cd62d877ac23718f0866",
+        "failed_samples": 0,
+        "finished_ns": 1789216708487643000,
+        "format_version": 1,
+        "guard_samples": 531,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 1586794000,
+        "peak_observed_allocated_bytes": 1074298880,
+        "rejected_guard_stages": [],
+        "samples": 275,
+        "started_ns": 1789216385552584000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      },
+      "budget_bytes": 100000000000,
+      "headroom_bytes": 10000000000,
+      "min_free_bytes": 1073741824,
+      "server_data_bytes_at_start": 901926912,
+      "peak_server_data_allocated_bytes": 1063895040,
+      "peak_local_allocated_bytes": 29786112,
+      "smallest_server_unreserved_bytes": 4203659264,
+      "active_merge_observations": 0,
+      "periodic_samples_sha256": "a7627c80f27220a7ffd049d43f3790c1371bdb9205e5201b36fc15a00ec141b9",
+      "guard_samples_sha256": "9e229ebe603595e13e226b7342f26f93bed19ea8bee296d4b80a63d47a28c371",
+      "workload": {
+        "format_version": 1,
+        "workload": "synthetic native-schema state and retention stress fixture",
+        "account_count": 64,
+        "hot_account_slots": 100000,
+        "quiet_account_slots": 64,
+        "total_nonzero_slots": 104032,
+        "cleared_and_replaced_slots": 50000,
+        "initial_checksum": "2683aa7701f7caaa660fc9e39d2d3301e9796160e1ff1d78ce117c99492dce9b",
+        "restored_checksum": "2683aa7701f7caaa660fc9e39d2d3301e9796160e1ff1d78ce117c99492dce9b",
+        "updated_checksum": "e31d96e86d6912012d4eb779a3676832098df5408c34013fea4b2a05e7dd748b",
+        "export_bytes": 4744344,
+        "databases": [
+          "evm_capacity_20260912_source",
+          "evm_capacity_20260912_checkpoints",
+          "evm_capacity_20260912_restored"
+        ],
+        "phases": [
+          {
+            "phase": "construct-synthetic-proofs",
+            "seconds": 25.420020459219813,
+            "source_parts_bytes": 0,
+            "checkpoint_parts_bytes": 0,
+            "restored_parts_bytes": 0
+          },
+          {
+            "phase": "checkpoint-initial",
+            "seconds": 56.488055917434394,
+            "source_parts_bytes": 7585812,
+            "checkpoint_parts_bytes": 7202756,
+            "restored_parts_bytes": 0
+          },
+          {
+            "phase": "export-initial",
+            "seconds": 45.56997754238546,
+            "source_parts_bytes": 7585812,
+            "checkpoint_parts_bytes": 7202756,
+            "restored_parts_bytes": 0
+          },
+          {
+            "phase": "restore-and-reverify",
+            "seconds": 108.5094317086041,
+            "source_parts_bytes": 7585812,
+            "checkpoint_parts_bytes": 7202756,
+            "restored_parts_bytes": 14807710
+          },
+          {
+            "phase": "construct-updated-proofs",
+            "seconds": 26.259575792588294,
+            "source_parts_bytes": 7585812,
+            "checkpoint_parts_bytes": 7202756,
+            "restored_parts_bytes": 14807710
+          },
+          {
+            "phase": "checkpoint-slot-churn",
+            "seconds": 58.501953166909516,
+            "source_parts_bytes": 12092392,
+            "checkpoint_parts_bytes": 14408347,
+            "restored_parts_bytes": 14807710
+          },
+          {
+            "phase": "prune-with-pinned-reader",
+            "seconds": 0.03319249954074621,
+            "source_parts_bytes": 12092392,
+            "checkpoint_parts_bytes": 14408347,
+            "restored_parts_bytes": 14807710
+          },
+          {
+            "phase": "prune-after-reader-release",
+            "seconds": 0.06691941618919373,
+            "source_parts_bytes": 12092392,
+            "checkpoint_parts_bytes": 7206851,
+            "restored_parts_bytes": 14807710
+          }
+        ],
+        "limitations": [
+          "synthetic accounts and headers, not BSC or customer data",
+          "no server backprocessing or native transport throughput measurement",
+          "capacity summary reports sampled peaks plus publication/trie guard samples"
+        ]
+      },
+      "component_peaks_allocated_bytes": {}
+    },
+    "capacity-merge": {
+      "summary": {
+        "command_exit_code": 0,
+        "config_sha256": "0c6e4ef4c3f2f55b2d5ae068bce521cf1844c04e9bcecbdb1595879ed864f234",
+        "failed_samples": 0,
+        "finished_ns": 1789216913933972000,
+        "format_version": 1,
+        "guard_samples": 0,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 489705000,
+        "peak_observed_allocated_bytes": 1893478400,
+        "rejected_guard_stages": [],
+        "samples": 7,
+        "started_ns": 1789216911914301000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      },
+      "budget_bytes": 100000000000,
+      "headroom_bytes": 10000000000,
+      "min_free_bytes": 1073741824,
+      "server_data_bytes_at_start": 1081937920,
+      "peak_server_data_allocated_bytes": 1893449728,
+      "peak_local_allocated_bytes": 28672,
+      "smallest_server_unreserved_bytes": 3369885696,
+      "active_merge_observations": 3,
+      "periodic_samples_sha256": "d7de06822f38ffd625dcd7ec7f5f49a1232e067c1acf2b5d0cef3ed1a83b6081",
+      "guard_samples_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "workload": {
+        "format_version": 1,
+        "workload": "synthetic incompressible eight-part merge",
+        "database": "evm_capacity_merge_20260912_checkpoints",
+        "rows": 65536,
+        "payload_bytes_per_row": 4096,
+        "parts_bytes_before": 269764725,
+        "parts_bytes_after": 809286373,
+        "merge_seconds": 0.8860886665061116,
+        "total_seconds": 1.1771177500486374,
+        "limitations": [
+          "auxiliary merge stress table, not account state or a customer footprint",
+          "random payload bytes; row count and payload size are reproducible"
+        ]
+      },
+      "component_peaks_allocated_bytes": {}
+    },
+    "capacity-bsc": {
+      "summary": {
+        "command_exit_code": 0,
+        "config_sha256": "4462ef8c8b2ce821f7bd69df071efe07c1e48144c9ca110accc1c01865fef486",
+        "failed_samples": 0,
+        "finished_ns": 1789217316392805000,
+        "format_version": 1,
+        "guard_samples": 26,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 756333000,
+        "peak_observed_allocated_bytes": 1823137792,
+        "rejected_guard_stages": [],
+        "samples": 48,
+        "started_ns": 1789217284420177000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      },
+      "budget_bytes": 100000000000,
+      "headroom_bytes": 10000000000,
+      "min_free_bytes": 1073741824,
+      "server_data_bytes_at_start": 1796767744,
+      "peak_server_data_allocated_bytes": 1819070464,
+      "peak_local_allocated_bytes": 24031232,
+      "smallest_server_unreserved_bytes": 3422961664,
+      "active_merge_observations": 0,
+      "periodic_samples_sha256": "36d11a775bac14cd1cacc9090665f38dd519b946b184c41e9fe7cac3aa48df83",
+      "guard_samples_sha256": "8da19ba4669d0c258ff8516f3ee67bd0b6311083141dd4e938d22d64418ce46c",
+      "native_output": {
+        "accounts": [
+          "0x0000f90827f1c53a10cb7a02335b175320002935",
+          "0x32c59d556b16db81dfc32525efb3cb257f7e493d",
+          "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+        ],
+        "blocks": 10000,
+        "changed_rows": {
+          "balances": 9936,
+          "codes": 0,
+          "lifecycle": 0,
+          "nonces": 0,
+          "storage": 219692
+        },
+        "database": "evm_capacity_bsc_20260912",
+        "end_block": 121309999,
+        "format_version": 1,
+        "header": {
+          "hash": "0x2d4ffd9c181392d1789854402de50b71f5d378985d2aa2e870c1253f49d89d10",
+          "number": 121309999,
+          "parent_hash": "0x22f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130",
+          "state_root": "0xd646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93f",
+          "timestamp": 1789151326
+        },
+        "header_rlp": "0xf9037ca022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347945009317fd4f6f8feea9dae41e5f0a4737bb7a7d5a0d646e99122331aae9c5e59866c304cd7d2c8bd4d2a69c7e892976db16b1fa93fa0bf4f5e2c61570198e04c4128b878f837b40a492e5f34cd20330e057abfe563c8a09d59e61aeaac5cb196e6df32ea14cf4394431e0953d79a1099cb8a6bb6f69daab9010020210ac080e80d5309231055a69c8001900006200c24448014021009200081843778500019c101000623a129402e0000000908024436219507900a010f28108064c00290a45280a80d021019222400a32c7018291d680030f0141c0ad0cb0d4011a80b2a428b0000bc442002040408081806c6530004964060098852e90846002470305c2840a040c1c8000840000aca61a4848521802819081001410108042002b42042190402782fcc2a90ab0405000560884042a02b884097224f088082090006c1d7067c044940a1503004b4b00020d432224ec000993e104006003ca0066a502e170a6d480025c8064da04413648800a128c61005584402900ac00145100284073b0b2f84042c1b6b835d3fde846aa4485eb90118db8301070888636462373534386289676f312e32352e3132836c696ed38cc282f8b5831dffffb860884b45353a73360d145ea9701db285595f7a506acd9d819bfff30e3a8031b531fc64c7c4cbf7457336c8bd7e292f99ee127f0f4c004570ac36976002f4caf592eb3ce34e4a9f6c49e0bc77c18add19b16fcf36444ac993e650a8d0bd1abb7963f84c84073b0b2da05b357ff8476e2a1617f0c56e571c35de3319b7c6fd7a7f4402f0019c1f27ab5384073b0b2ea022f20554bcec12ab71b57bcfb7d4d1f1a920d0e7d596fa5e1b8966e2adb6f130800c5186f3731ea1445f0056cbaa7cf337360e7b83404cd93758471699533cfad8027ff223dd47c16d3973253ff9bcd2dc38f814a85baf3d0b5ed1358fc0c48fb601a000000000000000000000000000000000000000000000000000000000000003b688000000000000000080a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000020557e8cb169f90f6ef421a54e29d7dd0629ca597",
+        "header_trust": "provider-finalized-header",
+        "limitations": [
+          "account storage completeness is not established by this update sample",
+          "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",
+          "cache warmth and wall time are separate measurements"
+        ],
+        "logical_protobuf_bytes": 45103529,
+        "max_protobuf_bytes_per_block": 23861,
+        "mean_protobuf_bytes_per_block": 4510.3529,
+        "module_hash": "da327dbc1039a2d58b892570e6cf01f182dfd79e",
+        "package_sha256": "93d0be987950029816bd53462bd61fc110ffc94c6145aa22589816247e0ae347",
+        "run_id": "621ca8a63c5249188102141005759bee",
+        "start_block": 121300000,
+        "validation": "encoded header, native interval and durable cursor verified"
+      },
+      "component_peaks_allocated_bytes": {
+        "native": 23842816,
+        "spool": 23080960
+      }
+    }
+  },
+  "limitations": [
+    "Observed peaks and explicit operation guard checks, not a hard quota or proof of every instant between samples",
+    "Synthetic 64-account state is not the customer account set or a BSC activity model",
+    "BSC sample is a complete update interval, not a complete initial-state checkpoint; cache warmth was not established",
+    "Whole-server totals include other qualification data and system tables, so do not use them as per-account storage estimates"
+  ]
+}

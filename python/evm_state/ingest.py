@@ -17,6 +17,7 @@ from .files import atomic_json, atomic_write, exclusive_lock
 from .proof import VerificationError
 from .ch import identifier
 from .cursor import load_progress, observe, save_progress
+from .capacity import check as capacity_check
 
 MODULE = "map_block_state"
 
@@ -125,6 +126,7 @@ def _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, chec
 
 def prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database=None):
     directory = Path(directory).resolve()
+    capacity_check(client, [directory], "native-prepare")
     with exclusive_lock(directory / "run.lock"):
         return _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database)
 
@@ -151,6 +153,7 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
     if isinstance(decode_batch_size, bool) or not isinstance(decode_batch_size, int) or decode_batch_size < 1:
         raise ValueError("decode batch size must be a positive integer")
     with exclusive_lock(directory / "run.lock") as run_lock:
+        capacity_check(client, [directory], "native-start")
         record = _prepare(client, spkg, endpoint, accounts, start_block, directory, dsn, checkpoint_database)
         cursor = directory / "cursor.txt"
         blocks = int(client.one("SELECT count() AS n FROM state_blocks FINAL")["n"])
@@ -190,6 +193,7 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
                     break
                 except subprocess.TimeoutExpired:
                     observe(client, record, directory)
+                    capacity_check(client, [directory], "native-progress")
             if result:
                 raise RuntimeError(f"native sink exited with status {result}; retain its cursor and spool for recovery")
         finally:
@@ -199,7 +203,9 @@ def ingest(client, spkg, endpoint, accounts, start_block, directory, dsn, stop_b
                     process.wait(timeout=15)
                 except subprocess.TimeoutExpired:
                     process.kill(); process.wait()
-        progress = observe(client, record, directory)
+            # SIGTERM may drain a pending spool and write a newer valid cursor.
+            # Back it up even when this run exits through a capacity/error path.
+            progress = observe(client, record, directory)
         if progress is None:
             raise VerificationError("native sink completed without a valid cursor; recover from durable progress")
         if stop_block is not None and progress["position"]["block"]["number"] != stop_block - 1:

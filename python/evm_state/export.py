@@ -17,6 +17,8 @@ from .files import atomic_json
 from .header import verify_header
 from .proof import VerificationError, address, unhex, verify_account, verify_complete
 from .triedb import TrieDB
+from .capacity import check as capacity_check
+from .ch import ClickHouse
 
 FORMAT = "evm-state-checkpoint-v1"
 MAX_JSON_BYTES = 64 * 1024 * 1024
@@ -91,7 +93,11 @@ def _page_rows(directory, item):
         raise VerificationError("export page count or boundary mismatch")
 
 
-def _verify(directory, layout, expected_hash=None, work_dir=None):
+def _verify(directory, layout, expected_hash=None, work_dir=None, capacity_client=None):
+    # Without an explicit capacity policy this stays entirely offline.
+    capacity_client = capacity_client or ClickHouse("default")
+    capacity_paths = [directory, Path(work_dir or tempfile.gettempdir())]
+    capacity_check(capacity_client, capacity_paths, "export-verify-start")
     if layout.get("format") != FORMAT or layout.get("status") != "ready":
         raise VerificationError("unsupported or incomplete checkpoint export")
     snapshot = layout["checkpoint"]
@@ -153,6 +159,7 @@ def _verify(directory, layout, expected_hash=None, work_dir=None):
             database = TrieDB(Path(directory_name) / "trie.sqlite")
             try:
                 count = verify_complete(proven, slots(), metadata["code"], metadata, database)
+                capacity_check(capacity_client, capacity_paths, "export-verify-trie")
             finally:
                 database.close()
         if count != metadata["nonzero_slots"]:
@@ -171,6 +178,8 @@ def export_checkpoint(client, snapshot_id, directory, page_size=10000, work_dir=
         raise ValueError("export page_size must be between 1 and 10000")
     directory = Path(directory).resolve()
     with control(client).reader():
+        capacity_paths = [directory, Path(work_dir or tempfile.gettempdir()), control(client).path]
+        capacity_check(client, capacity_paths, "export-start")
         snapshot = _manifest(client, snapshot_id)
         if not snapshot["proof_bundle"].get("header_rlp"):
             raise VerificationError("portable exports require the encoded block header")
@@ -198,7 +207,8 @@ def export_checkpoint(client, snapshot_id, directory, page_size=10000, work_dir=
                     pending = []
             if pending:
                 layout["storage_pages"].append(_write_page(directory, len(layout["storage_pages"]), account, pending))
-        result = _verify(directory, layout, work_dir=work_dir)
+        result = _verify(directory, layout, work_dir=work_dir, capacity_client=client)
+        capacity_check(client, capacity_paths, "export-publish")
         atomic_json(directory / "manifest.json", layout)
         return {**result, "directory": str(directory), "pages": len(layout["storage_pages"]),
                 "bytes": sum(path.stat().st_size for path in directory.iterdir() if path.is_file())}
