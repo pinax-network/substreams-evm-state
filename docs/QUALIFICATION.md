@@ -188,6 +188,14 @@ remain interim evidence: neither prefix has reached its saved full-state proof
 target, and the WBNB compaction's reported 2.79 GB memory use makes growing-state
 aggregation a further operating qualification.
 
+That follow-up now includes a [real-prefix aggregation comparison](CAPACITY.md#aggregation-memory-and-temporary-spill-files):
+default and explicit-spill queries agree on all 1,912,703 resulting nonzero slots
+and the ordered state/account-field checksum. The explicit settings reduce reported
+query memory from 1.88 GB to 0.95 GB in this case. A separate live compaction also
+exercised the tested server's default spill behavior. This qualifies the observed
+prefix and query shape; larger retained state, full proofs and sustained growth
+remain pending.
+
 The [lifecycle implementation and source references](LIFECYCLE.md) distinguish
 account-wide deletion from code clearing and post-Cancun SELFDESTRUCT that keeps
 storage. Checkpoint tests remove untouched inherited slots, preserve later

@@ -185,6 +185,65 @@ Current state, pinned old checkpoints and backups can continue growing; the guar
 stops work when they exhaust the selected reserve. It cannot guarantee that an
 unknown customer account set will fit or meet a publication-latency target.
 
+## Aggregation memory and temporary spill files
+
+The disk policy does not bound RAM. Bootstrap compaction and checkpoint assembly
+group storage by account and slot, so their query memory also needs measurement.
+ClickHouse supports [external aggregation](https://clickhouse.com/docs/reference/statements/select/group-by#group-by-in-external-memory)
+that spills intermediate groups to disk; the spill threshold is distinct from
+the whole query's memory limit. Temporary spill paths must be inside the measured
+server data disks. The qualified local server uses `/var/lib/clickhouse/tmp/`.
+
+On ClickHouse 26.3.33.24, the observed defaults include a 0.5 external-aggregation
+memory ratio and no explicit per-query memory limit. The second live million-block
+WBNB compaction exercised that default spill path: 1,907,462 retained nonzero slots,
+3,461,513,972 bytes of reported query memory, 30 spill parts and 15.300 seconds.
+Its 281,410,897 compressed spill bytes are cumulative writes, not a temporary
+allocation peak. The private prefix remains unverified against an account root.
+
+A separate [same-state comparison](evidence/bsc-aggregation-memory-2026-09-12.json)
+copied that checksummed prefix and 10,000 contiguous native blocks into a fresh
+database. Both variants produced exactly 1,912,703 nonzero slots and the same
+ordered state/account-field checksum:
+
+| Query settings | Server query duration | Reported query memory |
+|---|---|---|
+| Observed aggregation/memory defaults | 3.932 s | 1,878,636,028 bytes |
+| 256 MiB aggregation spill, 128 MiB sort spill, 2 GiB query memory limit; ratio thresholds disabled | 4.950 s | 948,184,379 bytes |
+
+Both comparison queries also have a 120-second execution limit and 10 GiB
+temporary-data limit. The explicit spill variant wrote 162 aggregation parts;
+the default comparison did not spill. These are sequential queries on shared
+infrastructure, not a universal memory bound or performance guarantee. Query-log
+duration includes completion; client HTTP response timing is recorded separately.
+The settings apply only to the measurement queries. The running bootstraps keep
+their existing defaults, whose spill path was observed independently above.
+
+The completed comparison has 13 periodic and five guard samples, with no rejected
+samples. Its largest shared-server/local allocation is 10,417,532,928 bytes,
+plus the separate 1,742,835,712-byte original-volume reserve. The maximum sample
+gap is 22.57 seconds, so this does not bound short-lived spill allocation. Retained
+comparison databases and concurrent bootstraps are included in the total.
+
+To repeat against an owned source that has a private prefix and at least 10,000
+durable subsequent blocks, select a fresh comparison database and workload path
+inside the declared roots:
+
+```bash
+.venv/bin/evm-state --database <fresh-comparison-db> capacity-run \
+  --config <runtime>/capacity.json --output <runtime>/aggregation-capacity -- \
+  .venv/bin/python scripts/qualify_aggregation.py \
+    --state-dir <runtime>/source/native --database <fresh-comparison-db> \
+    --output <runtime>/aggregation-work --delta-blocks 10000
+```
+
+The script briefly holds the source's cleanup lock to copy a fixed prefix/suffix,
+then verifies the isolated copy and compares complete ordered results. Insufficient
+durable suffix data fails the attempt. It preserves all comparison data and never
+publishes a checkpoint. Query-log completion is awaited because it can become
+visible after the HTTP response. The evidence retains the earlier boundary,
+measurement-syntax and logging-race failures as unsuccessful attempts.
+
 ## Reproduce the state/retention stress fixture
 
 With the pinned CLI, Python test dependencies and local ClickHouse running, use a
