@@ -126,8 +126,11 @@ The capacity-stage diagnostics [passed CI](https://github.com/pinax-network/subs
 at `b904bd3`, with 188 tests. They subsequently identified a host filesystem
 disappearance during the [five-million-block trial](evidence/bsc-host-scan-retries-2026-09-12.json).
 Replay and private compaction completed, but the rejected cleanup measurement
-keeps that capacity run failed. Streaming directory traversal is being qualified
-without changing the capacity thresholds or accepting partial totals.
+keeps that capacity run failed. Streaming directory traversal then
+[passed a full five-million-block trial](evidence/bsc-streaming-walk-2026-09-12.json)
+through 77,735,079 with no rejected samples, without changing the capacity
+thresholds or accepting partial totals. Its `f118424` runtime also
+[passed all 188 CI tests](https://github.com/pinax-network/substreams-evm-state/actions/runs/34733481895).
 
 Full WBNB account-root acceptance, current-package continuation, hot-state
 export/restore and sustained-growth qualification remain release gates. The

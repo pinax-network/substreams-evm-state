@@ -222,9 +222,16 @@ that generation were 573 MB, while the observed whole-scope peak was 20.60 GB
 before the 1.74 GB retained-volume reserve. These are different scopes, and none
 of these private-state measurements establishes complete account-root verification.
 The host walker now measures entries as they are read instead of queuing their
-paths until later, shortening the race window with part cleanup. Its sustained
-replay qualification remains pending; missing-file errors still require a fresh
-whole walk and exhausted retries still reject the sample.
+paths until later, shortening the race window with part cleanup. A subsequent
+[five-million-block trial](evidence/bsc-streaming-walk-2026-09-12.json) completed
+through 77,735,079, including compaction and cleanup: 171 periodic samples and
+425 internal checks, with zero rejections. It took 16.73 minutes end to end and
+peaked at 20.29 GB, or 22.04 GB including the retained-volume reserve. The new
+8,165,197-slot private prefix used 594 MB of active parts; its compaction took
+23.84 seconds and 3.41 GB of query memory. This qualifies that interval, while
+full-target account verification and hot-state operations remain pending.
+Missing-file errors still require a fresh whole walk and exhausted retries still
+reject the sample.
 
 The [bootstrap retry record](evidence/bootstrap-capacity-retries-2026-09-12.json)
 preserves two stopped runs, their failed periodic samples and admitted resume

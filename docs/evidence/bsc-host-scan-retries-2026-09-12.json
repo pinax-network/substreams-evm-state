@@ -110,7 +110,7 @@
     "The private prefixes remain unverified account state; full final-target proof, current-package continuation and hot-state export/restore remain required",
     "The five-million-block child completed replay and compaction, but its capacity supervisor stopped after a host data-directory NotFound error exhausted five fresh walks; this is not a passing capacity run",
     "The elapsed trial includes recovery of a retained earlier suffix, the new batch, compaction and cleanup; it is not isolated ingestion time",
-    "Streaming directory traversal is a subsequent mitigation whose sustained replay result is still pending"
+    "The subsequent streaming traversal trial is recorded separately in bsc-streaming-walk-2026-09-12.json; this record preserves the earlier failed runs"
   ],
   "five_million_trial": {
     "command_exit_code": 0,

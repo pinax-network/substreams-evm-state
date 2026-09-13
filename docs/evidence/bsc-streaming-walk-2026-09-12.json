@@ -1,0 +1,191 @@
+{
+  "format_version": 1,
+  "qualification": "Completed five-million-block WBNB replay with streaming directory measurement",
+  "runtime_source_commit": "f118424ebbec2490e8fc5e0040d4c481ecb1e03d",
+  "runtime_checksums": "7f3208cc6bbf1c4825c545429a2783c0cd51aaea3c01da9685a08edf2f6235dd  bin/evm-state\nfb8f6e62993c26f744a6d9d642d74e44a02be8f26a7eff108ad1c0c5227ff245  bin/evm-state-qualify\n",
+  "source_and_interval": {
+    "run_id": "62b4938ec1554bc093644232ef4b469d",
+    "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+    "identity": {
+      "database": "evm_wbnb_bootstrap",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "start_block": 149268,
+      "accounts": [
+        "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+      ],
+      "final_blocks_only": true
+    },
+    "trial": {
+      "from_block": 72735080,
+      "through_block": 77735079,
+      "blocks": 5000000,
+      "chunk_blocks": 5000000,
+      "parallel_workers_requested": 200
+    },
+    "ultimate_target_block": 121466775
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789268086052533000,
+    "format_version": 1,
+    "guard_samples": 425,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 6572828000,
+    "peak_observed_allocated_bytes": 20293201920,
+    "rejected_guard_stages": [],
+    "samples": 171,
+    "started_ns": 1789267082359891000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "elapsed_seconds": 1003.692642048,
+  "private_prefix_before": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "69582fa5b4f24bbd8db4039edc4c3c98",
+    "header": {
+      "hash": "0xc4750c4b049339d4d548869132b0eb686546374bf1f0dd62adf387c08c51447d",
+      "number": 72735079,
+      "parent_hash": "0x5b3a699075ceb728998c4ca7d54a87a0f870a28d719537d06f8b0e0c29377efa",
+      "state_root": "0x5ae77c636ce70164db85fdb8e97f94168d1f5fc4dc08551ce4a81946606b72ba",
+      "timestamp": 1766553332
+    },
+    "nonzero_slots": 7884601,
+    "start_block": 149268,
+    "state_sha256": "0ae99a7d85611c863d3a4cd0cfa29f08b9faae37194e1524ac9167d9dafad541",
+    "status": "unverified-bootstrap"
+  },
+  "private_prefix_after": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "e94d56a86d134850ab51df9c2dbabe11",
+    "header": {
+      "hash": "0x727cb85b788ab0fb33c18368f731e3a20e18c6f62e25285fea485478f8c6beda",
+      "number": 77735079,
+      "parent_hash": "0x61b68240083050969bcaf7882282e6bd2aba9fcc5034033cec9fded4e59bddbf",
+      "state_root": "0x7a51ad8ffae8ef2627a3805fdb227b74205f028358ea123e8a2eb2514e93f9db",
+      "timestamp": 1769526121
+    },
+    "nonzero_slots": 8165197,
+    "start_block": 149268,
+    "state_sha256": "09952a730434bfd0d1e6914c09409dda64d45240a5056b85ea750adcdc295f31",
+    "status": "unverified-bootstrap"
+  },
+  "growth_observation": {
+    "accounted_allocated_bytes": 19965476864,
+    "admitted": true,
+    "capacity_data_scan_mode": "host_bind",
+    "capacity_sample_finished_ns": 1789268059886466000,
+    "cohort": "wbnb-bootstrap",
+    "compaction_query": {
+      "event_time": "2026-09-13 02:53:31",
+      "exception_code": 0,
+      "external_events": {
+        "ExternalAggregationCompressedBytes": 803364881,
+        "ExternalAggregationMerge": 1,
+        "ExternalAggregationUncompressedBytes": 1972635600,
+        "ExternalAggregationWritePart": 50,
+        "ExternalProcessingCompressedBytesTotal": 803364881,
+        "ExternalProcessingFilesTotal": 50,
+        "ExternalProcessingUncompressedBytesTotal": 1972635600
+      },
+      "memory_usage": 3412201937,
+      "query_duration_ms": 23843,
+      "query_id": "52a30b7a-1e45-4e2a-b4b1-16e379ea5f01",
+      "read_rows": 17884601,
+      "written_rows": 8165197
+    },
+    "generation": "e94d56a86d134850ab51df9c2dbabe11",
+    "generation_parts": {
+      "active_manifest_rows": 1,
+      "active_part_bytes": 594269653,
+      "active_storage_rows": 8165197,
+      "generation": "e94d56a86d134850ab51df9c2dbabe11",
+      "inactive_part_bytes": 462587113,
+      "parts": [
+        {
+          "active": 1,
+          "compressed_bytes": 2956,
+          "part_bytes": 3465,
+          "parts": 1,
+          "rows": 1,
+          "table": "bootstrap_generations"
+        },
+        {
+          "active": 0,
+          "compressed_bytes": 462538759,
+          "part_bytes": 462587113,
+          "parts": 6,
+          "rows": 6313474,
+          "table": "bootstrap_storage"
+        },
+        {
+          "active": 1,
+          "compressed_bytes": 594209501,
+          "part_bytes": 594266188,
+          "parts": 3,
+          "rows": 8165197,
+          "table": "bootstrap_storage"
+        }
+      ],
+      "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+    },
+    "header": {
+      "hash": "0x727cb85b788ab0fb33c18368f731e3a20e18c6f62e25285fea485478f8c6beda",
+      "number": 77735079,
+      "parent_hash": "0x61b68240083050969bcaf7882282e6bd2aba9fcc5034033cec9fded4e59bddbf",
+      "state_root": "0x7a51ad8ffae8ef2627a3805fdb227b74205f028358ea123e8a2eb2514e93f9db",
+      "timestamp": 1769526121
+    },
+    "local_allocated_bytes": 2745098240,
+    "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+    "nonzero_slots": 8165197,
+    "observed_ns": 1789268061318539000,
+    "overall_budget_bytes": 100000000000,
+    "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+    "phase": "streaming-five-million-capacity",
+    "prefix_json_sha256": "7e0c9d09f72c4a6ae4adc8eb40142c605b6b8bf2b99357b9ab2b7813b9ac52d6",
+    "qualification": "Checksummed private prefix and fresh admitted capacity sample; not a full account-root proof, retained-footprint bound or billing evidence. Query memory is server accounting, not process RSS.",
+    "retained_original_volume_reserve_bytes": 1742835712,
+    "run_id": "62b4938ec1554bc093644232ef4b469d",
+    "server_data_allocated_bytes": 17220378624,
+    "state_sha256": "09952a730434bfd0d1e6914c09409dda64d45240a5056b85ea750adcdc295f31",
+    "status": "unverified-bootstrap"
+  },
+  "retained_original_volume_reserve_bytes": 1742835712,
+  "observed_peak_including_volume_reserve_bytes": 22036037632,
+  "overall_budget_bytes": 100000000000,
+  "budget_headroom_bytes": 10000000000,
+  "ci": {
+    "url": "https://github.com/pinax-network/substreams-evm-state/actions/runs/34733481895",
+    "conclusion": "success",
+    "total_tests": 188
+  },
+  "limitations": [
+    "This is one passing five-million-block interval; it does not erase prior rejected measurements or guarantee future scan availability",
+    "The observed capacity scope includes the shared ClickHouse data directory and declared runtime/work directories; the retained original volume is a separate reserve",
+    "The private prefix remains unverified account state; complete historical proof, current-package continuation, hot reads/export/restore and retention acceptance remain pending",
+    "The elapsed time includes source validation, replay, private compaction and cleanup; it is not isolated network throughput"
+  ]
+}
