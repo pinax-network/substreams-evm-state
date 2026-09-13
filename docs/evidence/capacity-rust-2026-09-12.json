@@ -1,0 +1,126 @@
+{
+  "format_version": 1,
+  "qualification": "Rust 64-account synthetic checkpoint, export, restore, churn and pin-aware retention",
+  "result": {
+    "account_count": 64,
+    "cleared_and_replaced_slots": 50000,
+    "databases": [
+      "evm_rust_capacity_source",
+      "evm_rust_capacity_checkpoints",
+      "evm_rust_capacity_restored"
+    ],
+    "export_bytes": 4843103,
+    "format_version": 1,
+    "hot_account_slots": 100000,
+    "initial_checksum": "2683aa7701f7caaa660fc9e39d2d3301e9796160e1ff1d78ce117c99492dce9b",
+    "limitations": [
+      "synthetic accounts and headers, not BSC or customer data",
+      "no server backprocessing or native transport throughput measurement",
+      "capacity summary reports sampled peaks plus publication/trie guard samples"
+    ],
+    "phases": [
+      {
+        "checkpoint_parts_bytes": 0,
+        "phase": "construct-synthetic-proofs",
+        "restored_parts_bytes": 0,
+        "seconds": 0.089989792,
+        "source_parts_bytes": 1452
+      },
+      {
+        "checkpoint_parts_bytes": 7202977,
+        "phase": "checkpoint-initial",
+        "restored_parts_bytes": 0,
+        "seconds": 367.154325334,
+        "source_parts_bytes": 7587664
+      },
+      {
+        "checkpoint_parts_bytes": 7202977,
+        "phase": "export-initial",
+        "restored_parts_bytes": 0,
+        "seconds": 154.243983042,
+        "source_parts_bytes": 7587664
+      },
+      {
+        "checkpoint_parts_bytes": 7202977,
+        "phase": "restore-and-reverify",
+        "restored_parts_bytes": 10509702,
+        "seconds": 864.061295542,
+        "source_parts_bytes": 7587664
+      },
+      {
+        "checkpoint_parts_bytes": 7202977,
+        "phase": "construct-updated-proofs",
+        "restored_parts_bytes": 10509702,
+        "seconds": 0.102151333,
+        "source_parts_bytes": 7587664
+      },
+      {
+        "checkpoint_parts_bytes": 14408721,
+        "phase": "checkpoint-slot-churn",
+        "restored_parts_bytes": 7204479,
+        "seconds": 492.293040292,
+        "source_parts_bytes": 12094244
+      },
+      {
+        "checkpoint_parts_bytes": 14408721,
+        "phase": "prune-with-pinned-reader",
+        "restored_parts_bytes": 7204479,
+        "seconds": 0.052909333,
+        "source_parts_bytes": 12094244
+      },
+      {
+        "checkpoint_parts_bytes": 7207073,
+        "phase": "prune-after-reader-release",
+        "restored_parts_bytes": 7204479,
+        "seconds": 0.098508792,
+        "source_parts_bytes": 12094244
+      }
+    ],
+    "quiet_account_slots": 64,
+    "restored_checksum": "2683aa7701f7caaa660fc9e39d2d3301e9796160e1ff1d78ce117c99492dce9b",
+    "total_nonzero_slots": 104032,
+    "updated_checksum": "e31d96e86d6912012d4eb779a3676832098df5408c34013fea4b2a05e7dd748b",
+    "workload": "synthetic native-schema state and retention stress fixture"
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "b10a47de895cb5b6d69adf3297c644174aa0647b111bc7109ab13313b87b0b06",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789257033764146000,
+    "format_version": 1,
+    "guard_samples": 534,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 46197297000,
+    "peak_observed_allocated_bytes": 10819801088,
+    "rejected_guard_stages": [],
+    "samples": 203,
+    "started_ns": 1789255132954679000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "retained_rollback_reserve_bytes": 1742835712,
+  "runtime_checksums": "897315f3887e20acb5da924b7e197508ebf57f2ef95683e3ec17f48e3d8dfece  target/release/evm-state\n97b305b31dc14ffee85347fe447fc62f366a378a2262833e474020a848fab21f  target/release/evm-state-qualify\n",
+  "source_commit": "9f95722b9ecd096cba3dde1c3e046a9ff9458f26",
+  "previous_state_parity": [
+    {
+      "field": "initial_checksum",
+      "matches": true
+    },
+    {
+      "field": "restored_checksum",
+      "matches": true
+    },
+    {
+      "field": "updated_checksum",
+      "matches": true
+    }
+  ],
+  "limitations": [
+    "Synthetic account set, not the unavailable customer list",
+    "Shared ClickHouse server and full-directory guards; elapsed times include other work and capacity measurements",
+    "Capacity peak includes retained work from other qualifications; rollback reserve is additional",
+    "No statement about sustained growth of the real WBNB complete state"
+  ]
+}

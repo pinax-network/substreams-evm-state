@@ -1,0 +1,70 @@
+{
+  "format_version": 1,
+  "qualification": "Rust takes over the stopped WBNB private bootstrap without changing its source identity",
+  "runtime_source_commit": "b63b60274dd967896760d5ccc34153d3e2c94d36",
+  "runtime_checksums": "7d090814459dbe672e050350a072e548451e7ae245d59ce68d08e49e29e41325  localdata/qualification/wbnb-bootstrap/rust-handoff/bin/evm-state\n332c0d566385635cc40ee5768f201fc90276ff58778c73a0af0a855ffb16bdcd  localdata/qualification/wbnb-bootstrap/rust-handoff/bin/evm-state-qualify\n",
+  "previous_stop": {
+    "command_exit_code": -15,
+    "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+    "failed_guard_samples": 0,
+    "failed_samples": 1,
+    "finished_ns": 1789254457037633000,
+    "format_version": 1,
+    "guard_samples": 1736,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 36697369000,
+    "peak_observed_allocated_bytes": 12699402240,
+    "rejected_guard_stages": [],
+    "samples": 1415,
+    "started_ns": 1789239283250196000,
+    "status": "stopped",
+    "stop_reasons": [
+      "incomplete_capacity_sample"
+    ],
+    "termination_error": null
+  },
+  "before": {
+    "generation": "1ae8bdc7b283471a91992c1128882782",
+    "header": {
+      "hash": "0xe0e478810461949d9ec6a0eeb5d445fea9d6d6133655b4345480b348be470a70",
+      "number": 56645978,
+      "parent_hash": "0xfe55f10b68ff270ddc6c5f0cc6ab3e0e7690f437ad425cbfa07d86a2194292ea",
+      "state_root": "0xbfd45a56dacb2588784621450e59e0c44734b7d1968a3056a8c7c9ad46582ce2",
+      "timestamp": 1754482543
+    },
+    "nonzero_slots": 5696587,
+    "state_sha256": "e5af3360e9e84bf141bdfb199aff9c5e2c8dfd638a17328477636f097d77acac",
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "status": "unverified-bootstrap"
+  },
+  "rust_compacted": {
+    "generation": "da3d8ba67eea4298865edd4f0f74730d",
+    "header": {
+      "hash": "0x855eeb652122e560dc6ac2993bf2bd0ff92d6cedb72d8ccf349e2e2b509d6b39",
+      "number": 56974989,
+      "parent_hash": "0xb842543246c3232feecfe13f490890d543b0c5e4cda320fce7ca407469327233",
+      "state_root": "0x56618a5d4937c1e0f354b4237dbb2ec01e3fa59e12025c93bc6edc375de59a24",
+      "timestamp": 1754729313
+    },
+    "nonzero_slots": 5747139,
+    "state_sha256": "7d98df5b5011aa65187f6a1a498dec122c482a7d901186984f381dfa590bf50b",
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "status": "unverified-bootstrap"
+  },
+  "source_metadata_byte_identical": true,
+  "limitations": [
+    "Ongoing historical replay; neither private prefix is a complete account-root proof",
+    "Old controller stop was an incomplete changing-directory scan and is retained as a failed attempt",
+    "Full hot-account proof, continuation and sustained-growth qualification remain release gates"
+  ]
+}

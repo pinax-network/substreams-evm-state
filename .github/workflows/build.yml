@@ -14,6 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Enforce Rust-only implementation
+        run: |
+          unexpected=$(git ls-files '*.py' '*.go' 'go.mod' 'go.sum' 'requirements*.txt' 'requirements*.lock' 'pyproject.toml')
+          if [ -n "$unexpected" ]; then
+            printf '%s\n' "$unexpected"
+            exit 1
+          fi
       - name: Install pinned toolchain
         run: rustup show
       - name: Test from a clean checkout
@@ -51,33 +58,15 @@ jobs:
           --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.26.5'
-          cache-dependency-path: tests/grpc_proxy/go.sum
       - name: Install pinned CLI with Rust
         run: |
           cargo run --locked -p evm-state -- install-substreams
           echo "$PWD/localdata/toolchain/bin" >> "$GITHUB_PATH"
-      - name: Install remaining migration baseline dependencies
-        run: |
-          python -m pip install -r requirements-test.lock
-          # Exercise the installed wheel and its bundled SQL, not an editable
-          # checkout that could hide missing package data.
-          python -m pip install --no-deps .
-          python -m pip check
       - name: Build the release package from source
         run: make build
       - name: Verify Rust publication, native preparation and cursor recovery
         env:
           PG_DSN: postgresql://evm_test:local-development-only@127.0.0.1:15432/evm_test
         run: cargo test --locked -p evm-state --test clickhouse_state --test native_prepare --test portable_database --test bootstrap_database --test capacity_workload --test publication_parity --test postgres_database -- --ignored
-      - name: Verify proofs, publication, ownership and real sink recovery
-        env:
-          PG_DSN: postgresql://evm_test:local-development-only@127.0.0.1:15432/evm_test
-        run: python -m pytest --run-clickhouse --run-database-crash --run-postgres -q
       - name: Verify Rust hard database restart in its own disposable container
         run: cargo test --locked -p evm-state --test database_crash -- --ignored

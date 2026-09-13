@@ -33,6 +33,10 @@ The rebuilt package used by the latest Rust continuation and lifecycle replay is
 `ec683cd342f2d1c90ca5e12acd9bb589cdbcde4053827a3aab70f1865ea1f61c`.
 Rust independently exported, verified and restored the retained BSC checkpoints;
 those results are linked below with executable provenance.
+The source-removal `make build` produced
+`29069bba7d656455388baf37fd0f714322be68a80215ab11c9a3fdb20415a954`;
+all three module hashes match the preceding package for the same parameters.
+Existing replay directories retain their original frozen packages.
 
 Native failure tests prove:
 

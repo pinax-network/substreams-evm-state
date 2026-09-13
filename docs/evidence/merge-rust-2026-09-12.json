@@ -1,0 +1,49 @@
+{
+  "format_version": 1,
+  "qualification": "Rust auxiliary 256 MiB forced merge workload",
+  "result": {
+    "database": "evm_rust_merge_checkpoints",
+    "format_version": 1,
+    "limitations": [
+      "auxiliary merge stress table, not account state or a customer footprint",
+      "random payload bytes; row count and payload size are reproducible"
+    ],
+    "merge_seconds": 14.561447875,
+    "parts_bytes_after": 809286373,
+    "parts_bytes_before": 269764725,
+    "payload_bytes_per_row": 4096,
+    "rows": 65536,
+    "total_seconds": 172.204600625,
+    "workload": "synthetic incompressible eight-part merge"
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "64475287895818ef75c93332b29dad49e274ff6c881f00e2933cd31cb415486f",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789257460174037000,
+    "format_version": 1,
+    "guard_samples": 10,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 45221092000,
+    "peak_observed_allocated_bytes": 10657992704,
+    "rejected_guard_stages": [],
+    "samples": 14,
+    "started_ns": 1789257255066282000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "observations": {
+    "samples": 14,
+    "active_merge_observations": 0,
+    "peak_selected_parts_bytes": 809286373
+  },
+  "runtime_checksums": "7d090814459dbe672e050350a072e548451e7ae245d59ce68d08e49e29e41325  localdata/qualification/customer-example/merge-rust-bin/evm-state\n332c0d566385635cc40ee5768f201fc90276ff58778c73a0af0a855ffb16bdcd  localdata/qualification/customer-example/merge-rust-bin/evm-state-qualify\n",
+  "source_commit": "b63b60274dd967896760d5ccc34153d3e2c94d36",
+  "limitations": [
+    "Whole-directory measurements include concurrent WBNB replay",
+    "The merge completed and retained part-catalog growth was observed; periodic samples did not capture an active system.merges row",
+    "Retained rollback reserve of 1742835712 bytes is additional"
+  ]
+}
