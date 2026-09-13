@@ -11,6 +11,13 @@ container owns the configured HTTP endpoint, rejects container replacement and
 remote/object-storage disks, and checks that its data paths reside on persistent
 mounts. It does not provision storage or alter quotas.
 
+The container must provide GNU `du` and `timeout`, as the tested ClickHouse image
+does. Scans have a 25-second deadline inside the container, followed by a
+two-second termination grace, within the local Docker client's 30-second limit.
+Killing only that client can leave its scan running inside the container; the
+inner deadline also terminates the scanner. A timed-out or incomplete scan still
+rejects admission, and its sample records the timeout when identified.
+
 ## Storage placement and migration
 
 Compose defaults to the named `ch_data` volume. For a fresh database, create a
@@ -138,6 +145,15 @@ Results are written as:
 - `guards/*.json`: checks inside the managed operations, tagged by stage;
 - `summary.json`: child exit status, stop reasons, sample counts, maximum observed
   sample gap, and the largest allocation seen in either periodic or guard samples.
+
+`evm-state-qualify record-growth` additionally records active and inactive part
+bytes for each observed private generation. It checks that the active storage
+row count matches the prefix and that exactly one active manifest row exists.
+If compaction replaces the pointer during observation, it retries the newer
+generation. These per-generation catalog figures exclude native history, other
+generations, exports and verification work; the whole-directory capacity sample
+remains the operating-budget measurement. A private prefix still needs complete
+account-root verification before it can become ready state.
 
 Incomplete internal scans also write rejected guard events with their operation
 stage and error type, without a fabricated byte total or third-party error text.

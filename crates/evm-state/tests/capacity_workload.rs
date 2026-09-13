@@ -9,14 +9,18 @@ use evm_state::{
 #[test]
 #[ignore = "requires ClickHouse with query logging"]
 fn growth_matches_compaction_destination_and_rejects_duplicate_writes() -> Result<()> {
-    use evm_state::{ch::params, qualification::compaction_query};
+    use evm_state::{
+        ch::params,
+        qualification::{compaction_query, generation_parts},
+    };
     use serde_json::json;
     let admin = ClickHouse::new("default")?;
     let name = format!("evm_test_rust_{}", new_id());
     admin.execute(&format!("CREATE DATABASE {name}"), &Default::default())?;
     let client = admin.with_database(&name)?;
     let operation = (|| -> Result<()> {
-        client.execute("CREATE TABLE bootstrap_storage (generation String, n UInt64) ENGINE=MergeTree ORDER BY generation", &Default::default())?;
+        client.execute("CREATE TABLE bootstrap_storage (generation String, n UInt64) ENGINE=MergeTree PARTITION BY generation ORDER BY generation", &Default::default())?;
+        client.execute("CREATE TABLE bootstrap_generations (generation String, manifest String) ENGINE=MergeTree PARTITION BY generation ORDER BY generation", &Default::default())?;
         let first = new_id();
         let second = new_id();
         let arguments = params(json!({"first":first,"second":second}))?;
@@ -25,6 +29,7 @@ fn growth_matches_compaction_destination_and_rejects_duplicate_writes() -> Resul
             &arguments,
         )?;
         client.execute("INSERT INTO bootstrap_storage SELECT {second:String},n FROM bootstrap_storage WHERE generation={first:String}", &arguments)?;
+        client.execute("INSERT INTO bootstrap_generations SELECT {first:String},'first manifest' UNION ALL SELECT {second:String},'second manifest'", &arguments)?;
         admin.execute("SYSTEM FLUSH LOGS", &Default::default())?;
         let original = compaction_query(&client, &first, 2)?;
         let successor = compaction_query(&client, &second, 2)?;
@@ -33,6 +38,18 @@ fn growth_matches_compaction_destination_and_rejects_duplicate_writes() -> Resul
         assert!(compaction_query(&client, &first, 1).is_err());
         assert!(compaction_query(&client, "invalid-generation", 2).is_err());
         assert!(compaction_query(&client, &new_id(), 2)?.is_null());
+        let measured = generation_parts(&client, &first)?;
+        assert_eq!(measured["active_storage_rows"], 2);
+        assert_eq!(measured["active_manifest_rows"], 1);
+        assert!(measured["active_part_bytes"].as_u64().unwrap() > 0);
+        assert_eq!(
+            generation_parts(&client, &second)?["active_storage_rows"],
+            2
+        );
+        assert_eq!(
+            generation_parts(&client, &new_id())?["active_part_bytes"],
+            0
+        );
 
         // A real second write to the same destination remains an error.
         client.execute(
@@ -41,6 +58,7 @@ fn growth_matches_compaction_destination_and_rejects_duplicate_writes() -> Resul
         )?;
         admin.execute("SYSTEM FLUSH LOGS", &Default::default())?;
         assert!(compaction_query(&client, &first, 2).is_err());
+        assert_eq!(generation_parts(&client, &first)?["active_storage_rows"], 4);
         Ok(())
     })();
     admin.execute(&format!("DROP DATABASE {name}"), &Default::default())?;

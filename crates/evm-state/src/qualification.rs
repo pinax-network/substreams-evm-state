@@ -76,6 +76,40 @@ pub fn compaction_query(
     Ok(query)
 }
 
+/// Physical parts belonging to one immutable private generation, not the server.
+pub fn generation_parts(client: &ClickHouse, generation: &str) -> Result<Value> {
+    let generation = object_id(generation)?;
+    let parts = client.rows("SELECT table,active,count() AS parts,sum(rows) AS rows,sum(data_compressed_bytes) AS compressed_bytes,sum(bytes_on_disk) AS part_bytes FROM system.parts WHERE database={db:String} AND table IN ('bootstrap_storage','bootstrap_generations') AND (partition={generation:String} OR partition={quoted:String}) GROUP BY table,active ORDER BY table,active",
+        &params(json!({"db":client.database,"generation":generation,"quoted":format!("'{generation}'")}))?)?.collect::<Result<Vec<_>>>()?;
+    let mut storage_rows = 0_u64;
+    let mut manifest_rows = 0_u64;
+    let mut active_bytes = 0_u64;
+    let mut inactive_bytes = 0_u64;
+    for part in &parts {
+        let bytes = uint(&part["part_bytes"])?;
+        if uint(&part["active"])? == 1 {
+            active_bytes = active_bytes
+                .checked_add(bytes)
+                .context("part byte overflow")?;
+            match string(part, "table")? {
+                "bootstrap_storage" => storage_rows = uint(&part["rows"])?,
+                "bootstrap_generations" => manifest_rows = uint(&part["rows"])?,
+                _ => anyhow::bail!("unexpected private generation table"),
+            }
+        } else {
+            inactive_bytes = inactive_bytes
+                .checked_add(bytes)
+                .context("part byte overflow")?;
+        }
+    }
+    Ok(
+        json!({"generation":generation,"active_storage_rows":storage_rows,
+        "active_manifest_rows":manifest_rows,"active_part_bytes":active_bytes,
+        "inactive_part_bytes":inactive_bytes,"parts":parts,
+        "scope":"ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"}),
+    )
+}
+
 pub fn record_growth(
     root: &Path,
     output: &Path,
@@ -90,6 +124,10 @@ pub fn record_growth(
             // Recover observed generations from complete prior records only.
             let line = line?;
             if let Ok(record) = serde_json::from_str::<Value>(&line) {
+                // Enrich a legacy last observation once after an upgrade.
+                if record.get("generation_parts").is_none() {
+                    continue;
+                }
                 seen.insert(
                     string(&record, "cohort")?.into(),
                     (
@@ -148,12 +186,23 @@ pub fn record_growth(
                 "growth recorder source URL differs from its native run"
             );
             let query = compaction_query(&client, &generation, uint(&prefix["nonzero_slots"])?)?;
+            let parts = generation_parts(&client, &generation)?;
+            // Compaction can publish and clean a newer generation during these
+            // read-only measurements. Retry that new pointer on the next pass.
+            if fs::read(path.join("native/bootstrap.json"))? != raw {
+                continue;
+            }
+            ensure!(
+                parts["active_storage_rows"] == prefix["nonzero_slots"]
+                    && parts["active_manifest_rows"] == 1,
+                "generation part counts differ from the private prefix"
+            );
             let record = json!({"phase":phase,"retained_original_volume_reserve_bytes":reserve_bytes,"overall_budget_bytes":budget_bytes,
                 "observed_ns":now,"cohort":name,"run_id":run["run_id"],"module_hash":run["identity"]["module_hash"],
                 "package_sha256":run["identity"]["package_sha256"],"prefix_json_sha256":hex::encode(Sha256::digest(raw)),
                 "generation":generation,"header":prefix["header"],"nonzero_slots":prefix["nonzero_slots"],"state_sha256":prefix["state_sha256"],
                 "status":prefix["status"],"capacity_sample_finished_ns":sample["sample_finished_ns"],
-                "accounted_allocated_bytes":sample["accounted_allocated_bytes"],"admitted":sample["admitted"],"compaction_query":query,
+                "accounted_allocated_bytes":sample["accounted_allocated_bytes"],"admitted":sample["admitted"],"compaction_query":query,"generation_parts":parts,
                 "qualification":"Checksummed private prefix and fresh admitted capacity sample; not a full account-root proof, retained-footprint bound or billing evidence. Query memory is server accounting, not process RSS."});
             writeln!(log, "{}", canonical_json(&record)?)?;
             log.flush()?;

@@ -141,7 +141,7 @@ fn decode_docker_output(
             && !error.contains("Permission denied");
         return Err(DockerCapacityError {
             operation,
-            timed_out: false,
+            timed_out: operation == "data-directory scan" && output.status.code() == Some(124),
             directory_changed: changed,
         }
         .into());
@@ -340,6 +340,12 @@ impl Meter {
         let mut arguments = vec![
             "exec".into(),
             self.container_id.clone().unwrap(),
+            // Killing the local docker client does not terminate its remote
+            // exec process. Give the scanner its own shorter container deadline.
+            "timeout".into(),
+            "--signal=TERM".into(),
+            "--kill-after=2s".into(),
+            "25s".into(),
             "du".into(),
             "-s".into(),
             "-c".into(),
@@ -532,7 +538,7 @@ mod tests {
                 ("No such file or directory\nPermission denied", false),
                 ("dummy-secret", false),
             ] {
-                for status in [1, 2] {
+                for status in [1, 2, 124] {
                     let result = decode_docker_output(
                         operation,
                         Some(process::Output {
@@ -544,6 +550,10 @@ mod tests {
                     .unwrap_err();
                     let error = result.downcast_ref::<DockerCapacityError>().unwrap();
                     assert_eq!(error.operation, operation);
+                    assert_eq!(
+                        error.timed_out,
+                        operation == "data-directory scan" && status == 124
+                    );
                     assert_eq!(
                         error.directory_changed,
                         expected && operation == "data-directory scan" && status == 1
@@ -624,6 +634,7 @@ fn failure(error: &anyhow::Error, started: u64) -> Result<Value> {
         value["error_type"] = json!("DockerCapacityError");
         value["inspection_operation"] = json!(error.operation);
         value["directory_changed"] = json!(error.directory_changed);
+        value["timed_out"] = json!(error.timed_out);
     }
     Ok(value)
 }
