@@ -67,7 +67,9 @@ failure after later data insertion but before cursor persistence.
 - [Merge workload](evidence/merge-rust-2026-09-12.json): a Rust-created 256 MiB
   incompressible fixture merged successfully, with 809,286,373 bytes observed in
   its retained part catalog. The periodic scans did not capture an active merge
-  row, so that limitation is explicit in the record.
+  row, so that limitation is explicit in the record. A separate
+  [1 GiB workload](evidence/merge-rust-large-2026-09-12.json) then captured two
+  active-merge observations and completed without rejected capacity samples.
 - [Aggregation](evidence/bsc-aggregation-rust-2026-09-12.json): an isolated
   WBNB prefix plus one contiguous update produced 5,696,588 slots and identical
   ordered checksums under both settings. Explicit spilling used 1.91 GB of
@@ -90,8 +92,9 @@ through durable block 56,974,989. The Rust historical replay continues toward
 ## Release acceptance
 
 The Rust recovery phase passed CI at `b63b602`, including its dedicated hard
-ClickHouse restart test. The final source-removal commit must also pass the
-Rust-only CI workflow. Reproduce with `make test`, `make test-integration` and
+ClickHouse restart test. The Rust-only source-removal commit `eb3c0f4` also
+[passed CI](https://github.com/pinax-network/substreams-evm-state/actions/runs/34726918252).
+Reproduce with `make test`, `make test-integration` and
 `make test-postgres`; integration tests use disposable databases, and the crash
 test needs space for a separate disposable Docker container.
 The suite contains 87 standalone native tests, 48 regular ClickHouse tests,

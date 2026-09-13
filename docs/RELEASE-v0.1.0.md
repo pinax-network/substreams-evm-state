@@ -95,9 +95,12 @@ describes measured roots, reserves, incomplete-sample handling and recovery.
 
 ## Gates before publishing
 
-- [ ] Complete the [Rust migration](RUST_MIGRATION.md): native CLI, operations,
+- [x] Complete the [Rust migration](RUST_MIGRATION.md): native CLI, operations,
   verification, qualification tools and test transport; remove first-party
   Python/Go code and Python dependencies, with behavior and recovery parity.
+  Rust-only CI passed at `eb3c0f4`: 87 standalone native, 48 regular ClickHouse,
+  one separate database-crash, two PostgreSQL and 43 mapper tests. The stopped
+  WBNB source resumed under Rust with unchanged identity and frozen package.
 - [x] Prove the supplied customer-example bootstrap, continue it with the rebuilt
   package, and verify complete reads plus export/restore. The
   [record](evidence/bsc-customer-example-rust-2026-09-12.json) contains source/package

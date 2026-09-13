@@ -1,0 +1,50 @@
+{
+  "format_version": 1,
+  "qualification": "Rust auxiliary 1 GiB forced merge with observed active merge samples",
+  "result": {
+    "database": "evm_rust_merge_large_checkpoints",
+    "format_version": 1,
+    "limitations": [
+      "auxiliary merge stress table, not account state or a customer footprint",
+      "random payload bytes; row count and payload size are reproducible"
+    ],
+    "merge_seconds": 19.799591791,
+    "parts_bytes_after": 3237128427,
+    "parts_bytes_before": 1079046751,
+    "payload_bytes_per_row": 4096,
+    "rows": 262144,
+    "total_seconds": 132.752197125,
+    "workload": "synthetic incompressible eight-part merge"
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "6ab39610b92b6f7480c249b9f3b9fdf3618b72a58b711ddbe4b54f6a97fc5ecd",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789257813525607000,
+    "format_version": 1,
+    "guard_samples": 10,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 32646342000,
+    "peak_observed_allocated_bytes": 14305505280,
+    "rejected_guard_stages": [],
+    "samples": 16,
+    "started_ns": 1789257658268659000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "observations": {
+    "samples": 16,
+    "active_merge_observations": 2,
+    "peak_selected_parts_bytes": 3237128427
+  },
+  "runtime_checksums": "7d090814459dbe672e050350a072e548451e7ae245d59ce68d08e49e29e41325  localdata/qualification/customer-example/merge-rust-bin/evm-state\n332c0d566385635cc40ee5768f201fc90276ff58778c73a0af0a855ffb16bdcd  localdata/qualification/customer-example/merge-rust-bin/evm-state-qualify\n",
+  "source_commit": "b63b60274dd967896760d5ccc34153d3e2c94d36",
+  "limitations": [
+    "Auxiliary incompressible payload, not customer account state",
+    "Whole-directory measurements include concurrent WBNB replay and other retained qualification data",
+    "Retained rollback reserve of 1742835712 bytes is additional",
+    "Sampled operating guard cannot bound excursions between scans"
+  ]
+}
