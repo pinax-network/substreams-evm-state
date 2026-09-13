@@ -1,0 +1,4490 @@
+{
+  "format_version": 1,
+  "qualification": "Full historical WBNB bootstrap accepted by the Rust checkpoint verifier",
+  "runtime_source_commit": "f118424ebbec2490e8fc5e0040d4c481ecb1e03d",
+  "runtime_sha256": "7f3208cc6bbf1c4825c545429a2783c0cd51aaea3c01da9685a08edf2f6235dd",
+  "manifest": {
+    "account_count": 1,
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "base_snapshot": null,
+    "chain_id": 56,
+    "created_at": 1789276802964417000,
+    "format_version": 1,
+    "header": {
+      "hash": "0xf43b443b232e80eb91597a4c7fa38b055cd713a8cc88b0c5382cf9d765ae6737",
+      "number": 121466775,
+      "parent_hash": "0x22121952c52f72de3b0b2488ad9eea3354d05512202f852342a24be8ed12185d",
+      "state_root": "0x2fbfb4715ef0c1abf683d463d6782301ced0b16e71d14140d4d8c7089f30967b",
+      "timestamp": 1789221911
+    },
+    "header_trust": "provider-finalized-header",
+    "nonzero_slots": 9718240,
+    "retained_budget_bytes": 98257164288,
+    "snapshot_id": "b18c1a13be41415f906209b5535e9b11",
+    "state_sha256": "1ee20a207c73448cceb9d6f0279a93cd40ba0198e8bf29bc6c548c272fd5959a",
+    "status": "ready",
+    "verification": {
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": {
+        "account_proof": "verified",
+        "nonzero_slots": 9718240,
+        "storage_root": "verified"
+      }
+    }
+  },
+  "sources": [
+    {
+      "database": "evm_wbnb_bootstrap",
+      "start_block": 149268,
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "accounts": [
+        "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+      ],
+      "final_blocks_only": true
+    }
+  ],
+  "account": {
+    "address": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "balance": "1589565244109159728652358",
+    "code_hash": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+    "exists": true,
+    "header": {
+      "hash": "0xf43b443b232e80eb91597a4c7fa38b055cd713a8cc88b0c5382cf9d765ae6737",
+      "number": 121466775,
+      "parent_hash": "0x22121952c52f72de3b0b2488ad9eea3354d05512202f852342a24be8ed12185d",
+      "state_root": "0x2fbfb4715ef0c1abf683d463d6782301ced0b16e71d14140d4d8c7089f30967b",
+      "timestamp": 1789221911
+    },
+    "nonce": 1,
+    "nonzero_slots": 9718240,
+    "snapshot_id": "b18c1a13be41415f906209b5535e9b11",
+    "storage_root": "0x0e7c9556d55f0a8ccf615129a69f65c0e9af77bd71505f6d0cd6f162ca5dc40c"
+  },
+  "proof_capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "6a5d64350ef50f024d0f2d7033496d6d06dbf2d366da93936de4031896cd623a",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789276804672213000,
+    "format_version": 1,
+    "guard_samples": 5,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 6174622000,
+    "peak_observed_allocated_bytes": 14049468416,
+    "rejected_guard_stages": [],
+    "samples": 29,
+    "started_ns": 1789276638689511000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "proof_elapsed_seconds": 165.98270208,
+  "final_replay_capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789276626014673000,
+    "format_version": 1,
+    "guard_samples": 1089,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 8910494000,
+    "peak_observed_allocated_bytes": 31204667392,
+    "rejected_guard_stages": [],
+    "samples": 428,
+    "started_ns": 1789274042619296000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "final_replay_interval": {
+    "from_block": 107736998,
+    "through_block": 121466775,
+    "blocks": 13729778,
+    "configured_chunk_blocks": 15000000,
+    "parallel_workers_requested": 200,
+    "startup_recovery_through": 107736997
+  },
+  "private_prefix": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "f94519bb0db54495a8f04d02518816f3",
+    "header": {
+      "hash": "0xf43b443b232e80eb91597a4c7fa38b055cd713a8cc88b0c5382cf9d765ae6737",
+      "number": 121466775,
+      "parent_hash": "0x22121952c52f72de3b0b2488ad9eea3354d05512202f852342a24be8ed12185d",
+      "state_root": "0x2fbfb4715ef0c1abf683d463d6782301ced0b16e71d14140d4d8c7089f30967b",
+      "timestamp": 1789221911
+    },
+    "nonzero_slots": 9718240,
+    "start_block": 149268,
+    "state_sha256": "69e4de92ba2ac3a23a8c1e9e614d201718c9f4122af9d16fb65470495711cc1b",
+    "status": "unverified-bootstrap"
+  },
+  "replay_capacity_history": [
+    {
+      "phase": "chunk-five-million-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 1,
+        "failed_samples": 1,
+        "finished_ns": 1789262481200593000,
+        "format_version": 1,
+        "guard_samples": 88,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 53633154000,
+        "peak_observed_allocated_bytes": 22514851840,
+        "rejected_guard_stages": [
+          "native-progress"
+        ],
+        "samples": 63,
+        "started_ns": 1789261533710753000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "continuation-output-capacity",
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "65aaf67f0899a3c7a8ccb5c542793d826241aa4aef07ef6efd5552de6a56b5d8",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789259510691523000,
+        "format_version": 1,
+        "guard_samples": 0,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 18241246000,
+        "peak_observed_allocated_bytes": 14332014592,
+        "rejected_guard_stages": [],
+        "samples": 3,
+        "started_ns": 1789259481572845000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "continuation-proof-capacity",
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789259346223345000,
+        "format_version": 1,
+        "guard_samples": 1,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6845779000,
+        "peak_observed_allocated_bytes": 10568978432,
+        "rejected_guard_stages": [],
+        "samples": 2,
+        "started_ns": 1789259335698794000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "continuation-rust-capacity",
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "65aaf67f0899a3c7a8ccb5c542793d826241aa4aef07ef6efd5552de6a56b5d8",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789259464779664000,
+        "format_version": 1,
+        "guard_samples": 8,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 18927232000,
+        "peak_observed_allocated_bytes": 12531027968,
+        "rejected_guard_stages": [],
+        "samples": 8,
+        "started_ns": 1789259385152669000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "full-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "72a5133ec20999e8ac5a6773693572df29ebb520c5c86a44f2768217effd31bd",
+        "failed_samples": 0,
+        "finished_ns": 1789224636117158000,
+        "format_version": 1,
+        "guard_samples": 1796,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 5648743000,
+        "peak_observed_allocated_bytes": 2803269632,
+        "rejected_guard_stages": [],
+        "samples": 441,
+        "started_ns": 1789222341267850000,
+        "status": "stopped",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-bind-five-million-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789264569334957000,
+        "format_version": 1,
+        "guard_samples": 255,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6321807000,
+        "peak_observed_allocated_bytes": 18605158400,
+        "rejected_guard_stages": [],
+        "samples": 101,
+        "started_ns": 1789263978430550000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-disk-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_samples": 0,
+        "finished_ns": 1789229687368327000,
+        "format_version": 1,
+        "guard_samples": 103,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 13214655000,
+        "peak_observed_allocated_bytes": 4144746496,
+        "rejected_guard_stages": [],
+        "samples": 58,
+        "started_ns": 1789229227149163000,
+        "status": "stopped",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "capacity": {
+        "command_exit_code": -15,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789231598753227000,
+        "format_version": 1,
+        "guard_samples": 277,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 25061472000,
+        "peak_observed_allocated_bytes": 4756439040,
+        "rejected_guard_stages": [],
+        "samples": 155,
+        "started_ns": 1789230179076098000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-disk-retry2-capacity",
+      "capacity": {
+        "command_exit_code": -15,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789233871327583000,
+        "format_version": 1,
+        "guard_samples": 230,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 16556006000,
+        "peak_observed_allocated_bytes": 4855181312,
+        "rejected_guard_stages": [],
+        "samples": 125,
+        "started_ns": 1789232788357022000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789235680559797000,
+        "format_version": 1,
+        "guard_samples": 205,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 19863123000,
+        "peak_observed_allocated_bytes": 4975067136,
+        "rejected_guard_stages": [],
+        "samples": 135,
+        "started_ns": 1789234495454024000,
+        "status": "stopped",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-disk-retry4-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789239214170401000,
+        "format_version": 1,
+        "guard_samples": 537,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 42383606000,
+        "peak_observed_allocated_bytes": 10676359168,
+        "rejected_guard_stages": [],
+        "samples": 318,
+        "started_ns": 1789235848533494000,
+        "status": "stopped",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "capacity": {
+        "command_exit_code": -15,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789254457037633000,
+        "format_version": 1,
+        "guard_samples": 1736,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 36697369000,
+        "peak_observed_allocated_bytes": 12699402240,
+        "rejected_guard_stages": [],
+        "samples": 1415,
+        "started_ns": 1789239283250196000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "host-stage-five-million-capacity",
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789266660854335000,
+        "format_version": 1,
+        "guard_samples": 532,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6802477000,
+        "peak_observed_allocated_bytes": 20596969472,
+        "rejected_guard_stages": [],
+        "samples": 218,
+        "started_ns": 1789265360813771000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "pilot-capacity",
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "72a5133ec20999e8ac5a6773693572df29ebb520c5c86a44f2768217effd31bd",
+        "failed_samples": 0,
+        "finished_ns": 1789222112237606000,
+        "format_version": 1,
+        "guard_samples": 15,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 1255984000,
+        "peak_observed_allocated_bytes": 1489985536,
+        "rejected_guard_stages": [],
+        "samples": 16,
+        "started_ns": 1789222094654429000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "resumed-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "72a5133ec20999e8ac5a6773693572df29ebb520c5c86a44f2768217effd31bd",
+        "failed_samples": 0,
+        "finished_ns": 1789227533087828000,
+        "format_version": 1,
+        "guard_samples": 1256,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6159411000,
+        "peak_observed_allocated_bytes": 3139813376,
+        "rejected_guard_stages": [
+          "native-progress"
+        ],
+        "samples": 353,
+        "started_ns": 1789225687160300000,
+        "status": "stopped",
+        "stop_reasons": [
+          "filesystem_free_space_below_floor"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "rust-deadline-capacity",
+      "capacity": {
+        "command_exit_code": 1,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 1,
+        "failed_samples": 0,
+        "finished_ns": 1789261466792614000,
+        "format_version": 1,
+        "guard_samples": 134,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 16044614000,
+        "peak_observed_allocated_bytes": 16569249792,
+        "rejected_guard_stages": [
+          "native-progress"
+        ],
+        "samples": 73,
+        "started_ns": 1789260853416980000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample",
+          "supervisor_interrupted"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "rust-handoff-capacity",
+      "capacity": {
+        "command_exit_code": -9,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789258854139989000,
+        "format_version": 1,
+        "guard_samples": 126,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 40634312000,
+        "peak_observed_allocated_bytes": 17435287552,
+        "rejected_guard_stages": [],
+        "samples": 112,
+        "started_ns": 1789257234079669000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "rust-resume1-capacity",
+      "capacity": {
+        "command_exit_code": -9,
+        "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789260137691784000,
+        "format_version": 1,
+        "guard_samples": 99,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 32556178000,
+        "peak_observed_allocated_bytes": 17992716288,
+        "rejected_guard_stages": [],
+        "samples": 79,
+        "started_ns": 1789259179103246000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "streaming-final-capacity",
+      "capacity": {
+        "command_exit_code": -9,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789269807872795000,
+        "format_version": 1,
+        "guard_samples": 662,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 7238522000,
+        "peak_observed_allocated_bytes": 19475824640,
+        "rejected_guard_stages": [],
+        "samples": 267,
+        "started_ns": 1789268202067345000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "streaming-final-resume-1-capacity",
+      "capacity": {
+        "command_exit_code": -9,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789271637543682000,
+        "format_version": 1,
+        "guard_samples": 654,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6773345000,
+        "peak_observed_allocated_bytes": 18089848832,
+        "rejected_guard_stages": [],
+        "samples": 276,
+        "started_ns": 1789269987669343000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "streaming-final-resume-2-capacity",
+      "capacity": {
+        "command_exit_code": -9,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789272725428122000,
+        "format_version": 1,
+        "guard_samples": 370,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6860245000,
+        "peak_observed_allocated_bytes": 18242543616,
+        "rejected_guard_stages": [],
+        "samples": 161,
+        "started_ns": 1789271751832689000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "streaming-final-resume-3-capacity",
+      "capacity": {
+        "command_exit_code": -9,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 1,
+        "finished_ns": 1789273861455711000,
+        "format_version": 1,
+        "guard_samples": 390,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 7931310000,
+        "peak_observed_allocated_bytes": 18299129856,
+        "rejected_guard_stages": [],
+        "samples": 168,
+        "started_ns": 1789272843456162000,
+        "status": "stopped",
+        "stop_reasons": [
+          "incomplete_capacity_sample"
+        ],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "streaming-final-tail-capacity",
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789276626014673000,
+        "format_version": 1,
+        "guard_samples": 1089,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 8910494000,
+        "peak_observed_allocated_bytes": 31204667392,
+        "rejected_guard_stages": [],
+        "samples": 428,
+        "started_ns": 1789274042619296000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    },
+    {
+      "phase": "streaming-five-million-capacity",
+      "capacity": {
+        "command_exit_code": 0,
+        "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+        "failed_guard_samples": 0,
+        "failed_samples": 0,
+        "finished_ns": 1789268086052533000,
+        "format_version": 1,
+        "guard_samples": 425,
+        "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+        "maximum_sample_gap_ns": 6572828000,
+        "peak_observed_allocated_bytes": 20293201920,
+        "rejected_guard_stages": [],
+        "samples": 171,
+        "started_ns": 1789267082359891000,
+        "status": "completed",
+        "stop_reasons": [],
+        "termination_error": null
+      }
+    }
+  ],
+  "growth": [
+    {
+      "phase": "host-disk",
+      "observed_ns": 1789229269784897000,
+      "header": {
+        "hash": "0xe978fe2fa4dfa0ae42d0ed1f08ecaf22c6b973a58e7b6311e5357446cf9ee8c0",
+        "number": 8449994,
+        "parent_hash": "0x6c7dce5076a609857144d8d38946a272baeb6ef9cd2a41a46c0dbe3ed681f5a1",
+        "state_root": "0x064bed1f25236e46c4020bc56750312ac4d82398759904eaafaadb94bb059c64",
+        "timestamp": 1624158868
+      },
+      "nonzero_slots": 828039,
+      "generation": "b9d13d52d714426d8818faa5500797eb",
+      "state_sha256": "55dbd6d786eb945844133f85435b040f82eccaff287317dce87537de0be1f2d5",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3347243008,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk",
+      "observed_ns": 1789229419827219000,
+      "header": {
+        "hash": "0xd77e8f6ffd5dbbdc05d2a138cd4c5660b631d7b353a68111fbc5bb0b95653a87",
+        "number": 8549994,
+        "parent_hash": "0x9f519fc99f2fe5e89c0bef0836c9ff864700aba9cfcb2bb584a2fbb08d9e1fef",
+        "state_root": "0xf3e1cac9c792d9212831a90ee44face7c039d4a71651fa0ec502e6ece37ec8a7",
+        "timestamp": 1624460088
+      },
+      "nonzero_slots": 850175,
+      "generation": "c331cfb04ef247a3a1a74413fb6c1907",
+      "state_sha256": "c5747a169f902f8357e4edf648bf44c1a5911651382481388950f35fa0ecae32",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3591286784,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk",
+      "observed_ns": 1789229509851786000,
+      "header": {
+        "hash": "0x4189e5788745dab3e8294b68a5f5873da34b57891f0081d265546e7a3dbcab6f",
+        "number": 8649994,
+        "parent_hash": "0x16a01e8dfbfe1576aa83242bdc60c9c4e64d368e53fa973005ed6f09d98c03b4",
+        "state_root": "0x803883e750cecb4f0d9905d45d0fab5da99eab2e2045536d341f4d466ca0bcdc",
+        "timestamp": 1624760825
+      },
+      "nonzero_slots": 870946,
+      "generation": "64fde36e8ecb4c2ea71532fca313df4a",
+      "state_sha256": "9cc0c9ea6f416a3b1cc79c173c84eae762393c214b3740fa0ccda9cd8e94b42a",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3971117056,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk",
+      "observed_ns": 1789229629893617000,
+      "header": {
+        "hash": "0x5f9e70295692e46bccdcb1170e469bb211ba919efdd075ae7a93f685be8a392c",
+        "number": 8749994,
+        "parent_hash": "0xc570bef078d44c52d2f41ae87b0638ae44c199b144d5c9ff20912f9d0c9ce740",
+        "state_root": "0x5f9ebebab3ef3959b05e8e1e35efbd1bee3b3fd59e87b43baf7a04ae3e37d002",
+        "timestamp": 1625062886
+      },
+      "nonzero_slots": 894868,
+      "generation": "f349ebc5e2a1491494214c7a565e03f1",
+      "state_sha256": "36feb5206ea564920b45a092e20bcbb12ad601ee0ffe64bf7e54454f39f90621",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3717996544,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789230227503795000,
+      "header": {
+        "hash": "0x0eec0b9c4a6a790a3754ab126708bbdaa91de279fbe193b147a4fc6e91e62131",
+        "number": 8810979,
+        "parent_hash": "0x58e5d148220e11c170024e0e58fb975be6d39907cec5aff13d8e8a75332e533a",
+        "state_root": "0x1db9cc49b027d1a7c3a368db2ad293ac3f37b8361657b9017948982bb721c645",
+        "timestamp": 1625247697
+      },
+      "nonzero_slots": 907473,
+      "generation": "a522a629dffa48c4ab672f11ac60525e",
+      "state_sha256": "1b682de23a0b6af7dc99d196d6f93d16c1604522b105b89a28b236244a33cce4",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3928481792,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789230347494258000,
+      "header": {
+        "hash": "0xd63fb2e240a7ec17e542a05ddb18746058d104022fc075e33c572c8792e9cd38",
+        "number": 8910979,
+        "parent_hash": "0x7b177433141b3414665726128b5dea0e0389358ba1a6eb9c6c019a38bbfef3bd",
+        "state_root": "0x4edde567991293500e31c0b4b989badf4c7a9482ce1ec770aae73d0548775aa4",
+        "timestamp": 1625550320
+      },
+      "nonzero_slots": 929183,
+      "generation": "c3f1be52babc4079a39c7bed0515f54b",
+      "state_sha256": "298b96d92686c3813f7bf0cf8961f1da7e826dcea5c0f353817415b7d42de3d0",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3779076096,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789230437510386000,
+      "header": {
+        "hash": "0x6c40f92a3bdde74f0e03a1b1a1d0b2d78515fcc0a3f6f12b84d4026a700fd42e",
+        "number": 9010979,
+        "parent_hash": "0x78f8189d6cf8268bdc2dd3bab52cc015821f8fd6a335349c1c4e9a8820b1d4c7",
+        "state_root": "0xfbfc42936794ba16fd93e6e7bb00f36af3d1bc8c9409b590e05ed75cc08e1337",
+        "timestamp": 1625850757
+      },
+      "nonzero_slots": 949366,
+      "generation": "a5d9ca299acc4d80a3d98de3b9f72d6e",
+      "state_sha256": "ad304b4deb62feb1e9d06bc78a36a5d7051f80d1cea6bb0a9e3eb0523d0a274f",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4135591936,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789230557531537000,
+      "header": {
+        "hash": "0xc7f2436acf8e297adc55df49527166e0496cca5e8b092014847f909fdbc2f878",
+        "number": 9110979,
+        "parent_hash": "0xa623645003956c0ed749f5ac5f625d6450d68c11e96505603117ccc38ffa5314",
+        "state_root": "0x07b5a5fbfeb0f0919eed9e002b1395bf7940cc64ad513e02fcabaeb4538e5077",
+        "timestamp": 1626150780
+      },
+      "nonzero_slots": 968577,
+      "generation": "1099c762113e4c109bc6e6f248c6f501",
+      "state_sha256": "71f7085e6d9351ef3335c06751ac64aa5679f61cbb4f631ab7ee9b582c493139",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4286640128,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789230677562499000,
+      "header": {
+        "hash": "0x81986034660e05b4b879e6e00e5544d425fdcd61d4a1b6edba3f1d885d52bf60",
+        "number": 9210979,
+        "parent_hash": "0x5c5bd920354dd4c356008fb8341a78e9406b79fd2081968a57d8d53608bc8a4a",
+        "state_root": "0x8be21a5fdc8a00beb4ec5421c79af615547a06a6b7909c50b0da3f709c871193",
+        "timestamp": 1626450898
+      },
+      "nonzero_slots": 984613,
+      "generation": "641af9408ad84480a5b7c5ea779e63a7",
+      "state_sha256": "536948f251b5ec5ad0b248fe1546d49e1e11bb1635a5a705e1239206073b7ac9",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3869626368,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789230797589192000,
+      "header": {
+        "hash": "0x226acfba0f2dcd0c47313e9017ec0e4cbeecd53c6d70226a6b5297bfb69460e2",
+        "number": 9310979,
+        "parent_hash": "0x00e1f94424aec8f302362cdfac23f836d57084947d8d208839f89d2d4feaff91",
+        "state_root": "0x8a497d4068cc02d7d22d22977672e3118b459562fb45ee1c5fef1e7afc2c5570",
+        "timestamp": 1626751097
+      },
+      "nonzero_slots": 999493,
+      "generation": "d877952d3a764032a63bcbf746d77bf5",
+      "state_sha256": "7558438034ed49c9795fdbbc2bd33d07449504d65c6a72a2f79533e8ce27e20b",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 3943776256,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789230947624775000,
+      "header": {
+        "hash": "0x45cdfcbc69b678c89a709627c6d2d8fb0ab5dd78af079c12ba26e905410d2c6b",
+        "number": 9410979,
+        "parent_hash": "0x49e4a6ab9a56b809b98e4ab125ef7d40b408e441a258de646c9b9175e4fb4f9b",
+        "state_root": "0xff452b8a709060b84c6bf6b60f104d0a69949bfa9c7c20e5f8f9012080abe82b",
+        "timestamp": 1627051416
+      },
+      "nonzero_slots": 1018340,
+      "generation": "53a8bc4670e54294a9bcdcd2a7361a8d",
+      "state_sha256": "394e5873d3eca6025f1946fdff6dfaa323999218a838bdcea157447fdb4a97e8",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4133167104,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789231127674183000,
+      "header": {
+        "hash": "0x13d470aaf9ffd82978d5fdaef455ba30ea61174b7e95b99d0500855ef88e9d98",
+        "number": 9510979,
+        "parent_hash": "0x45eaa60da8ac24e627edc8e9658fdcabe6bab66fbc81a4948c90cd50f91762c3",
+        "state_root": "0x1b13f9837b953473127291c534f4553388f90acf845734e06960295692819aa2",
+        "timestamp": 1627355452
+      },
+      "nonzero_slots": 1036195,
+      "generation": "246ac439637f454d9931e37ff9471efe",
+      "state_sha256": "1582894f5924994b44758c86b5b887c0f43e6a4f990630c88545a2eafe6083a4",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4694978560,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789231397765477000,
+      "header": {
+        "hash": "0xb04b0c6761c6d56790e76156a8df1a641860d6f2d6977c64e1b6107eb7073566",
+        "number": 9610979,
+        "parent_hash": "0xcf14f8484249449bc0dcd37b780282638407a11ce4e371cccb85fd48b1445b08",
+        "state_root": "0x1d5750c74e346c08f158c888c088ae6bb0a933e8746a8340e5f61690c339ff88",
+        "timestamp": 1627675363
+      },
+      "nonzero_slots": 1053080,
+      "generation": "6a90e829b3ea4ea9b4c30cddc695d578",
+      "state_sha256": "492d7027aeac928b4226f57cd592f9a9e238e94bd065e8450d5b7f988a7c452b",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4391665664,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry1-capacity",
+      "observed_ns": 1789231577813231000,
+      "header": {
+        "hash": "0x1eced59503a9f7ae5557917871ef7c145f4ba8d2f052d4178445d2956a8dd6c4",
+        "number": 9710979,
+        "parent_hash": "0x23f741ac4653e86043d3d08c7652da16bf161740dc8b9a5fb108f635e267b318",
+        "state_root": "0x5704ebd33a96a22ef5beefc2c80771d8b14175f688477ed36c00421b23890ad9",
+        "timestamp": 1627986413
+      },
+      "nonzero_slots": 1072643,
+      "generation": "854108e5dc734b7483eea66cdd89ff18",
+      "state_sha256": "6cb67aa00025968d56e5a413cb6169e6c6047be4b51ad91b2fdb74f1443ae0bb",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4191199232,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry2-capacity",
+      "observed_ns": 1789232838218294000,
+      "header": {
+        "hash": "0x38d418a1306dbdcf7859211c85b176f3b6b37085797660888ce3bd118081659e",
+        "number": 9710980,
+        "parent_hash": "0x1eced59503a9f7ae5557917871ef7c145f4ba8d2f052d4178445d2956a8dd6c4",
+        "state_root": "0x70a5cc28df244a1e2ccca0c733c35ef8a0e3e564cedce7387847d3a738cf9b61",
+        "timestamp": 1627986416
+      },
+      "nonzero_slots": 1072643,
+      "generation": "ebd9aa61c54e40c798b8c6e17462c883",
+      "state_sha256": "6c3eed5a29fd0e3f96fd73023d6cae1fdbf4efe852bb94eb5cc4db86696aa5cf",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4404469760,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry2-capacity",
+      "observed_ns": 1789233018285624000,
+      "header": {
+        "hash": "0x41188c63f8a53d076e44564657f5e820c520521742948e16af423e6bb5293e24",
+        "number": 9810980,
+        "parent_hash": "0xb891e2051d3912a78db9c30e6a9764b8a4907396e08f6356eaa9da701730fc4f",
+        "state_root": "0xcbd9b058f729ba463648560f4a7ee0fdc95d5a61ab8db822c1b44c300e78d161",
+        "timestamp": 1628296582
+      },
+      "nonzero_slots": 1099787,
+      "generation": "f4deac4c1fb84ff39204645e3f0650b4",
+      "state_sha256": "ee5732b4ded5d5a3e312dd2dd70f9b460ca73286961b104cd7591d82e85e51c9",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4783202304,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry2-capacity",
+      "observed_ns": 1789233198325631000,
+      "header": {
+        "hash": "0x6ec0d55574390a66a0e1b1a3a7c809590017f6f5e4280ee515eca9c299e257da",
+        "number": 9910980,
+        "parent_hash": "0x6a35f4e9979ebc005ec473fb058cfdaf53f3f7b00145d284bea7bf89f01ce18f",
+        "state_root": "0x15c8c8fb20e5d4d93fd6123843fd05034f3df9a036ceac6bbf075ed8913cd671",
+        "timestamp": 1628604735
+      },
+      "nonzero_slots": 1118764,
+      "generation": "edad6bff237c48f786b51e787bb950d4",
+      "state_sha256": "5c93b801de83ff3aad48d2608b864a8b8dbdbb25561c7f2511469241ca864901",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4613955584,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry2-capacity",
+      "observed_ns": 1789233408387609000,
+      "header": {
+        "hash": "0x2083fc49bf5f19dfbc704a10cf942e8bb7b04e1047b78cd7ed10a5732c8aa306",
+        "number": 10010980,
+        "parent_hash": "0x19bca2079d653903fce952388de52f6834ae0c33462855545d836f0760e563e3",
+        "state_root": "0xfea9affe9e1b428513dd3d6575290f0e338f6f714526f940387c1d8d6b20c05c",
+        "timestamp": 1628911708
+      },
+      "nonzero_slots": 1137025,
+      "generation": "ff2cdca7444b4695873552d147243acc",
+      "state_sha256": "9c859b331e731ea730c01ec6ec01d102e17048ba0019590a0aa5f596568cc1f0",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4208345088,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry2-capacity",
+      "observed_ns": 1789233558443062000,
+      "header": {
+        "hash": "0x7218c39dc8eb1e2d27332845c1e0db2e5cf514706ec63b5c62429900d57fa3c3",
+        "number": 10110980,
+        "parent_hash": "0x71e3ca1d039ed1be459cf26ee113b513bfca7ac176ab678cbe62542fbc0d8d5f",
+        "state_root": "0x87aa2ccde3d988655a32f207ec261b1a6d64f971b3be0744a153269dc01a313b",
+        "timestamp": 1629212767
+      },
+      "nonzero_slots": 1161024,
+      "generation": "587995e600a049fba1ee79490a33c151",
+      "state_sha256": "b038f0711102f5a1e4bd5e69d275fa0216fd412988eb556192f2f2f86f58b2be",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4230889472,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry2-capacity",
+      "observed_ns": 1789233708491328000,
+      "header": {
+        "hash": "0x018d9e74a8b6b94531821691362bde4c02f5b18773b7cdec3b8698598643a519",
+        "number": 10210980,
+        "parent_hash": "0x855ef27fce96711269a02bc260b96ba34c045aa69659fd270ee587ba8f603b86",
+        "state_root": "0xfa293bc1a020083f068a1617a6968e97dcdc65639aa6db8a3d3b7f6fe1568a5f",
+        "timestamp": 1629514516
+      },
+      "nonzero_slots": 1177068,
+      "generation": "659c30ca24ca4340b2b4bf7d529b8d37",
+      "state_sha256": "a489992beef7382d44828d2ed3c495cdde2b73817ca9680ad42e5d2b8d9f7a7d",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4698394624,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789234548763631000,
+      "header": {
+        "hash": "0x9ea057b5f59631c4aa371500d5352ac9c9b3e34ba273575a0e236e995f5bbc8c",
+        "number": 10310980,
+        "parent_hash": "0x4562e9847aed6e1e4fa955dd128113efc4c7f358ed60acd7cda3edf7e75c1d2d",
+        "state_root": "0x6f523f68561bf2bfbeaf3e210b109c671688450c9b93d0729ec877be2e9a6741",
+        "timestamp": 1629816418
+      },
+      "nonzero_slots": 1193850,
+      "generation": "fcde6ee9d1b744008017aff25998d8bd",
+      "state_sha256": "8d21a5fb61a3cb632b57e97f06f2231e38a6102ab83c244331a82184966baa80",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4530458624,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789234698804940000,
+      "header": {
+        "hash": "0xb1cc1faf197705413d158b6c263c6b9d8da77d74e77c64ae7f37bca6b65457a8",
+        "number": 10410980,
+        "parent_hash": "0xec1a1fa606a1643eda47548815034c0927e36ec92f46bd1160d4ad7f57c6f6cd",
+        "state_root": "0xb366bb2d1f7a1776be847b7e22cda1a939c360ea2ed77b42a62edb2a8706e03c",
+        "timestamp": 1630120404
+      },
+      "nonzero_slots": 1206309,
+      "generation": "8915370dd55c4e15a1b7adb57678a7bf",
+      "state_sha256": "2532293b2359b219297c36c8e247379d21edb39967996891aa1c279ead717e17",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4593127424,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789234848847421000,
+      "header": {
+        "hash": "0x2f853ae3b6504688148ad1d1cd2d42b638967aa47d4f12daf963e4741826f5fe",
+        "number": 10510980,
+        "parent_hash": "0xd33088d44197110d799cf414271f2bab7d9b91c9c519b08c430c6d2a953e62c2",
+        "state_root": "0x141be8d6e31b82ab7718bd9a88329d1316038d63fb6b5e26d46206121580aa89",
+        "timestamp": 1630424095
+      },
+      "nonzero_slots": 1221792,
+      "generation": "143739511ab6483fad1d15abfca31537",
+      "state_sha256": "c408537d6344581ba4044d947e7e0026d7ab9e0d2eb7e8f3368c6d0fd2782a8d",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4675624960,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789234998875589000,
+      "header": {
+        "hash": "0x9592c8a4eb8c0839c3cf324cfe721bb83860d92385303cc490d56009110de5bb",
+        "number": 10610980,
+        "parent_hash": "0xbca2c1668e86924638200b0935cf2df688b4a17a9b3f485972165bd72da7708e",
+        "state_root": "0x88617267ab7afcb63213a61c871ba2864326ea1ff2596893a02cd7b0d4fcb026",
+        "timestamp": 1630727861
+      },
+      "nonzero_slots": 1238286,
+      "generation": "0d9f70dbaa494906b3457a284672d41e",
+      "state_sha256": "2862c3990db89cff23d86acde2130f6aae6f98d2ba7b2b7fc95e4369f788333c",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4663566336,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789235148917001000,
+      "header": {
+        "hash": "0xcc0f1e5be1b34f1405fd6b1403470c163c2494a9c0d64faab5d9a11fb33482e8",
+        "number": 10710980,
+        "parent_hash": "0x4f372afff6e89fe70cdfda490b365af36c919eb6c989321d46b4d5879c7c9fd9",
+        "state_root": "0xead2856c1a1ceb9e7af857befb76d4e3b797c34498f45ffb06c99aa49d4b4d6f",
+        "timestamp": 1631030191
+      },
+      "nonzero_slots": 1254945,
+      "generation": "cfcd6743f7294ea0b34e725a7b171bbe",
+      "state_sha256": "99dea94615d664867ebd80408498b7865a63c43c6942790bd9f8fdd28aca722c",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4625367040,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789235298960818000,
+      "header": {
+        "hash": "0xb9158204cfcb3e3960a8e00a205b1fabc80b8abfc898ba1ea7b48a30bc46e974",
+        "number": 10810980,
+        "parent_hash": "0xd2aa6f1b3d245a4bb74fc5981a520dd187d497d3312e728c24a1dc14b52bd106",
+        "state_root": "0xf47ffcb32b0e6cafe62c3977892a5cf0c0bff61c4631258460c493386403aa53",
+        "timestamp": 1631333961
+      },
+      "nonzero_slots": 1272655,
+      "generation": "299d5be33ad34be7a35d9265e5de6006",
+      "state_sha256": "6fde66cad9fe6504b5de2c198eb59f2a5b2a02d4167ab2a63028a4fcf46f2c60",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4242665472,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789235418998641000,
+      "header": {
+        "hash": "0x23067d12f7cbc6aa6c5521aa2c827a497ef5f2f80dce5594e783aa8e17fee742",
+        "number": 10910980,
+        "parent_hash": "0x5fea64d1564cfeb29766ba90c4e07f148371cc7fc678dabf8c227658d3a5fc0d",
+        "state_root": "0xefd583145f559003003a1dc0a9ce68ba1eda5d64d3131d7dd8d338dd761229fb",
+        "timestamp": 1631634949
+      },
+      "nonzero_slots": 1290989,
+      "generation": "084f8a6da7e54b8b8835d9c52cab6cf9",
+      "state_sha256": "c0decc42bcda9cb340f074be9c3d04d38e6fe1ad922d7cdba99f9cdd21b56985",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4375543808,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789235509028017000,
+      "header": {
+        "hash": "0x7f732f087345a85ed118dcedc256b272cdad0cb6ea92f12969b9a079be57ef68",
+        "number": 11010980,
+        "parent_hash": "0xde5b34282272f92cc9997e28e192d974f664d2d0f64736c703f70c33a0fdc42b",
+        "state_root": "0xdf8e4d0bb149a60ca8a025681833a83498f3d64060eb9f666afa81ecc4881b09",
+        "timestamp": 1631935704
+      },
+      "nonzero_slots": 1312050,
+      "generation": "035a52988bc5407b83d3aaa25c86a732",
+      "state_sha256": "e9f2c417bf9571970ccf6d9158476d92a17aede47e17c1c22e29d3b0574515cb",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4731883520,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry3-capacity",
+      "observed_ns": 1789235629059145000,
+      "header": {
+        "hash": "0xe12cfcd48d9b9724333b54a5084a79bd7a8c8adb0f8751840beb2b74a8e47883",
+        "number": 11110980,
+        "parent_hash": "0x26a799393fb1b35e013f591e7fa1dd6e31c892b4db3c7019d4572d736b9037cc",
+        "state_root": "0x54aabd3b28a0688ddde9518f02bbec2a95a9d316cb70a88004dd6760926faff8",
+        "timestamp": 1632237151
+      },
+      "nonzero_slots": 1328932,
+      "generation": "f490f94f9aae475cba959358ca16733e",
+      "state_sha256": "65aebb9bb30b5539f129087de902c0cca5a2bbac0712c2b5e833085b44cd6868",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4734672896,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry4-capacity",
+      "observed_ns": 1789235899148413000,
+      "header": {
+        "hash": "0xc70c7740ce9725485271edae15b6a5e6790657ed7b239c6193707fddb94c1379",
+        "number": 11110981,
+        "parent_hash": "0xe12cfcd48d9b9724333b54a5084a79bd7a8c8adb0f8751840beb2b74a8e47883",
+        "state_root": "0x3906ffbf9942488d9d64a738a21deae690e5c530897ec71d1b69bebbf8dc9535",
+        "timestamp": 1632237154
+      },
+      "nonzero_slots": 1328932,
+      "generation": "c0dd67517e4d4300a60ebed0417d3ef3",
+      "state_sha256": "75e49573b9c70e391ef31327590c23b2ed0112d816d0cb280907ae5e9be1a187",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 4368101376,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry4-capacity",
+      "observed_ns": 1789236439207381000,
+      "header": {
+        "hash": "0xe8e5bb7c328ea75b8535f50d21561336d9cab01542855ebe60c17c86a449f8cc",
+        "number": 12110981,
+        "parent_hash": "0x3069814f1ecd4dd14a01074b26d4b43cc3d50159d0f45e5fa752cfd1760b70ec",
+        "state_root": "0x9211886920bc027d9a4141befa389e3861f57c2fe512bf745e8f27805106a0f1",
+        "timestamp": 1635263584
+      },
+      "nonzero_slots": 1517479,
+      "generation": "2faebd6fd22147ad9ffd197072384521",
+      "state_sha256": "9fa6249f081fc6c68c138336723eb914efd5dd6a105e1f62d294532e09f60d93",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 7823134720,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry4-capacity",
+      "observed_ns": 1789237309426772000,
+      "header": {
+        "hash": "0xecbf4966b7382d4c8c2ccf1f698debe41f2d92711717d40581126153ea07904c",
+        "number": 13110981,
+        "parent_hash": "0x34e88c792a51ea5ed1303ab36027489a6d8e2430bb9ea2b866125c573785e969",
+        "state_root": "0x4426709d5cd673d3796cff2f4bc422f1710182374a47fa0c821cdfa53af134d0",
+        "timestamp": 1638386994
+      },
+      "nonzero_slots": 1907462,
+      "generation": "4026852f1c9947f7aaaae2bebc2e2127",
+      "state_sha256": "77af76e3c9ebf6142e8e0666880816871d91b611ad14ac9570e8465d13f7bd0a",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": null,
+      "accounted_allocated_bytes": 10496552960,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry4-capacity",
+      "observed_ns": 1789237975878763000,
+      "header": {
+        "hash": "0x83c6a83fe5f63f3072db0b6d399a1cd8e8e8d4aca7333f0f7bb14bb09396ea07",
+        "number": 14110981,
+        "parent_hash": "0x6debe2b813664c2e2415773fa547c5215eff6c29b01aaebc300a4a56b83e5bce",
+        "state_root": "0xd42be0c4e88a75c63b0f980449771d8281aa3d890f133bee9a95936d092713bf",
+        "timestamp": 1641420046
+      },
+      "nonzero_slots": 2246715,
+      "generation": "ed22e4fb76f24c5a94bd6ba0354d7565",
+      "state_sha256": "b87b51728754dbf538f400ead3f00a44e49c35d30829d54a649af263cbd1981a",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 18:32:04",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 310612517,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 721484732,
+          "ExternalAggregationWritePart": 32,
+          "ExternalProcessingCompressedBytesTotal": 310612517,
+          "ExternalProcessingFilesTotal": 32,
+          "ExternalProcessingUncompressedBytesTotal": 721484732
+        },
+        "memory_usage": 3562094551,
+        "query_duration_ms": 11422,
+        "query_id": "8b0a79e1-b0df-49c4-9f70-9a86d236181f",
+        "read_rows": 3908460,
+        "written_rows": 2246715
+      },
+      "accounted_allocated_bytes": 10115145728,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry4-capacity",
+      "observed_ns": 1789238486100090000,
+      "header": {
+        "hash": "0xa10ffe1a4dc4ccada0d1b4d41c48bc4b20537f028ffcb559298da780c3f009b1",
+        "number": 15110981,
+        "parent_hash": "0x7df83c9ae686ddb2ed91a190836db476478e338fc3a9226643e4a190fdcc9953",
+        "state_root": "0x99be52558571159c3a48a706397e9201d047663798351e5feecbbb062da6d3d6",
+        "timestamp": 1644427633
+      },
+      "nonzero_slots": 2413265,
+      "generation": "b97d229495fe4369a815e884e85e8d2b",
+      "state_sha256": "0520af51d63074672f4100bbd0145f352faef7cada1a30d26a75892010f49c24",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 18:40:31",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 269607336,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 640777701,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 269607336,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 640777701
+        },
+        "memory_usage": 3460210255,
+        "query_duration_ms": 9669,
+        "query_id": "e4c24c2a-dc47-473d-abcc-7b43d1936bab",
+        "read_rows": 4246715,
+        "written_rows": 2413265
+      },
+      "accounted_allocated_bytes": 9469857792,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry4-capacity",
+      "observed_ns": 1789238966324108000,
+      "header": {
+        "hash": "0xceb29dab832b19249179bc58e7e0448c44e0d2f616fcc3107a88098016109fc9",
+        "number": 16110981,
+        "parent_hash": "0xb37fd9243775953419271f9b1e474e594116b59c1ea56799a68471d87ea2b805",
+        "state_root": "0x3c36969671ff1aa9b575b799217df8b5bd897f2d886ac32e124bccd7128aee42",
+        "timestamp": 1647438981
+      },
+      "nonzero_slots": 2562403,
+      "generation": "512eacc0b9e74b65a1624650f410d756",
+      "state_sha256": "38502602b413c8c3fdc18534d42e4d23999134f2f7f15eeccafda1c772fd9d68",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 18:48:42",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 278951031,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 665047970,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 278951031,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 665047970
+        },
+        "memory_usage": 3206476751,
+        "query_duration_ms": 12325,
+        "query_id": "db043786-1aa2-4ba3-8dbf-44d6f22d29f4",
+        "read_rows": 4415055,
+        "written_rows": 2562403
+      },
+      "accounted_allocated_bytes": 9198366720,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789239386711043000,
+      "header": {
+        "hash": "0x3e1cef3d17ec5f7b7b5ec66e22d9673bfbb8956fdb8486152d385ccebab8a2dd",
+        "number": 16645978,
+        "parent_hash": "0x1b749af872b62be870046fdc5d166473cf18ecf82753184736a7b78274b707cd",
+        "state_root": "0x132e97e9293370621ed447f37b59e9da9052ba86d181eca7ace0dece27a02a00",
+        "timestamp": 1649057788
+      },
+      "nonzero_slots": 2635163,
+      "generation": "c037bfe87d924bed812f30d46a5ff806",
+      "state_sha256": "6edf90daa6e43c7ff3c24bbf7e0784767b2106039bdab623fea0295f32995e05",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 18:55:33",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 256903336,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 622255059,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 256903336,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 622255059
+        },
+        "memory_usage": 3302875764,
+        "query_duration_ms": 8655,
+        "query_id": "b2710f93-129c-4de7-85d2-511b3a84599e",
+        "read_rows": 3633893,
+        "written_rows": 2635163
+      },
+      "accounted_allocated_bytes": 8146698240,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789239716891398000,
+      "header": {
+        "hash": "0x15de72272ed4e195f4a4ef74a33c2091b667f2268e3aead91f9e6626c9d09161",
+        "number": 17645978,
+        "parent_hash": "0x547aee9817131ffe12e478611ecc6bc993d4cc59e556730b9667a0f693e4b995",
+        "state_root": "0x63178119d921bc4b2fa42871851e7c7784ef8c4db95ddf3dcc35357e4007e41c",
+        "timestamp": 1652076037
+      },
+      "nonzero_slots": 2765439,
+      "generation": "9575d705d05b4be594b0e5f0c878b9d5",
+      "state_sha256": "b0aa94b476432edff5aba6e5d35f0493cd177df01b8c34c30fa0fcf4586a2432",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:01:13",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 285028485,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 684206592,
+          "ExternalAggregationWritePart": 33,
+          "ExternalProcessingCompressedBytesTotal": 285028485,
+          "ExternalProcessingFilesTotal": 33,
+          "ExternalProcessingUncompressedBytesTotal": 684206592
+        },
+        "memory_usage": 3272269499,
+        "query_duration_ms": 11393,
+        "query_id": "f7ab2aa3-4f49-4649-b1d6-d7624b23ab3b",
+        "read_rows": 4635163,
+        "written_rows": 2765439
+      },
+      "accounted_allocated_bytes": 9100980224,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789240077042256000,
+      "header": {
+        "hash": "0x4afda72c562393766d65bfed43e052cfc0d8843608c85fd5285bbd368b983c1c",
+        "number": 18645978,
+        "parent_hash": "0xaa7fef3afc6076ab1da74c0f91ca5a60095f50d094f22cfb93397229c795afde",
+        "state_root": "0x230a4ee2c0a6c8f05f6e9a28f2e771f2669bd3bd0911276ff806bfedc9db645d",
+        "timestamp": 1655103279
+      },
+      "nonzero_slots": 2833671,
+      "generation": "25705567c4914ebba3f52d6ff89a81fc",
+      "state_sha256": "46cf50a9fd51165e91c89676bee0f1231ad1f0225be6575911a3742fc8dec367",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:07:13",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 283081143,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 683917342,
+          "ExternalAggregationWritePart": 32,
+          "ExternalProcessingCompressedBytesTotal": 283081143,
+          "ExternalProcessingFilesTotal": 32,
+          "ExternalProcessingUncompressedBytesTotal": 683917342
+        },
+        "memory_usage": 3362855389,
+        "query_duration_ms": 9256,
+        "query_id": "353a4e28-08b4-4ee9-bae2-cd63b3ddc782",
+        "read_rows": 4765439,
+        "written_rows": 2833671
+      },
+      "accounted_allocated_bytes": 8575586304,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789240407288553000,
+      "header": {
+        "hash": "0x4020f92f668892ae6afe2616284627e1a2634b203f5228916a4f849cad96d823",
+        "number": 19645978,
+        "parent_hash": "0xb1fd0cd756e8447582a135fd370bbb5d5c8ed3740ccb8696fc1364d5458d21e6",
+        "state_root": "0x7dc12bdcaa4e3a7476217481807cfc44c8a6010c3fd307f390d13fd4b706243c",
+        "timestamp": 1658109938
+      },
+      "nonzero_slots": 2906971,
+      "generation": "1635bd75432742fd8b3232d9dafa9e52",
+      "state_sha256": "5a9feef14d6b5107fd766771f30f6d907965efd70c2d388662c3d0e310b236e9",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:12:33",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 275400264,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 670194691,
+          "ExternalAggregationWritePart": 34,
+          "ExternalProcessingCompressedBytesTotal": 275400264,
+          "ExternalProcessingFilesTotal": 34,
+          "ExternalProcessingUncompressedBytesTotal": 670194691
+        },
+        "memory_usage": 3447700211,
+        "query_duration_ms": 7926,
+        "query_id": "14e653c7-d878-44d2-b1a8-a0761b9209e2",
+        "read_rows": 4833671,
+        "written_rows": 2906971
+      },
+      "accounted_allocated_bytes": 8358227968,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789240677403169000,
+      "header": {
+        "hash": "0xbe5d83d17c95490853d24809342110984ab9430edb79392186ae0ce01b859295",
+        "number": 20645978,
+        "parent_hash": "0x5d345c7b0e305f282dc7239f497b3d2eadd6ca840f5a9cedb2bb189044664ec8",
+        "state_root": "0x125c0dd4f13edb0fbead11b30be0f4ab384552de55a481210976f5ca70117977",
+        "timestamp": 1661116816
+      },
+      "nonzero_slots": 2972292,
+      "generation": "335abfc491314551b7667ab02f4b4899",
+      "state_sha256": "1201888d21a78f1db2770ad72700421caf426e5ef2c5bf5ddc314395216525f1",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:17:28",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 280371974,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 681661165,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 280371974,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 681661165
+        },
+        "memory_usage": 3467437844,
+        "query_duration_ms": 7797,
+        "query_id": "3b02f762-4d00-48cf-9948-d8c6cb913606",
+        "read_rows": 4906971,
+        "written_rows": 2972292
+      },
+      "accounted_allocated_bytes": 8356093952,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789240947531003000,
+      "header": {
+        "hash": "0xc1dc40cb44f77304b5be828cc66522208c16c6a3a1ab636585210a741711f9a6",
+        "number": 21645978,
+        "parent_hash": "0x55794749fe4103462cafbdc3c4fcc717cd2690d1b69d16b9c6204de3fb2d3459",
+        "state_root": "0x83fd4d62e03d00373e923a8f82f0f07364d133bacc967a97d4364ef33c1831cc",
+        "timestamp": 1664127717
+      },
+      "nonzero_slots": 3033917,
+      "generation": "a5d1f57e865e45da9f9e2a909d7248ec",
+      "state_sha256": "7077415a98d6ed8ba882ca225d7b46a050798c67b7839c848fe01f351c323ed2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:21:48",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 282764068,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 689299994,
+          "ExternalAggregationWritePart": 37,
+          "ExternalProcessingCompressedBytesTotal": 282764068,
+          "ExternalProcessingFilesTotal": 37,
+          "ExternalProcessingUncompressedBytesTotal": 689299994
+        },
+        "memory_usage": 3439606629,
+        "query_duration_ms": 8080,
+        "query_id": "13151836-f3f2-486e-b809-028053d89efd",
+        "read_rows": 4972292,
+        "written_rows": 3033917
+      },
+      "accounted_allocated_bytes": 8368349184,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789241217701230000,
+      "header": {
+        "hash": "0xfcfbd8e58bbee6561bcc15f65e1bf5f808ea88aa6b32c3a1cf945f9d59268304",
+        "number": 22645978,
+        "parent_hash": "0x312ac9e9229e450c54c85e9ae7e8bd0abb64223341298d160174b5cdd1168ca8",
+        "state_root": "0xa9c2faa616e293870c2d2dc96a6853934c1e675401cfe8c5a6a763939ad511d5",
+        "timestamp": 1667202263
+      },
+      "nonzero_slots": 3086781,
+      "generation": "785c29e83e1d4a0e8226e631c0c3f2b9",
+      "state_sha256": "a1ac1c45b079917aaf8ddd603a2fdee27f7e65c53084f8ef1ae8c0f8df603604",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:26:01",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 287926910,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 702547863,
+          "ExternalAggregationWritePart": 51,
+          "ExternalProcessingCompressedBytesTotal": 287926910,
+          "ExternalProcessingFilesTotal": 51,
+          "ExternalProcessingUncompressedBytesTotal": 702547863
+        },
+        "memory_usage": 3442142227,
+        "query_duration_ms": 9010,
+        "query_id": "0d4366c9-fb6f-4656-91c4-a546dcd0046e",
+        "read_rows": 5033917,
+        "written_rows": 3086781
+      },
+      "accounted_allocated_bytes": 8737497088,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789241487886571000,
+      "header": {
+        "hash": "0x3eee75310fe19fa475b985f06ecf35c89f25c17db8dc4e972e4e425d5f18a9ae",
+        "number": 23645978,
+        "parent_hash": "0x97e41d160e947ea6196201a9a5cecd7d94ae9ea740406678610b4b820a6b9da3",
+        "state_root": "0x00383b33296e18b9f13380e027132e53fa6d6c5f57cf85c695d8bd2382c0f6bb",
+        "timestamp": 1670250316
+      },
+      "nonzero_slots": 3138358,
+      "generation": "d790ce9a8b4845fe8ecf46418ab11c9e",
+      "state_sha256": "2532682f282989a71e63baa5cabd63c6f3960b0faaa4dedb77585437b76c6a3d",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:30:43",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 286858170,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 701765788,
+          "ExternalAggregationWritePart": 33,
+          "ExternalProcessingCompressedBytesTotal": 286858170,
+          "ExternalProcessingFilesTotal": 33,
+          "ExternalProcessingUncompressedBytesTotal": 701765788
+        },
+        "memory_usage": 3469405786,
+        "query_duration_ms": 9131,
+        "query_id": "d67d7c76-958f-4af0-8c7e-2ebb19f69034",
+        "read_rows": 5086781,
+        "written_rows": 3138358
+      },
+      "accounted_allocated_bytes": 8320466944,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789241758026127000,
+      "header": {
+        "hash": "0xff1ce1ca6ed560cfeb37db86941afec6c7717d900dcc909f4b51cd2908d312b7",
+        "number": 24645978,
+        "parent_hash": "0x481e99e73d4974fc06f7159151b0b5df301732e408fef52bd0505b77bc5cb497",
+        "state_root": "0xd715138301f14b017b64b5281c1c7e2134f727ad407913e63799249a84c52cde",
+        "timestamp": 1673296057
+      },
+      "nonzero_slots": 3179820,
+      "generation": "76d42d3b65f9495489ea102140131d07",
+      "state_sha256": "173413b83355e16706c7e4247af019e34142d70d400a3a67df21bc05a3d65e84",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:34:58",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 284210730,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 697639180,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 284210730,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 697639180
+        },
+        "memory_usage": 3409324002,
+        "query_duration_ms": 8694,
+        "query_id": "b2ea61b4-ecb6-412f-945a-eb62baaf472d",
+        "read_rows": 5139216,
+        "written_rows": 3179820
+      },
+      "accounted_allocated_bytes": 8039272448,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789242028204550000,
+      "header": {
+        "hash": "0xf2b423a580eb5347671de3c73ac9ed852233bf33f79be3fa8563ab5abf008d90",
+        "number": 25645978,
+        "parent_hash": "0x5c163607d5d058f48651f402f7c0fadaa638c8027c6585a4069da7a56fb3a2c6",
+        "state_root": "0x9268509ae2ae87bf1f390e329f5ba8089397e052f02b0ecb006d61305db2612b",
+        "timestamp": 1676334723
+      },
+      "nonzero_slots": 3247613,
+      "generation": "4604eb4586254091a2c2cda1743aa3b0",
+      "state_sha256": "13e7a3ffd0be150a86f5365c9508017226d12b201f59297087e2e4c916bea237",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:39:38",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 299043222,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 730583738,
+          "ExternalAggregationWritePart": 36,
+          "ExternalProcessingCompressedBytesTotal": 299043222,
+          "ExternalProcessingFilesTotal": 36,
+          "ExternalProcessingUncompressedBytesTotal": 730583738
+        },
+        "memory_usage": 3511391119,
+        "query_duration_ms": 9343,
+        "query_id": "70535915-b182-4c7a-af47-35e785efd09f",
+        "read_rows": 5179820,
+        "written_rows": 3247613
+      },
+      "accounted_allocated_bytes": 8573595648,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789242328410644000,
+      "header": {
+        "hash": "0x584527efeb6780bef946752387fc17a1efa0a403b7d9645d1a086a42aa582b44",
+        "number": 26645978,
+        "parent_hash": "0xe06824e427ebfed9f09b87d3aa1a3d64c965e1ae2bb2abdd9adfd5ba98f04cce",
+        "state_root": "0x05b523b1178a989f55f59bea4836b5f0a0e46f5c6a8529f29304c577fd86882f",
+        "timestamp": 1679369157
+      },
+      "nonzero_slots": 3304604,
+      "generation": "6fdfb8dc7397445db4bfb8710d6303f0",
+      "state_sha256": "58c4a5f7a7946580bea93c233cba61e489ff87e2d7aff02fcab84fc600cb6add",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:44:42",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 297316698,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 729816283,
+          "ExternalAggregationWritePart": 33,
+          "ExternalProcessingCompressedBytesTotal": 297316698,
+          "ExternalProcessingFilesTotal": 33,
+          "ExternalProcessingUncompressedBytesTotal": 729816283
+        },
+        "memory_usage": 3141296747,
+        "query_duration_ms": 12089,
+        "query_id": "7b2fe6d9-d7d7-4a02-9d0b-3c17d688554f",
+        "read_rows": 5248887,
+        "written_rows": 3304604
+      },
+      "accounted_allocated_bytes": 8349581312,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789242628570678000,
+      "header": {
+        "hash": "0x509505e3f7adb945c838c1ad4fac0fe33e05a1c33eea8e36efb841c3bc98a35f",
+        "number": 27645978,
+        "parent_hash": "0x46c57f575a59e7e5482eabb6580e0d0ff5d2ab038b1e42191945860f806a7e3a",
+        "state_root": "0x3ba90730b127ccbcad430929177e7c96b9a31e61b3560c426934bb14062e370b",
+        "timestamp": 1682393391
+      },
+      "nonzero_slots": 3381838,
+      "generation": "3a06739e8ed94a5d8083ad1c3a7f9694",
+      "state_sha256": "b5a7695ef6b28b93410b5518aa60354ec57460e63d253270095c3a4954a22404",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:49:41",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 304234495,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 747215897,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 304234495,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 747215897
+        },
+        "memory_usage": 3367802650,
+        "query_duration_ms": 8502,
+        "query_id": "9067c3bf-4397-4b6d-b1e6-865c2c0fcc0f",
+        "read_rows": 5304604,
+        "written_rows": 3381838
+      },
+      "accounted_allocated_bytes": 8603242496,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789242958766119000,
+      "header": {
+        "hash": "0x13faa1f9a20c852511cd514b20e940244dd6450b565e21704f5555e1c212a4ee",
+        "number": 28645978,
+        "parent_hash": "0x74ce5d013a3d83f3cdf4dab36171f60b0279372f9fe57145784aad08d82cc759",
+        "state_root": "0xd6b86e98fc0a4a01c31a1139544028dc09e8f3843221a473a623aec04c09ebc1",
+        "timestamp": 1685398075
+      },
+      "nonzero_slots": 3480032,
+      "generation": "56f7735d1115407597cfd3ece305135e",
+      "state_sha256": "d4f7ba855f8b8c5b4d6c5676a2d099fc1e8f238b1d58a807a823b7fd7918f1f7",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 19:55:06",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 316913419,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 776615961,
+          "ExternalAggregationWritePart": 31,
+          "ExternalProcessingCompressedBytesTotal": 316913419,
+          "ExternalProcessingFilesTotal": 31,
+          "ExternalProcessingUncompressedBytesTotal": 776615961
+        },
+        "memory_usage": 3411131256,
+        "query_duration_ms": 10910,
+        "query_id": "6feee23d-c995-4f85-b6e5-cc89c1cd2c5d",
+        "read_rows": 5381838,
+        "written_rows": 3480032
+      },
+      "accounted_allocated_bytes": 9297719296,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789243289043030000,
+      "header": {
+        "hash": "0x8d441e176bef1678af3990d38319817d7aba6dd8217691418cde11aeff3feedb",
+        "number": 29645978,
+        "parent_hash": "0xbf488862c44bef68adf3731f71fa703e67129b21b577c1b802e5df8f2453b395",
+        "state_root": "0xd6455aa851d8402609b25b7983f944cb61cbb18001d439cb1ef752d2535868e2",
+        "timestamp": 1688405955
+      },
+      "nonzero_slots": 3558227,
+      "generation": "1505b5589bfa4342b99e69c7ad7a2ca6",
+      "state_sha256": "968bf69b817c86adced96e58b84419c1455130654e20e265ebb8ac8371f71686",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:00:31",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 326827438,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 800549513,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 326827438,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 800549513
+        },
+        "memory_usage": 3365410388,
+        "query_duration_ms": 9189,
+        "query_id": "efab1c5e-e414-491b-b3c3-b78b56c24f56",
+        "read_rows": 5480032,
+        "written_rows": 3558227
+      },
+      "accounted_allocated_bytes": 9239666688,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789243589196553000,
+      "header": {
+        "hash": "0x98e5d5b09515937007daa1208ed69a3f37974126288486ae89f5cac0f2d4127a",
+        "number": 30645978,
+        "parent_hash": "0x9245d8c6e6fa0c33e956bae792bcc8658a8ae590ed9370ab284919fb2e217590",
+        "state_root": "0x7d834a96ef6220d8a6e0e4b22c21c81d7a138115d66afc4dba277518232ca9f6",
+        "timestamp": 1691415435
+      },
+      "nonzero_slots": 3620010,
+      "generation": "605aeb2211a84baa9c3555474201c81a",
+      "state_sha256": "3f6f59371b98704d5341c08dca9012553265d8ac524e772f8e88391c5e812bfe",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:05:44",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 324463526,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 796933767,
+          "ExternalAggregationWritePart": 36,
+          "ExternalProcessingCompressedBytesTotal": 324463526,
+          "ExternalProcessingFilesTotal": 36,
+          "ExternalProcessingUncompressedBytesTotal": 796933767
+        },
+        "memory_usage": 3454940823,
+        "query_duration_ms": 10646,
+        "query_id": "4bad711a-4db6-471c-8108-e1b01b9fe234",
+        "read_rows": 5558227,
+        "written_rows": 3620010
+      },
+      "accounted_allocated_bytes": 8703004672,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789243889562275000,
+      "header": {
+        "hash": "0x4e9c8ec14579606fed9316cf4788178548820453337ac9e78da77f3e7414563e",
+        "number": 31645978,
+        "parent_hash": "0x905c855173fd817ca9173a4a35400b83ce66f9ad383c12bd206d15429da4cc3f",
+        "state_root": "0x4c410c431b035137261f2dc0cd4c1220404dc44742b4e5a1c100ab1cdce8ea7e",
+        "timestamp": 1694426884
+      },
+      "nonzero_slots": 3676251,
+      "generation": "0c1a7d53f0014fccbe5fb745249f24b7",
+      "state_sha256": "9cbae463c2ac63c9d0ae77a7ffc82118f9b041ec73c91b71fd147d4c393ac489",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:10:43",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 326152787,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 802058341,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 326152787,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 802058341
+        },
+        "memory_usage": 3324455091,
+        "query_duration_ms": 10024,
+        "query_id": "0abcba1b-0ce3-4300-b0ca-e9db317582ca",
+        "read_rows": 5620010,
+        "written_rows": 3676251
+      },
+      "accounted_allocated_bytes": 8742936576,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789244159702459000,
+      "header": {
+        "hash": "0x42f4d715b2b173e86b0a8577130e97946b2546f150b6d7a8d774892a99a1cf71",
+        "number": 32645978,
+        "parent_hash": "0xf788e464bab5483281282f8c81ae59fb93b34f12582c7cc29b7de96fde59b468",
+        "state_root": "0x6667f65cd205dab8bd722518165611f7a16a1cf756f099e05b43e8d0ab89f1a2",
+        "timestamp": 1697436619
+      },
+      "nonzero_slots": 3723562,
+      "generation": "155386131f6f4774a42769a1a72c8765",
+      "state_sha256": "6a147ef46e854dc07c3a6fdd2d379530eed59a50a34d75a8a2aea97c8de1bed5",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:15:05",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 328250896,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 808455599,
+          "ExternalAggregationWritePart": 33,
+          "ExternalProcessingCompressedBytesTotal": 328250896,
+          "ExternalProcessingFilesTotal": 33,
+          "ExternalProcessingUncompressedBytesTotal": 808455599
+        },
+        "memory_usage": 3348901786,
+        "query_duration_ms": 9083,
+        "query_id": "c324557e-9e27-4cce-bf16-fa2f62aebbe0",
+        "read_rows": 5676251,
+        "written_rows": 3723562
+      },
+      "accounted_allocated_bytes": 9210781696,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789244519865632000,
+      "header": {
+        "hash": "0x2573c757ce555b4c9790977f7dfe90ffdc4d801439e027ccc152659d855c02f1",
+        "number": 33645978,
+        "parent_hash": "0xca603fcc4fa209101907bed58d1cfdc62ee57a812cafb2c9193b5d4194b778c8",
+        "state_root": "0x3a93386e6bf077d3503de4fad3c90e51cb3b1282b9414c4cedbb80c6ed530852",
+        "timestamp": 1700447730
+      },
+      "nonzero_slots": 3797459,
+      "generation": "7ea8024565594d329a876da0e173555b",
+      "state_sha256": "afa1c6c46e56b8666bb36258ff5f41c0bcf15d17c972999e621921c381b93450",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:20:59",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 341268554,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 837585904,
+          "ExternalAggregationWritePart": 36,
+          "ExternalProcessingCompressedBytesTotal": 341268554,
+          "ExternalProcessingFilesTotal": 36,
+          "ExternalProcessingUncompressedBytesTotal": 837585904
+        },
+        "memory_usage": 3383829487,
+        "query_duration_ms": 9086,
+        "query_id": "8c4af2f7-b202-4dd0-be08-5c011f283839",
+        "read_rows": 5723562,
+        "written_rows": 3797459
+      },
+      "accounted_allocated_bytes": 9034096640,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789244940488174000,
+      "header": {
+        "hash": "0xf6ed337a5e9b8d7dac1519f012a5eaa443ad17b45c31cfff6b0aa79d6c943e29",
+        "number": 34645978,
+        "parent_hash": "0xf73e40f0f5780baff0a21189f6ca44b49b7cdc8a147cf465d4196bfba9789efc",
+        "state_root": "0x415c936c687f2b5c5d1c6df25b89d5eee65ea44f04161aad99cb137a532132bd",
+        "timestamp": 1703457794
+      },
+      "nonzero_slots": 3875099,
+      "generation": "93886efa4d9c4f979d0d8d6f45ab7cf5",
+      "state_sha256": "dd301e7a631f862c825e6777e2ea71bdb03608dcccdefa4cc06ffb2cd35206e5",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:28:14",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 350291620,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 858970026,
+          "ExternalAggregationWritePart": 36,
+          "ExternalProcessingCompressedBytesTotal": 350291620,
+          "ExternalProcessingFilesTotal": 36,
+          "ExternalProcessingUncompressedBytesTotal": 858970026
+        },
+        "memory_usage": 3132140528,
+        "query_duration_ms": 14319,
+        "query_id": "a6c89c59-4c5c-4ebe-a4ca-b60fa8b77f0a",
+        "read_rows": 5797459,
+        "written_rows": 3875099
+      },
+      "accounted_allocated_bytes": 9299230720,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789245478509226000,
+      "header": {
+        "hash": "0x211ac03fe7dd45d6a52a03dcd642e4ea34161d0eb73f1ed7b5e604f665578f24",
+        "number": 35645978,
+        "parent_hash": "0x5cc4bd16ba7988f3b045d50e465d9ba3edc6ad2d9cf38586338bb6561c5d7647",
+        "state_root": "0x52b3ae4934aa9ea3de954d6d8dde0e6117e64ab82e45c6cc176d95773471ada8",
+        "timestamp": 1706464346
+      },
+      "nonzero_slots": 3952387,
+      "generation": "61810afd836a4e598e6fe4d262b9796d",
+      "state_sha256": "38bf6794b6c0b10e972cc8c5622d6831dd1e4082ce42e2104b50f284c0ae6093",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:33:50",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 358325002,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 878052066,
+          "ExternalAggregationWritePart": 28,
+          "ExternalProcessingCompressedBytesTotal": 358325002,
+          "ExternalProcessingFilesTotal": 28,
+          "ExternalProcessingUncompressedBytesTotal": 878052066
+        },
+        "memory_usage": 3131901300,
+        "query_duration_ms": 16105,
+        "query_id": "7f0d4186-9243-4803-8ed4-c6cb0a0a3c1a",
+        "read_rows": 5875099,
+        "written_rows": 3952387
+      },
+      "accounted_allocated_bytes": 9234292736,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789245598788032000,
+      "header": {
+        "hash": "0x7c32b578eed3b3bf9e46d02f157f292bcca4a0ec8bd340750d672469ca224dd3",
+        "number": 36645978,
+        "parent_hash": "0x17e34b48c4b9a070673ed5e9f56698a47f15f363ec034ad18c64d1ae213ac005",
+        "state_root": "0xee9f45cf3af6f0e12023a99fb3ad196395a32fa1297c386186f5e71358a0d2fe",
+        "timestamp": 1709470079
+      },
+      "nonzero_slots": 4034919,
+      "generation": "7c9e262292534f89bd495f293f3440fb",
+      "state_sha256": "8918b884790853ace47dfed1d692ca130bdeb2e053faef906ff1626d9bdbae60",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:39:04",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 371944941,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 909325433,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 371944941,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 909325433
+        },
+        "memory_usage": 3072645562,
+        "query_duration_ms": 11461,
+        "query_id": "9ad9a03b-2609-421e-a403-3d3c27911674",
+        "read_rows": 5952387,
+        "written_rows": 4034919
+      },
+      "accounted_allocated_bytes": 9052176384,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789245959008753000,
+      "header": {
+        "hash": "0x9b83ff0fcc924faefe4497c7b3a4825b88a7628a8d675b6b02a058c57530dc13",
+        "number": 37645978,
+        "parent_hash": "0x3303b29d120ce70f7cf71795c3e66fe2cc866f968549d00488e4f5c94330be28",
+        "state_root": "0x1281936e321bb8f6a24843daacdc353c3427d9a57fd27c4ed60378306dc720cf",
+        "timestamp": 1712476716
+      },
+      "nonzero_slots": 4149925,
+      "generation": "a25deb076f894d94b7dda4f0ddc96645",
+      "state_sha256": "2fcd7f9679546c500bbbadf80bb34a066d6a201a9403b546f686c15f74ad35a1",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:44:50",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 391882091,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 957123744,
+          "ExternalAggregationWritePart": 36,
+          "ExternalProcessingCompressedBytesTotal": 391882091,
+          "ExternalProcessingFilesTotal": 36,
+          "ExternalProcessingUncompressedBytesTotal": 957123744
+        },
+        "memory_usage": 3376780223,
+        "query_duration_ms": 12481,
+        "query_id": "e94a2655-71e3-4f88-b982-546d9c129b00",
+        "read_rows": 6034919,
+        "written_rows": 4149925
+      },
+      "accounted_allocated_bytes": 9742999552,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789246289191335000,
+      "header": {
+        "hash": "0x570740c6a5553da84e13c7a42fa4cf471e3546d36ab937dfd08bce52b4dc594a",
+        "number": 38645978,
+        "parent_hash": "0x3b47601602cb9089bd99f98e5710559d26606df5f16ed1826331dd4752000ec7",
+        "state_root": "0xee9b65982cd3e330ba924d65c83588400c90b47c4c65210edf0a99cf7c430a94",
+        "timestamp": 1715482475
+      },
+      "nonzero_slots": 4223737,
+      "generation": "b3d355f69b6b4b7bbf8baacbc4e6b11c",
+      "state_sha256": "9ce0eb49854b678aa8aa99860f57ad2c86ebbdf934ddc8f104364a09cacad9a6",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:50:38",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 388026686,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 949664232,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 388026686,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 949664232
+        },
+        "memory_usage": 3339076994,
+        "query_duration_ms": 12456,
+        "query_id": "fe3d3ae3-9050-4d62-8095-9773a0aa4c9c",
+        "read_rows": 6149925,
+        "written_rows": 4223737
+      },
+      "accounted_allocated_bytes": 9434943488,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789246649642830000,
+      "header": {
+        "hash": "0xd7ec30985d8975568740454c973d4ccc6713e40bd7a8e6e993ee53fc206ab43c",
+        "number": 39645978,
+        "parent_hash": "0xaa57042b09303b9e0086d0d10e97bc51424122382f8ce47bcf51123f41a217fd",
+        "state_root": "0x3930d738cacfe3d10e148cc92fd4c02f4da782386c4a352ca9b59e18d9e35006",
+        "timestamp": 1718491028
+      },
+      "nonzero_slots": 4292177,
+      "generation": "8e54ba47dbdb4f7a816d3622201c5069",
+      "state_sha256": "f220733ae7a97a3cef4405d638bf1bd86135c422a40b6244419d9a27c9bb00c1",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 20:56:25",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 396062783,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 969473788,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 396062783,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 969473788
+        },
+        "memory_usage": 3343285745,
+        "query_duration_ms": 14787,
+        "query_id": "b833f8ed-946f-477e-9854-00570f99e057",
+        "read_rows": 6226551,
+        "written_rows": 4292177
+      },
+      "accounted_allocated_bytes": 9707933696,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789246979826163000,
+      "header": {
+        "hash": "0xdf7b94ab41d3674c3aa02236fa0a555cc0e906f77e17e861809227a757a7c2df",
+        "number": 40645978,
+        "parent_hash": "0xaea1ec9c88d1084038ae3e6487aa25767f732e5f3555aa2861461e09a8db1c87",
+        "state_root": "0x2ad3a146ff1157c9ace9912709c692902cf46a592b81627c6da9b3572a29f495",
+        "timestamp": 1721502860
+      },
+      "nonzero_slots": 4376848,
+      "generation": "35738050e00b4eaf93989d88e9d074fc",
+      "state_sha256": "8947329ef51f8e82464a2c00e664d2a63bea1a70666a3843d808da245d3c4939",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:02:02",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 397568093,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 974197098,
+          "ExternalAggregationWritePart": 31,
+          "ExternalProcessingCompressedBytesTotal": 397568093,
+          "ExternalProcessingFilesTotal": 31,
+          "ExternalProcessingUncompressedBytesTotal": 974197098
+        },
+        "memory_usage": 3342879062,
+        "query_duration_ms": 11180,
+        "query_id": "3d4d4f60-5fba-4628-8ea6-f5aa7a80d354",
+        "read_rows": 6292177,
+        "written_rows": 4376848
+      },
+      "accounted_allocated_bytes": 9810321408,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789247340124493000,
+      "header": {
+        "hash": "0x2d9fc9301762fb0cb45283c6a5fee400f0436dbdca468bc5ca8ef85597bb229c",
+        "number": 41645978,
+        "parent_hash": "0xd34da97a4dbdf05ebd6a7042b36ec07589f50215e6b2e63f04b9928b033aab2b",
+        "state_root": "0x42ed5b98bed56cdaa0e4d743d4ac4e2709abfb2e5dd72cb6d029c263e8525ec7",
+        "timestamp": 1724510574
+      },
+      "nonzero_slots": 4486497,
+      "generation": "42771f3bdf094becac5b08fb37fa28a7",
+      "state_sha256": "eee31bf60ad3ffec16a2342aa77df238e24e4b46c2834144cff1837823296e6a",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:07:58",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 399758931,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 984020634,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 399758931,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 984020634
+        },
+        "memory_usage": 3349181086,
+        "query_duration_ms": 11433,
+        "query_id": "8f6992ef-7294-4965-aed0-ee9d2d0c5f60",
+        "read_rows": 6376848,
+        "written_rows": 4486497
+      },
+      "accounted_allocated_bytes": 9934430208,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789247670339399000,
+      "header": {
+        "hash": "0xd0e5875a5f02acdb58e44fd8c51a6d535af0eeca7bd75049f96ced619b86f69e",
+        "number": 42645978,
+        "parent_hash": "0xabbfd12b3c1325ae1efc50cde514e9b868c4d208a1cf31bd28d381b666353ac5",
+        "state_root": "0x7097ec0b20c313c42b0033b4e8882a34380e0abcea21e35889c0feab2e076a79",
+        "timestamp": 1727517732
+      },
+      "nonzero_slots": 4598237,
+      "generation": "90dfbb5adaac4cd98222b206fb031d1e",
+      "state_sha256": "88dbc0a34c9d242f66b424c0a5ed7aeb5387b193f2491364fadbb3dbf12a7d14",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:13:39",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 409170296,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1007498291,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 409170296,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1007498291
+        },
+        "memory_usage": 3348817867,
+        "query_duration_ms": 12916,
+        "query_id": "66d2ab56-58b1-476b-902d-9533bb104708",
+        "read_rows": 6486497,
+        "written_rows": 4598237
+      },
+      "accounted_allocated_bytes": 9721585664,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789248030570408000,
+      "header": {
+        "hash": "0x58d6cf2609c5e5365b260fefc9f21e5ecf71c3f5108e82a31d9e74b8491ae93e",
+        "number": 43645978,
+        "parent_hash": "0x660acb259376bedbfe81074e93efb17bfe97af6a76905a04b49d5e3c12668ffa",
+        "state_root": "0x9d99f78a646b13d41788ff6eeb0431567e8172944364a35c2212dcb528927182",
+        "timestamp": 1730517909
+      },
+      "nonzero_slots": 4686691,
+      "generation": "7d4b988fc3054c618e1e3fe0279cd63a",
+      "state_sha256": "f8d0d0dc7e712f47efb1950fb8159624d60469f42c23d0aef3b02ea9223dd9c3",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:19:17",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 417860237,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1030493418,
+          "ExternalAggregationWritePart": 31,
+          "ExternalProcessingCompressedBytesTotal": 417860237,
+          "ExternalProcessingFilesTotal": 31,
+          "ExternalProcessingUncompressedBytesTotal": 1030493418
+        },
+        "memory_usage": 3260512980,
+        "query_duration_ms": 13324,
+        "query_id": "54e5500c-566b-4d77-bbaf-df4786e752fa",
+        "read_rows": 6598237,
+        "written_rows": 4686691
+      },
+      "accounted_allocated_bytes": 10184720384,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789248390776824000,
+      "header": {
+        "hash": "0xea4fe3107a5fbb44e1c990fad9afb050dba354ee265d21548a10a24041558b4a",
+        "number": 44645978,
+        "parent_hash": "0x5794a98903428980cf13f162dd8728dc9aab7679b222daaadd6fd02e806ccf9d",
+        "state_root": "0x3399554220fa58231083a7c80dd86a4cb77cac9b979459db856f37daeb43342a",
+        "timestamp": 1733518804
+      },
+      "nonzero_slots": 4769840,
+      "generation": "2fc457640955471bb194268aba29d700",
+      "state_sha256": "5ae31e74f523b9c82eb77dac9005ab3b189b9372dc26325c445753978ff7ab47",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:25:34",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 425223904,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1050748854,
+          "ExternalAggregationWritePart": 28,
+          "ExternalProcessingCompressedBytesTotal": 425223904,
+          "ExternalProcessingFilesTotal": 28,
+          "ExternalProcessingUncompressedBytesTotal": 1050748854
+        },
+        "memory_usage": 3362967770,
+        "query_duration_ms": 15996,
+        "query_id": "f6e1f953-07ba-4622-a9a4-f18819a033df",
+        "read_rows": 6686691,
+        "written_rows": 4769840
+      },
+      "accounted_allocated_bytes": 10836840448,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789248780972316000,
+      "header": {
+        "hash": "0xff75289abf39505061ce33f6c2fca2b659d606dc5249202b7215d452aea1b268",
+        "number": 45645978,
+        "parent_hash": "0xd35c8890c4bdc00a76132df98c15882f967f9d4c82fe99bac437064fdfa87254",
+        "state_root": "0xc8c8a6bb52be1ef67b84d73151d4be151663a27778766ddad8ad1cea87cc7737",
+        "timestamp": 1736519197
+      },
+      "nonzero_slots": 4855247,
+      "generation": "76d421e2b6844d5a98a0c3254feef262",
+      "state_sha256": "45440668eddafc2bce66245be512e3b4bc8ae2da2605b26c8a7bc40a8f3fee8e",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:32:01",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 434533281,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1074081758,
+          "ExternalAggregationWritePart": 34,
+          "ExternalProcessingCompressedBytesTotal": 434533281,
+          "ExternalProcessingFilesTotal": 34,
+          "ExternalProcessingUncompressedBytesTotal": 1074081758
+        },
+        "memory_usage": 3353438514,
+        "query_duration_ms": 13072,
+        "query_id": "60e66f5d-529e-46e3-a695-9d17eeb279eb",
+        "read_rows": 6769840,
+        "written_rows": 4855247
+      },
+      "accounted_allocated_bytes": 10500829184,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789249261310829000,
+      "header": {
+        "hash": "0x5fc1274b80f9f11ee1652f4c3f8f898bbf0081cca3a39e7a89841ccbb5330db4",
+        "number": 46645978,
+        "parent_hash": "0x1df2c80571148aebf8683645fc37b43953c6c762456c5b15fcff80df3acd9da9",
+        "state_root": "0xa97d1651dc0320f5ca38c4a713f08248cb13ffd3f5d829aa98bf3f98fde9d800",
+        "timestamp": 1739519365
+      },
+      "nonzero_slots": 4942645,
+      "generation": "490d4aaf44c5410998417065f5dc91a7",
+      "state_sha256": "a56cdd2044b81d712ac80994ff5f43b8e6781e41d8f01097496959bce9f90370",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:40:07",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 442597942,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1094770502,
+          "ExternalAggregationWritePart": 35,
+          "ExternalProcessingCompressedBytesTotal": 442597942,
+          "ExternalProcessingFilesTotal": 35,
+          "ExternalProcessingUncompressedBytesTotal": 1094770502
+        },
+        "memory_usage": 3372921234,
+        "query_duration_ms": 12910,
+        "query_id": "3e17e724-eaae-4178-b357-3ab2bd77c31b",
+        "read_rows": 6855247,
+        "written_rows": 4942645
+      },
+      "accounted_allocated_bytes": 10478432256,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789249711579322000,
+      "header": {
+        "hash": "0xcfc2cc6074fdba315bde5e71b4886136a7bd7521845e229ee998430feb2f7e97",
+        "number": 47645978,
+        "parent_hash": "0x5fd39c50706d57ba32bb83b637744c1ff8a9046adea6eb026c70a290e9bec1f7",
+        "state_root": "0x092473fa789c57925559018ed9aa2621120d820e64ddd1b0ea746516cc78c142",
+        "timestamp": 1742519619
+      },
+      "nonzero_slots": 5065357,
+      "generation": "65471b34fc8445c8a48f2d070b638846",
+      "state_sha256": "b0167a311b27f8d0eea95111d55b2db47e1ceb72b78082499185bf9e4d9b5f49",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:47:21",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 456648826,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1129160986,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 456648826,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1129160986
+        },
+        "memory_usage": 3452335445,
+        "query_duration_ms": 13146,
+        "query_id": "523c5224-2c26-4e46-a16a-3b1c86a15eb8",
+        "read_rows": 6942645,
+        "written_rows": 5065357
+      },
+      "accounted_allocated_bytes": 11455750144,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789250252040861000,
+      "header": {
+        "hash": "0xf47339f40c98d2e8f74cf3740c62650fe14406e9cf1cc25b0f56ae58b6f65fb3",
+        "number": 48645978,
+        "parent_hash": "0x6e25b1e994767f066e269b60d1450cc2c032cfc6b035c941ec56c8d845836def",
+        "state_root": "0xaf3468759d689b7252e8d1969e79af42a6406419d08cd706c8b16e7b22612c5f",
+        "timestamp": 1745520234
+      },
+      "nonzero_slots": 5216509,
+      "generation": "4030aa78bb6e4a7aaa447f7a7f63465c",
+      "state_sha256": "24e201eeeb0be91b1e51fe1e55cf139529f53f195308adfa75a25204c451f4de",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 21:56:14",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 469988124,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1161704156,
+          "ExternalAggregationWritePart": 32,
+          "ExternalProcessingCompressedBytesTotal": 469988124,
+          "ExternalProcessingFilesTotal": 32,
+          "ExternalProcessingUncompressedBytesTotal": 1161704156
+        },
+        "memory_usage": 3362500974,
+        "query_duration_ms": 14997,
+        "query_id": "ecafe2fa-5333-4107-8094-10f52ac3c69d",
+        "read_rows": 7066773,
+        "written_rows": 5216509
+      },
+      "accounted_allocated_bytes": 10960138240,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789250672246192000,
+      "header": {
+        "hash": "0xe7c0331ed3a3fecbb1b0ed1d676f94debcecf281a046d23fd6410abe8c9983c8",
+        "number": 49645978,
+        "parent_hash": "0x798b2c5da19c0baef30cde597644e30e6e9bd596ae179eae019df752184a4fea",
+        "state_root": "0x7d53566d5e80dd4eb23c1581eeb93c1b9b23f8483a7848276f0ddc5f5e8f5428",
+        "timestamp": 1747212203
+      },
+      "nonzero_slots": 5290312,
+      "generation": "be9d1bf68b4d42b99e1ae8ffda29da28",
+      "state_sha256": "a4a7879433370ddf2fdba5d3c8e30daa453844fbc9f584739263e01a25797419",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 22:03:25",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 462076474,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1149282934,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 462076474,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1149282934
+        },
+        "memory_usage": 3348014649,
+        "query_duration_ms": 13493,
+        "query_id": "6d8156bf-675d-4ac6-b9e8-aa51553d418a",
+        "read_rows": 7216509,
+        "written_rows": 5290312
+      },
+      "accounted_allocated_bytes": 11046133760,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789251392644104000,
+      "header": {
+        "hash": "0xc0a60664c54064f94dff4bd6a8a76c229164bc77b14fa9b32b85f67b7c31d7f9",
+        "number": 50645978,
+        "parent_hash": "0x4179aded69069689601c9da04bd3d0b7702264fdc6f463044325eda3e4f11a6c",
+        "state_root": "0x9962921e4a38f1835c2795c65f93976f34848506afcf20fd90668f552c92a97c",
+        "timestamp": 1748712811
+      },
+      "nonzero_slots": 5374282,
+      "generation": "3132c75831174405a76767990e40e8c1",
+      "state_sha256": "4204cd77f8e461dba3652990260fbacececb8061f31dc9df837a865d925c9f19",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 22:15:09",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 468435836,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1160990468,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 468435836,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1160990468
+        },
+        "memory_usage": 3396762427,
+        "query_duration_ms": 15553,
+        "query_id": "33fa5678-b630-4176-92db-23b03145f9b8",
+        "read_rows": 7291860,
+        "written_rows": 5374282
+      },
+      "accounted_allocated_bytes": 11240374272,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789252203038176000,
+      "header": {
+        "hash": "0x41213a0825df6b04e1bf02a493775c9fc7a07089efa3015c64193106ee854f8e",
+        "number": 51645978,
+        "parent_hash": "0xe3fb31e51021f926e61fdf0fb2ee7df2e18aa84d09a00ca557cbcadb79ed438d",
+        "state_root": "0xf855f7c2b2f14172b1020c245a8cbfb80e155eab43c7bce21afa56977786136c",
+        "timestamp": 1750213116
+      },
+      "nonzero_slots": 5469169,
+      "generation": "139712c3fca74ad8956492157b59e51b",
+      "state_sha256": "c11d2a1f098b65918180a3b78ead5123eb39fd50c3f59225285d9651f7222a17",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 22:28:45",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 475924234,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1179120148,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 475924234,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1179120148
+        },
+        "memory_usage": 3343014458,
+        "query_duration_ms": 15750,
+        "query_id": "0a1348d7-d8d5-4f7c-bd04-93488c5dfc78",
+        "read_rows": 7375906,
+        "written_rows": 5469169
+      },
+      "accounted_allocated_bytes": 12619796480,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789252802681976000,
+      "header": {
+        "hash": "0xf46a0149c8860c3dcae9bd3a174b0c962f5110a643fc6dce73c815fcd8256599",
+        "number": 52645978,
+        "parent_hash": "0x48d72af3222071c5c6e5f1f93de3763fa84ba1d0ca442001b77104a5a48e9ca2",
+        "state_root": "0xd62600fdd16937871f0f59d55e806d161e06f9bc194dbd92166b212e2fb15a32",
+        "timestamp": 1751482277
+      },
+      "nonzero_slots": 5552355,
+      "generation": "3e6a9692d73a440094cbe522eae8bbc2",
+      "state_sha256": "0251f4f353fd82fb077cea06f2e42a1e5834366ed4c70f7563df361e892d9aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 22:39:03",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 481746277,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1194985492,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 481746277,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1194985492
+        },
+        "memory_usage": 3441368691,
+        "query_duration_ms": 16097,
+        "query_id": "63acfef4-2847-4563-ab1d-aa15c507452f",
+        "read_rows": 7469169,
+        "written_rows": 5552355
+      },
+      "accounted_allocated_bytes": 11339923456,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789253192997686000,
+      "header": {
+        "hash": "0x628abc762038e52e23c79ebb9288e46414077241dceac36b19508043899b4984",
+        "number": 53645978,
+        "parent_hash": "0xf67fc1fdd0a31fb28cb58da9a2c0a1469195e09cffb02065be4286130420f95a",
+        "state_root": "0xb869e2d38d29cf752dd31e9a4aed1a8155b0b2a9c380ead87e3aa09e737a2701",
+        "timestamp": 1752232321
+      },
+      "nonzero_slots": 5588300,
+      "generation": "f706dd8c91874b5d90e05a1ae9708726",
+      "state_sha256": "c5422f7b913f902da12a99c9f71dd36e333eef8c1ff7ce39c5b4deff72266d8e",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 22:45:33",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 475128590,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1182896008,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 475128590,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1182896008
+        },
+        "memory_usage": 3422663240,
+        "query_duration_ms": 12293,
+        "query_id": "c4b96955-8924-4398-aaf1-9c2d1aef5d9f",
+        "read_rows": 7552355,
+        "written_rows": 5588300
+      },
+      "accounted_allocated_bytes": 10496364544,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789253583129845000,
+      "header": {
+        "hash": "0x636e58d71bb4a0644a328016c7e39bb8202d0eff9aa46076ba7836c349c2db4b",
+        "number": 54645978,
+        "parent_hash": "0x1c8b74bf51e05b7cff861704a787b7b797dcc48adf4440c98dbdb7ed82f0ce67",
+        "state_root": "0x094f7466dc69e97fc087a48de5e19e5484a5a26932e1434f1ea1d3b3bf71f6d7",
+        "timestamp": 1752982390
+      },
+      "nonzero_slots": 5619342,
+      "generation": "c8bdd67c34e341d6bde3de43255e4c8f",
+      "state_sha256": "b48e9596021925779054ee706c893d5a4c29df9b1c933c06ec638f4c3c151e94",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 22:51:58",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 483079738,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1200990238,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 483079738,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1200990238
+        },
+        "memory_usage": 3427791122,
+        "query_duration_ms": 11327,
+        "query_id": "efea8af3-6403-498d-8292-f1daccf5617a",
+        "read_rows": 7588300,
+        "written_rows": 5619342
+      },
+      "accounted_allocated_bytes": 10675224576,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789253973332527000,
+      "header": {
+        "hash": "0xeb1eb7812aa0b3e8fc0a0d7062652f6798933fffe036793ed2e8fedde06e7a3c",
+        "number": 55645978,
+        "parent_hash": "0xe88bb1109f10ff5786e9389da58f7083336c06d5a47ac833c00aa60c90f866ea",
+        "state_root": "0x531d39dae5d81a4d508cd21f55f65004353b6f9ff7035185a0936ead99cd0853",
+        "timestamp": 1753732468
+      },
+      "nonzero_slots": 5658982,
+      "generation": "496718f045244382bc7d24cc25b9ef70",
+      "state_sha256": "fe11e2759d868f63ea90426d934a05a1a9c6157cc40af0e16fcefd31898b1c0e",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 22:58:12",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 486226451,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1209079132,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 486226451,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1209079132
+        },
+        "memory_usage": 3260877211,
+        "query_duration_ms": 12284,
+        "query_id": "a4152411-fd1f-44a1-b79b-b924dfbcc586",
+        "read_rows": 7622230,
+        "written_rows": 5658982
+      },
+      "accounted_allocated_bytes": 11107844096,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-disk-retry5-capacity",
+      "observed_ns": 1789254333454332000,
+      "header": {
+        "hash": "0xe0e478810461949d9ec6a0eeb5d445fea9d6d6133655b4345480b348be470a70",
+        "number": 56645978,
+        "parent_hash": "0xfe55f10b68ff270ddc6c5f0cc6ab3e0e7690f437ad425cbfa07d86a2194292ea",
+        "state_root": "0xbfd45a56dacb2588784621450e59e0c44734b7d1968a3056a8c7c9ad46582ce2",
+        "timestamp": 1754482543
+      },
+      "nonzero_slots": 5696587,
+      "generation": "1ae8bdc7b283471a91992c1128882782",
+      "state_sha256": "e5af3360e9e84bf141bdfb199aff9c5e2c8dfd638a17328477636f097d77acac",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-12 23:04:16",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 484844825,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1206815200,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 484844825,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1206815200
+        },
+        "memory_usage": 3415808975,
+        "query_duration_ms": 12470,
+        "query_id": "3cc8e375-a748-4491-ad7a-6aad2c99256f",
+        "read_rows": 7658982,
+        "written_rows": 5696587
+      },
+      "accounted_allocated_bytes": 10734927872,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "rust-handoff-capacity",
+      "observed_ns": 1789257844365806000,
+      "header": {
+        "hash": "0x6f4039ba15cf8de81e6f841b910305a1c8db18620ca9e6b0502496ec59b9f71b",
+        "number": 57974989,
+        "parent_hash": "0xfc8a3970455fb37f35f5e58fe97dcfafff352a01aa639ff11abdf906f5660a10",
+        "state_root": "0x6e4e1682488d72c28ad0f374914b804226753a3a5708b3cc2f95fa82d8e1194c",
+        "timestamp": 1755479379
+      },
+      "nonzero_slots": 5830173,
+      "generation": "0705fd0473a741e39c3e807c4faeaa9b",
+      "state_sha256": "347bcb4a1e39ec29be00666656e4c69d2167c9bf91473cee49161aec7e1e187e",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-13 00:01:41",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 529204588,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1307973202,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 529204588,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1307973202
+        },
+        "memory_usage": 3386620393,
+        "query_duration_ms": 22130,
+        "query_id": "50bafe60-1de9-4085-b86f-e0445d08ed19",
+        "read_rows": 7747875,
+        "written_rows": 5830173
+      },
+      "accounted_allocated_bytes": 14693244928,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "rust-handoff-capacity",
+      "observed_ns": 1789258114564031000,
+      "header": {
+        "hash": "0x130dd0c05873cce1f66eccf0b58ddbe981b6ec614a2fa92e6e48862426a71de5",
+        "number": 58974989,
+        "parent_hash": "0x3a2f42b2dd826290ee29750ba84e9af6ad6aa18bf23b318ea242ea4c263446f5",
+        "state_root": "0x5826b72c121b386e985a56bbda09e6e7239da3dc0b1280a3e72f78ab035d43ca",
+        "timestamp": 1756229500
+      },
+      "nonzero_slots": 5859815,
+      "generation": "d83f039f43f848a0bef1ab654e69b75c",
+      "state_sha256": "464e6dfdd492fe5f5889ec5eee2ab9010334f6f29bee586b3db3b23e47303819",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-13 00:07:23",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 536675603,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1323961092,
+          "ExternalAggregationWritePart": 39,
+          "ExternalProcessingCompressedBytesTotal": 536675603,
+          "ExternalProcessingFilesTotal": 39,
+          "ExternalProcessingUncompressedBytesTotal": 1323961092
+        },
+        "memory_usage": 3461637095,
+        "query_duration_ms": 20157,
+        "query_id": "25255227-0a88-4b03-8139-c8bc47414a25",
+        "read_rows": 7831333,
+        "written_rows": 5859815
+      },
+      "accounted_allocated_bytes": 16766517248,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "rust-handoff-capacity",
+      "observed_ns": 1789258414709868000,
+      "header": {
+        "hash": "0x81bd89583f4ccea3fdeb0abfe4c0d5eaebe4120724eba33e7e7e7b95c0224873",
+        "number": 59974989,
+        "parent_hash": "0x4f6b6c7eab162ead7adb2ddcc94b0239dcab9f95e159f9451d727b39c12ca566",
+        "state_root": "0x7b975858072f931bae169f4022a41754d10b4b7f337300c4add5b22294728d38",
+        "timestamp": 1756979734
+      },
+      "nonzero_slots": 5887971,
+      "generation": "0c7ce91c0dba433fbd426bf66e3b038d",
+      "state_sha256": "b20d2188f584e614220d570c5dd926e9f1810bb5aa30d0ee5185421c22d8209e",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-13 00:12:51",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 513823779,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1274349436,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 513823779,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1274349436
+        },
+        "memory_usage": 3412985965,
+        "query_duration_ms": 18420,
+        "query_id": "02b34c1c-ce6d-4b7c-ac64-ca6647a781a6",
+        "read_rows": 7861689,
+        "written_rows": 5887971
+      },
+      "accounted_allocated_bytes": 15453917184,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "rust-handoff-capacity",
+      "observed_ns": 1789258804962094000,
+      "header": {
+        "hash": "0x055aeda46c34e9bb2e625ae430b6aa788a3fdb737c743437bd655367ec135fbc",
+        "number": 60974989,
+        "parent_hash": "0x9dbedd04d7500b3653e35106a92258b251968c384124ba5e8fffbeb6cff97b9f",
+        "state_root": "0x21cb3ce49408f32fa195e55864fd049878a143cc134f0fa91c008f5d004375db",
+        "timestamp": 1757729923
+      },
+      "nonzero_slots": 5916295,
+      "generation": "7a3625f4c4ae42af91341a0b6ff55d84",
+      "state_sha256": "babe5c18ff0af073fe28e1daff7e0a8c4c79d7905c896e8d7ca62d3930f303fe",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-13 00:19:06",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 513567812,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1274348050,
+          "ExternalAggregationWritePart": 29,
+          "ExternalProcessingCompressedBytesTotal": 513567812,
+          "ExternalProcessingFilesTotal": 29,
+          "ExternalProcessingUncompressedBytesTotal": 1274348050
+        },
+        "memory_usage": 3378743983,
+        "query_duration_ms": 20197,
+        "query_id": "773e8834-b371-4598-ac06-2d463ed91a9c",
+        "read_rows": 7890245,
+        "written_rows": 5916295
+      },
+      "accounted_allocated_bytes": 15253454848,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "rust-resume1-capacity",
+      "observed_ns": 1789259827053209000,
+      "header": {
+        "hash": "0x0b5282b5d0dd9db89c9d3e4533290a62aecd8266c4f705bc41f80885f0ed2c23",
+        "number": 61974990,
+        "parent_hash": "0xfd66f51476679bbfb222b4c905096ac646f1b4dfc07ee65c241b0ff711f1ec58",
+        "state_root": "0xbe4842bbee039a504dccfc1c8cd6ab71c8ad852b94ad4b9d43b1f5596ca3b4e3",
+        "timestamp": 1758480115
+      },
+      "nonzero_slots": 5945554,
+      "generation": "b82eb5a35a0c45bd89bf4b4eff764503",
+      "state_sha256": "c87606dcf69ec05d6d261d612f1fb4cb63545c2a848882c7ae1aa87336600474",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": null,
+      "compaction_query": {
+        "event_time": "2026-09-13 00:33:19",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 537555982,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1325883583,
+          "ExternalAggregationWritePart": 42,
+          "ExternalProcessingCompressedBytesTotal": 537555982,
+          "ExternalProcessingFilesTotal": 42,
+          "ExternalProcessingUncompressedBytesTotal": 1325883583
+        },
+        "memory_usage": 3376802895,
+        "query_duration_ms": 16326,
+        "query_id": "8ec660aa-24e1-47d7-bb12-fec4b70a63cd",
+        "read_rows": 7918500,
+        "written_rows": 5945554
+      },
+      "accounted_allocated_bytes": 15140474880,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "rust-deadline-capacity",
+      "observed_ns": 1789260891808825000,
+      "header": {
+        "hash": "0x8c2306aa858b3802c78b961c3eb4745f06a658025c6394987538bf155f317846",
+        "number": 62974990,
+        "parent_hash": "0x15cae7f5d5a59fd03a206d8cc2cec4ee8544fe9af19b782cfb1d64d5c27879d6",
+        "state_root": "0x6a3897cc87cb7c304ed4e0a92e9e775b79705ec2e2059f8b0c74f1c0551ed7fc",
+        "timestamp": 1759230299
+      },
+      "nonzero_slots": 5982029,
+      "generation": "882101e05ae547ab9e3b3bd29dc06497",
+      "state_sha256": "fbdfeb9b81d20137e68df3b210d27ba76aac61d24109c41904a2d375ad3d2d54",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 436228603,
+        "active_storage_rows": 5982029,
+        "generation": "882101e05ae547ab9e3b3bd29dc06497",
+        "inactive_part_bytes": 0,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2962,
+            "part_bytes": 3471,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 436185214,
+            "part_bytes": 436225132,
+            "parts": 1,
+            "rows": 5982029,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 00:41:07",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 532067182,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1314530862,
+          "ExternalAggregationWritePart": 46,
+          "ExternalProcessingCompressedBytesTotal": 532067182,
+          "ExternalProcessingFilesTotal": 46,
+          "ExternalProcessingUncompressedBytesTotal": 1314530862
+        },
+        "memory_usage": 3512935611,
+        "query_duration_ms": 20309,
+        "query_id": "18c58218-c90f-42b0-ad5e-09e9ca57ecc4",
+        "read_rows": 7946838,
+        "written_rows": 5982029
+      },
+      "accounted_allocated_bytes": 13103149056,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "rust-deadline-capacity",
+      "observed_ns": 1789261401998303000,
+      "header": {
+        "hash": "0x04f4e81cab82dbb7a0f04f4ecbcf127cd175f1a419cbf0b4ed9dece7314f6ee8",
+        "number": 63974990,
+        "parent_hash": "0x017eef3af2ccc1c86ff1445c341bdf821bd0999f9e1eeea21602ba035468be68",
+        "state_root": "0x34d308a813bf5cf5966830d6aca12138100024cb0250e8c86964589a22898570",
+        "timestamp": 1759980668
+      },
+      "nonzero_slots": 6033904,
+      "generation": "1ff790a919ae4e06aef99667083aa454",
+      "state_sha256": "d7adf473522d93f6e6d914e208d4d05341f76e0f4b67e6060f09f6a083c95119",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 440075379,
+        "active_storage_rows": 6033904,
+        "generation": "1ff790a919ae4e06aef99667083aa454",
+        "inactive_part_bytes": 443941920,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2961,
+            "part_bytes": 3470,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 443895223,
+            "part_bytes": 443941920,
+            "parts": 6,
+            "rows": 6033904,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 440031749,
+            "part_bytes": 440071909,
+            "parts": 1,
+            "rows": 6033904,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 01:02:32",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 557441270,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1369793492,
+          "ExternalAggregationWritePart": 39,
+          "ExternalProcessingCompressedBytesTotal": 557441270,
+          "ExternalProcessingFilesTotal": 39,
+          "ExternalProcessingUncompressedBytesTotal": 1369793492
+        },
+        "memory_usage": 3381121017,
+        "query_duration_ms": 15192,
+        "query_id": "61aa5e3f-f579-4e61-bb2f-927ebad444ef",
+        "read_rows": 7983735,
+        "written_rows": 6033904
+      },
+      "accounted_allocated_bytes": 16563249152,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "chunk-five-million-capacity",
+      "observed_ns": 1789261612268619000,
+      "header": {
+        "hash": "0x4de373a878177b06fd24048fdbe8f9ba849297aa57bd95a228954d696eebb782",
+        "number": 63974991,
+        "parent_hash": "0x04f4e81cab82dbb7a0f04f4ecbcf127cd175f1a419cbf0b4ed9dece7314f6ee8",
+        "state_root": "0x1aa9493c083f161fd4d88f3540ade82e6ea0ee9cdb315cd772f5b193cd567029",
+        "timestamp": 1759980669
+      },
+      "nonzero_slots": 6033904,
+      "generation": "7a1627a24bbb4de796bc8538df4629a6",
+      "state_sha256": "0b92e288e06f3d8951c853a6d6b3813cf1b16409065ec74ecd95c7b9272a81ac",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 440075333,
+        "active_storage_rows": 6033904,
+        "generation": "7a1627a24bbb4de796bc8538df4629a6",
+        "inactive_part_bytes": 443948422,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2965,
+            "part_bytes": 3474,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 443901677,
+            "part_bytes": 443948422,
+            "parts": 6,
+            "rows": 6033904,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 440031681,
+            "part_bytes": 440071859,
+            "parts": 1,
+            "rows": 6033904,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 01:06:15",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 473339238,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1195956994,
+          "ExternalAggregationWritePart": 30,
+          "ExternalProcessingCompressedBytesTotal": 473339238,
+          "ExternalProcessingFilesTotal": 30,
+          "ExternalProcessingUncompressedBytesTotal": 1195956994
+        },
+        "memory_usage": 3461194022,
+        "query_duration_ms": 8749,
+        "query_id": "7206ddeb-10c0-41c7-a0f9-fe45161c91b0",
+        "read_rows": 6033906,
+        "written_rows": 6033904
+      },
+      "accounted_allocated_bytes": 13709004800,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-bind-five-million-capacity",
+      "observed_ns": 1789264069184947000,
+      "header": {
+        "hash": "0x863d2ffc03f3698aad6346c06f4f24c77396e6df9b36fd2a53712f113b763f83",
+        "number": 66146986,
+        "parent_hash": "0x4ce7f9ce652433cb16d525f723852ee398c29b481b00b68cb39daa5ff0f77078",
+        "state_root": "0x7b1eb7668284e727defb41dd4f7b728652fdf978e19a0daafb4426744fd62e79",
+        "timestamp": 1761611090
+      },
+      "nonzero_slots": 7220161,
+      "generation": "5e17e6a261d044b192e54ab409b01f49",
+      "state_sha256": "a8e57028b329f38736c6aa50c546f3a6681183ab1e67fc2bc9c8fa522bd4654a",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 523728393,
+        "active_storage_rows": 7220161,
+        "generation": "5e17e6a261d044b192e54ab409b01f49",
+        "inactive_part_bytes": 470061193,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2973,
+            "part_bytes": 3482,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 470012107,
+            "part_bytes": 470061193,
+            "parts": 6,
+            "rows": 6430426,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 523675620,
+            "part_bytes": 523724911,
+            "parts": 2,
+            "rows": 7220161,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 01:47:18",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 688414901,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1678023484,
+          "ExternalAggregationWritePart": 38,
+          "ExternalProcessingCompressedBytesTotal": 688414901,
+          "ExternalProcessingFilesTotal": 38,
+          "ExternalProcessingUncompressedBytesTotal": 1678023484
+        },
+        "memory_usage": 3388765507,
+        "query_duration_ms": 23106,
+        "query_id": "13e1ce78-ee91-4cb3-8514-55497e60eb17",
+        "read_rows": 10378482,
+        "written_rows": 7220161
+      },
+      "accounted_allocated_bytes": 18493800448,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-stage-five-million-capacity",
+      "observed_ns": 1789265449745202000,
+      "header": {
+        "hash": "0xe53b0bcbdc7287858bb68f35b791be1928357e314064ab1546c59618602554d7",
+        "number": 67735079,
+        "parent_hash": "0x9a95a2477c6760695e4aaf07a013ec1458d08fba3f6becfc239b98c0df909edb",
+        "state_root": "0xe70fc3c21ea4708737182d4180ffcac4e42a4f3e37a745f02249e58af21def8c",
+        "timestamp": 1762802313
+      },
+      "nonzero_slots": 7438253,
+      "generation": "f5116d3549b34e6dbcc7cb1cc49f7989",
+      "state_sha256": "315e2b19ab5fe900d4ab3afe58d44b4c046b42c56eca559d19b4331e18dd2d2b",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 540500902,
+        "active_storage_rows": 7438253,
+        "generation": "f5116d3549b34e6dbcc7cb1cc49f7989",
+        "inactive_part_bytes": 472247704,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2961,
+            "part_bytes": 3470,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 472198423,
+            "part_bytes": 472247704,
+            "parts": 6,
+            "rows": 6449797,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 540446823,
+            "part_bytes": 540497432,
+            "parts": 2,
+            "rows": 7438253,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 02:10:17",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 692254751,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1705398912,
+          "ExternalAggregationWritePart": 40,
+          "ExternalProcessingCompressedBytesTotal": 692254751,
+          "ExternalProcessingFilesTotal": 40,
+          "ExternalProcessingUncompressedBytesTotal": 1705398912
+        },
+        "memory_usage": 3483984129,
+        "query_duration_ms": 17772,
+        "query_id": "adc6ee69-305b-4ab5-8acc-36d1a5aa778f",
+        "read_rows": 10397985,
+        "written_rows": 7438253
+      },
+      "accounted_allocated_bytes": 15480369152,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "host-stage-five-million-capacity",
+      "observed_ns": 1789266620739512000,
+      "header": {
+        "hash": "0xc4750c4b049339d4d548869132b0eb686546374bf1f0dd62adf387c08c51447d",
+        "number": 72735079,
+        "parent_hash": "0x5b3a699075ceb728998c4ca7d54a87a0f870a28d719537d06f8b0e0c29377efa",
+        "state_root": "0x5ae77c636ce70164db85fdb8e97f94168d1f5fc4dc08551ce4a81946606b72ba",
+        "timestamp": 1766553332
+      },
+      "nonzero_slots": 7884601,
+      "generation": "69582fa5b4f24bbd8db4039edc4c3c98",
+      "state_sha256": "0ae99a7d85611c863d3a4cd0cfa29f08b9faae37194e1524ac9167d9dafad541",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 573474771,
+        "active_storage_rows": 7884601,
+        "generation": "69582fa5b4f24bbd8db4039edc4c3c98",
+        "inactive_part_bytes": 471340313,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2965,
+            "part_bytes": 3474,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 471291168,
+            "part_bytes": 471340313,
+            "parts": 6,
+            "rows": 6435550,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 573416119,
+            "part_bytes": 573471297,
+            "parts": 3,
+            "rows": 7884601,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 02:29:41",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 764235159,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1869747367,
+          "ExternalAggregationWritePart": 41,
+          "ExternalProcessingCompressedBytesTotal": 764235159,
+          "ExternalProcessingFilesTotal": 41,
+          "ExternalProcessingUncompressedBytesTotal": 1869747367
+        },
+        "memory_usage": 3390224319,
+        "query_duration_ms": 25806,
+        "query_id": "de8f5304-2d90-4222-b3e0-155e86806e2e",
+        "read_rows": 17438253,
+        "written_rows": 7884601
+      },
+      "accounted_allocated_bytes": 20584550400,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-five-million-capacity",
+      "observed_ns": 1789268061318539000,
+      "header": {
+        "hash": "0x727cb85b788ab0fb33c18368f731e3a20e18c6f62e25285fea485478f8c6beda",
+        "number": 77735079,
+        "parent_hash": "0x61b68240083050969bcaf7882282e6bd2aba9fcc5034033cec9fded4e59bddbf",
+        "state_root": "0x7a51ad8ffae8ef2627a3805fdb227b74205f028358ea123e8a2eb2514e93f9db",
+        "timestamp": 1769526121
+      },
+      "nonzero_slots": 8165197,
+      "generation": "e94d56a86d134850ab51df9c2dbabe11",
+      "state_sha256": "09952a730434bfd0d1e6914c09409dda64d45240a5056b85ea750adcdc295f31",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 594269653,
+        "active_storage_rows": 8165197,
+        "generation": "e94d56a86d134850ab51df9c2dbabe11",
+        "inactive_part_bytes": 462587113,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2956,
+            "part_bytes": 3465,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 462538759,
+            "part_bytes": 462587113,
+            "parts": 6,
+            "rows": 6313474,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 594209501,
+            "part_bytes": 594266188,
+            "parts": 3,
+            "rows": 8165197,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 02:53:31",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 803364881,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1972635600,
+          "ExternalAggregationWritePart": 50,
+          "ExternalProcessingCompressedBytesTotal": 803364881,
+          "ExternalProcessingFilesTotal": 50,
+          "ExternalProcessingUncompressedBytesTotal": 1972635600
+        },
+        "memory_usage": 3412201937,
+        "query_duration_ms": 23843,
+        "query_id": "52a30b7a-1e45-4e2a-b4b1-16e379ea5f01",
+        "read_rows": 17884601,
+        "written_rows": 8165197
+      },
+      "accounted_allocated_bytes": 19965476864,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-capacity",
+      "observed_ns": 1789269021633258000,
+      "header": {
+        "hash": "0xdec9ff112da17b5df4415a45505200d1b4cf980df41322866b462cb51a32bffa",
+        "number": 82735079,
+        "parent_hash": "0x10a79669e9819657d033d87a09219fafc1846f335373934eb95b2245b7e748e4",
+        "state_root": "0xfcef359936db5ebd57956037a2c64601327ecd70aeb0814c707425b946673229",
+        "timestamp": 1771776586
+      },
+      "nonzero_slots": 8377851,
+      "generation": "e14f78bef3ee47899403b16a1e44cea8",
+      "state_sha256": "f45015f5b4ee745bca23f415aeeb187a0eafd52edcef7f5e8a04b6269493d909",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 609899361,
+        "active_storage_rows": 8377851,
+        "generation": "e14f78bef3ee47899403b16a1e44cea8",
+        "inactive_part_bytes": 469982540,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2962,
+            "part_bytes": 3471,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 469933354,
+            "part_bytes": 469982540,
+            "parts": 6,
+            "rows": 6413007,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 609837800,
+            "part_bytes": 609895890,
+            "parts": 3,
+            "rows": 8377851,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 03:09:37",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 816041143,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 2010639572,
+          "ExternalAggregationWritePart": 50,
+          "ExternalProcessingCompressedBytesTotal": 816041143,
+          "ExternalProcessingFilesTotal": 50,
+          "ExternalProcessingUncompressedBytesTotal": 2010639572
+        },
+        "memory_usage": 3446359996,
+        "query_duration_ms": 21894,
+        "query_id": "a35002cc-178a-4baf-917f-15efde7746f8",
+        "read_rows": 18165199,
+        "written_rows": 8377851
+      },
+      "accounted_allocated_bytes": 19149918208,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-capacity",
+      "observed_ns": 1789269772004954000,
+      "header": {
+        "hash": "0xf431b28e6f7c9c438c93753185d67f1e7e3f20139a8555c2d2ad2e925dae8e14",
+        "number": 87735079,
+        "parent_hash": "0x0a45ad8ed2d7edc8b82568004c1b8c5a1e78d3467309cd477c936991e9a1b897",
+        "state_root": "0x6247da12ddb56c1e51bde0ba4aa6452f9afe5214f2f8dd622703b3ca84d38db8",
+        "timestamp": 1774029380
+      },
+      "nonzero_slots": 8499526,
+      "generation": "0bd11a9d00e24e0c9e4f7cd11363315a",
+      "state_sha256": "73172591ff9e68de2b26de2179459ef3e0c0093d929f7018f5da37891ca232cb",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 618998838,
+        "active_storage_rows": 8499526,
+        "generation": "0bd11a9d00e24e0c9e4f7cd11363315a",
+        "inactive_part_bytes": 467243343,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2965,
+            "part_bytes": 3474,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 467194668,
+            "part_bytes": 467243343,
+            "parts": 6,
+            "rows": 6373297,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 618936659,
+            "part_bytes": 618995364,
+            "parts": 3,
+            "rows": 8499526,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 03:21:58",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 814411415,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 2012033688,
+          "ExternalAggregationWritePart": 50,
+          "ExternalProcessingCompressedBytesTotal": 814411415,
+          "ExternalProcessingFilesTotal": 50,
+          "ExternalProcessingUncompressedBytesTotal": 2012033688
+        },
+        "memory_usage": 3359628740,
+        "query_duration_ms": 21095,
+        "query_id": "5e667dfc-2a70-4c9b-b85c-c6beeafb2ec1",
+        "read_rows": 18377851,
+        "written_rows": 8499526
+      },
+      "accounted_allocated_bytes": 18029477888,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-resume-1-capacity",
+      "observed_ns": 1789270072454503000,
+      "header": {
+        "hash": "0xe024bfbe02d2a9c944741795f0a22b441dc648159c9313292a56ed732a45ad10",
+        "number": 87735971,
+        "parent_hash": "0xb730aa940c63ca76dc849b5ad4b97147c36d3de37d783d785e6781090e28bd4f",
+        "state_root": "0x99b23f662df391aa34e07be86b4a40c70647195afcefc649db18e06036ae22c6",
+        "timestamp": 1774029782
+      },
+      "nonzero_slots": 8499544,
+      "generation": "7e956dae74234d3dbbcb5a6c625dc784",
+      "state_sha256": "a1e047ecdc521ce25d76de4cd8da9656a9bbd36344bc6b4e0dbcf46490aa57be",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 618996083,
+        "active_storage_rows": 8499544,
+        "generation": "7e956dae74234d3dbbcb5a6c625dc784",
+        "inactive_part_bytes": 467241003,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2961,
+            "part_bytes": 3470,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 467192314,
+            "part_bytes": 467241003,
+            "parts": 6,
+            "rows": 6373167,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 618933963,
+            "part_bytes": 618992613,
+            "parts": 3,
+            "rows": 8499544,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 03:27:14",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 661753320,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1684805546,
+          "ExternalAggregationWritePart": 40,
+          "ExternalProcessingCompressedBytesTotal": 661753320,
+          "ExternalProcessingFilesTotal": 40,
+          "ExternalProcessingUncompressedBytesTotal": 1684805546
+        },
+        "memory_usage": 3548353308,
+        "query_duration_ms": 11933,
+        "query_id": "6337bf67-a3e5-43e6-b0ba-7da88200a7d8",
+        "read_rows": 8501310,
+        "written_rows": 8499544
+      },
+      "accounted_allocated_bytes": 12737622016,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-resume-1-capacity",
+      "observed_ns": 1789270822687105000,
+      "header": {
+        "hash": "0x08ec0246eb2b47f7bbbe7b746049fa615eb067bccf4d769abda7797a9683f540",
+        "number": 92735971,
+        "parent_hash": "0x5235a33ef7ce904ceb08c3fa6133ba244de6365e5e1899d3cde7f2fd31bbce59",
+        "state_root": "0xa282b92ab3fd2263cb6066925ba424e1aa90ef28bd762026cbbde6c85be0e613",
+        "timestamp": 1776282161
+      },
+      "nonzero_slots": 8559313,
+      "generation": "7b163e64f63744c9bb17e65c7fb5ac8b",
+      "state_sha256": "757cd069c18951669be2cf2bd1b96505469d219016832a9b004ace89c1c45a32",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 623620511,
+        "active_storage_rows": 8559313,
+        "generation": "7b163e64f63744c9bb17e65c7fb5ac8b",
+        "inactive_part_bytes": 470736358,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2967,
+            "part_bytes": 3476,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 470687356,
+            "part_bytes": 470736358,
+            "parts": 6,
+            "rows": 6418125,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 623557925,
+            "part_bytes": 623617035,
+            "parts": 3,
+            "rows": 8559313,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 03:39:42",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 823304002,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 2035438516,
+          "ExternalAggregationWritePart": 50,
+          "ExternalProcessingCompressedBytesTotal": 823304002,
+          "ExternalProcessingFilesTotal": 50,
+          "ExternalProcessingUncompressedBytesTotal": 2035438516
+        },
+        "memory_usage": 3577618232,
+        "query_duration_ms": 19838,
+        "query_id": "3cd9e4f2-5827-4aec-9c05-3973b1ad1425",
+        "read_rows": 18500716,
+        "written_rows": 8559313
+      },
+      "accounted_allocated_bytes": 17839542272,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-resume-1-capacity",
+      "observed_ns": 1789271603017574000,
+      "header": {
+        "hash": "0x4aaa31af986b8bd4dc08babaeb395eb99891371df1d643d502fa7ec8c5c9a93e",
+        "number": 97735971,
+        "parent_hash": "0xb981321e07dda866e43901dfc60841e53d4797fd397950141d01f34a2993b5f6",
+        "state_root": "0x0402473f4f4e192cb912034dc5f0aabec96a9c6e94a89a30ebaecc53ebca4bb4",
+        "timestamp": 1778535176
+      },
+      "nonzero_slots": 8668777,
+      "generation": "f5209c33f73f4ee48cca1986993293a1",
+      "state_sha256": "ac24936d6c37d575a7ee879eea04565d3005e9951b9d469f49b5b48d2781e612",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 632051665,
+        "active_storage_rows": 8668777,
+        "generation": "f5209c33f73f4ee48cca1986993293a1",
+        "inactive_part_bytes": 467022335,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2969,
+            "part_bytes": 3478,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 466973574,
+            "part_bytes": 467022335,
+            "parts": 6,
+            "rows": 6364767,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 631986784,
+            "part_bytes": 632048187,
+            "parts": 4,
+            "rows": 8668777,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 03:52:28",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 815066066,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 2016690510,
+          "ExternalAggregationWritePart": 48,
+          "ExternalProcessingCompressedBytesTotal": 815066066,
+          "ExternalProcessingFilesTotal": 48,
+          "ExternalProcessingUncompressedBytesTotal": 2016690510
+        },
+        "memory_usage": 3441934632,
+        "query_duration_ms": 20948,
+        "query_id": "4b313910-c9a7-4c6a-80bc-7b57fa4a6a4c",
+        "read_rows": 18559313,
+        "written_rows": 8668777
+      },
+      "accounted_allocated_bytes": 17747173376,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-resume-2-capacity",
+      "observed_ns": 1789271843337336000,
+      "header": {
+        "hash": "0x842c298425211469c5094fcddae962be68c8a5938ff48fe23fe7ca0439e11462",
+        "number": 97735972,
+        "parent_hash": "0x4aaa31af986b8bd4dc08babaeb395eb99891371df1d643d502fa7ec8c5c9a93e",
+        "state_root": "0xf17748f2f3e8d348b69d1fd6b6c9ca48b5dabd6cc6d4306d48065332527763c7",
+        "timestamp": 1778535177
+      },
+      "nonzero_slots": 8668777,
+      "generation": "3284f15bd73640428fd1b96195f13ab0",
+      "state_sha256": "74d7a33ed8cd378c22fd340426d762f639b0aab90e1bab5e61c6f92154c1c98f",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 632098968,
+        "active_storage_rows": 8668777,
+        "generation": "3284f15bd73640428fd1b96195f13ab0",
+        "inactive_part_bytes": 464514433,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2976,
+            "part_bytes": 3485,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 464465825,
+            "part_bytes": 464514433,
+            "parts": 6,
+            "rows": 6330679,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 632034166,
+            "part_bytes": 632095483,
+            "parts": 4,
+            "rows": 8668777,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 03:56:38",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 675374058,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1718056574,
+          "ExternalAggregationWritePart": 40,
+          "ExternalProcessingCompressedBytesTotal": 675374058,
+          "ExternalProcessingFilesTotal": 40,
+          "ExternalProcessingUncompressedBytesTotal": 1718056574
+        },
+        "memory_usage": 3556283729,
+        "query_duration_ms": 12083,
+        "query_id": "c294d341-6efe-46be-9d44-e6eaf6caa7c6",
+        "read_rows": 8668779,
+        "written_rows": 8668777
+      },
+      "accounted_allocated_bytes": 12816891904,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-resume-2-capacity",
+      "observed_ns": 1789272683625384000,
+      "header": {
+        "hash": "0x415f8b4cff2508476606549edaaa12f23a5979483f2f19e54c10f5356e6a0932",
+        "number": 102735972,
+        "parent_hash": "0x7b0aef3d309fe57dc7fbe4eae889ee30a8523243e3919fdff5a47b5c9c29a5e7",
+        "state_root": "0xc54b6c119ba34da6d5eef125617eddf9e7666f7867a287463e5a7bf18cd2db26",
+        "timestamp": 1780788544
+      },
+      "nonzero_slots": 8804313,
+      "generation": "366ba6be68674fd69835760bee2a347f",
+      "state_sha256": "cec85be8925bc12e9050555239e2a67addbe31a827a6124a54b927e18dcbd8a1",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 642026253,
+        "active_storage_rows": 8804313,
+        "generation": "366ba6be68674fd69835760bee2a347f",
+        "inactive_part_bytes": 469329698,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2971,
+            "part_bytes": 3480,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 469280641,
+            "part_bytes": 469329698,
+            "parts": 6,
+            "rows": 6395943,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 641960494,
+            "part_bytes": 642022773,
+            "parts": 4,
+            "rows": 8804313,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 04:10:36",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 856291267,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 2110381050,
+          "ExternalAggregationWritePart": 50,
+          "ExternalProcessingCompressedBytesTotal": 856291267,
+          "ExternalProcessingFilesTotal": 50,
+          "ExternalProcessingUncompressedBytesTotal": 2110381050
+        },
+        "memory_usage": 3474033597,
+        "query_duration_ms": 20931,
+        "query_id": "8a50437b-a61d-4c86-993c-d2d317f01d47",
+        "read_rows": 18668779,
+        "written_rows": 8804313
+      },
+      "accounted_allocated_bytes": 17987440640,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-resume-3-capacity",
+      "observed_ns": 1789272954067939000,
+      "header": {
+        "hash": "0x506c8151bfe595e11f701dbf46756d53912cbe4ae1e354e48dbdd63780606ca0",
+        "number": 102736996,
+        "parent_hash": "0x686d002df0b8285285ecbeb46ee00504a86d89e539623562794f60c33a47a969",
+        "state_root": "0x0cb966486724dc618060bf07e1171a1209490820019ad3e3ab15bb7e55380d86",
+        "timestamp": 1780789005
+      },
+      "nonzero_slots": 8804287,
+      "generation": "bceb057775d44f229883584634510bc7",
+      "state_sha256": "5a77851d92886a557cb8a6f4c340fb2f9f9b3e8d9bf8aa7da80b4b769105692e",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 642021935,
+        "active_storage_rows": 8804287,
+        "generation": "bceb057775d44f229883584634510bc7",
+        "inactive_part_bytes": 469326097,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2959,
+            "part_bytes": 3468,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 469277114,
+            "part_bytes": 469326097,
+            "parts": 6,
+            "rows": 6395752,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 641956234,
+            "part_bytes": 642018467,
+            "parts": 4,
+            "rows": 8804287,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 04:14:51",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 686163139,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1745165513,
+          "ExternalAggregationWritePart": 40,
+          "ExternalProcessingCompressedBytesTotal": 686163139,
+          "ExternalProcessingFilesTotal": 40,
+          "ExternalProcessingUncompressedBytesTotal": 1745165513
+        },
+        "memory_usage": 3528053703,
+        "query_duration_ms": 12611,
+        "query_id": "190281db-b905-4e10-b600-9467ad3b2332",
+        "read_rows": 8806361,
+        "written_rows": 8804287
+      },
+      "accounted_allocated_bytes": 12615012352,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-resume-3-capacity",
+      "observed_ns": 1789273824334036000,
+      "header": {
+        "hash": "0x0d04815c824d5da658bdd4b21b775faf7c6a3291449a172eaef0d57ac4005537",
+        "number": 107736996,
+        "parent_hash": "0x05282cdb7007739cebc2d97b1861460d874019036f48338edb169d3c79fc1221",
+        "state_root": "0x324ad8d15c40b9c4e8e1b043add0edd3e424bf50e642979d7957ca484d54fbf2",
+        "timestamp": 1783040410
+      },
+      "nonzero_slots": 8998363,
+      "generation": "4ae222fafa5445c3930eeb86850671eb",
+      "state_sha256": "270209f22e1398aa7ab265caa49cc8077341d57c9538516395c345a8a08aa259",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 656955736,
+        "active_storage_rows": 8998363,
+        "generation": "4ae222fafa5445c3930eeb86850671eb",
+        "inactive_part_bytes": 464633914,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2962,
+            "part_bytes": 3471,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 464585475,
+            "part_bytes": 464633914,
+            "parts": 6,
+            "rows": 6325785,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 656888937,
+            "part_bytes": 656952265,
+            "parts": 4,
+            "rows": 8998363,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 04:29:31",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 879561962,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 2161018798,
+          "ExternalAggregationWritePart": 50,
+          "ExternalProcessingCompressedBytesTotal": 879561962,
+          "ExternalProcessingFilesTotal": 50,
+          "ExternalProcessingUncompressedBytesTotal": 2161018798
+        },
+        "memory_usage": 3407365375,
+        "query_duration_ms": 21170,
+        "query_id": "2fa148b4-d35c-48e6-8d98-49a0471733e1",
+        "read_rows": 18806335,
+        "written_rows": 8998363
+      },
+      "accounted_allocated_bytes": 17971355648,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-tail-capacity",
+      "observed_ns": 1789274124669713000,
+      "header": {
+        "hash": "0x7dbdfb328bf18d33e33c8f18f94a8156b3ed720554b32ac8f96a220c5ff268c6",
+        "number": 107736997,
+        "parent_hash": "0x0d04815c824d5da658bdd4b21b775faf7c6a3291449a172eaef0d57ac4005537",
+        "state_root": "0x9f3dbea26b38ee7a20b593ca8e03d60a9ba0721ad525d767e413cd3ea98cfb2b",
+        "timestamp": 1783040411
+      },
+      "nonzero_slots": 8998364,
+      "generation": "b28b16e71d79448bba6dab5f0fd061f9",
+      "state_sha256": "33827861818689ab899c5cc2a5b1fb1c4d76f94b3c9ae7ae54741873ee918edd",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 656957674,
+        "active_storage_rows": 8998364,
+        "generation": "b28b16e71d79448bba6dab5f0fd061f9",
+        "inactive_part_bytes": 464594824,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2962,
+            "part_bytes": 3471,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 464546325,
+            "part_bytes": 464594824,
+            "parts": 6,
+            "rows": 6325208,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 656890947,
+            "part_bytes": 656954203,
+            "parts": 4,
+            "rows": 8998364,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 04:34:50",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 701560750,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 1783314064,
+          "ExternalAggregationWritePart": 40,
+          "ExternalProcessingCompressedBytesTotal": 701560750,
+          "ExternalProcessingFilesTotal": 40,
+          "ExternalProcessingUncompressedBytesTotal": 1783314064
+        },
+        "memory_usage": 3648313142,
+        "query_duration_ms": 12266,
+        "query_id": "0b2efb7c-51f7-47cd-ba76-fca46ddf1420",
+        "read_rows": 8998365,
+        "written_rows": 8998364
+      },
+      "accounted_allocated_bytes": 12565254144,
+      "retained_original_volume_reserve_bytes": 1742835712
+    },
+    {
+      "phase": "streaming-final-tail-capacity",
+      "observed_ns": 1789276585187407000,
+      "header": {
+        "hash": "0xf43b443b232e80eb91597a4c7fa38b055cd713a8cc88b0c5382cf9d765ae6737",
+        "number": 121466775,
+        "parent_hash": "0x22121952c52f72de3b0b2488ad9eea3354d05512202f852342a24be8ed12185d",
+        "state_root": "0x2fbfb4715ef0c1abf683d463d6782301ced0b16e71d14140d4d8c7089f30967b",
+        "timestamp": 1789221911
+      },
+      "nonzero_slots": 9718240,
+      "generation": "f94519bb0db54495a8f04d02518816f3",
+      "state_sha256": "69e4de92ba2ac3a23a8c1e9e614d201718c9f4122af9d16fb65470495711cc1b",
+      "run_id": "62b4938ec1554bc093644232ef4b469d",
+      "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+      "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+      "generation_parts": {
+        "active_manifest_rows": 1,
+        "active_part_bytes": 711535474,
+        "active_storage_rows": 9718240,
+        "generation": "f94519bb0db54495a8f04d02518816f3",
+        "inactive_part_bytes": 469409887,
+        "parts": [
+          {
+            "active": 1,
+            "compressed_bytes": 2952,
+            "part_bytes": 3461,
+            "parts": 1,
+            "rows": 1,
+            "table": "bootstrap_generations"
+          },
+          {
+            "active": 0,
+            "compressed_bytes": 469361166,
+            "part_bytes": 469409887,
+            "parts": 6,
+            "rows": 6375023,
+            "table": "bootstrap_storage"
+          },
+          {
+            "active": 1,
+            "compressed_bytes": 711462703,
+            "part_bytes": 711532013,
+            "parts": 5,
+            "rows": 9718240,
+            "table": "bootstrap_storage"
+          }
+        ],
+        "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+      },
+      "compaction_query": {
+        "event_time": "2026-09-13 05:15:27",
+        "exception_code": 0,
+        "external_events": {
+          "ExternalAggregationCompressedBytes": 1306107948,
+          "ExternalAggregationMerge": 1,
+          "ExternalAggregationUncompressedBytes": 3131859307,
+          "ExternalAggregationWritePart": 71,
+          "ExternalProcessingCompressedBytesTotal": 1306107948,
+          "ExternalProcessingFilesTotal": 71,
+          "ExternalProcessingUncompressedBytesTotal": 3131859307
+        },
+        "memory_usage": 3384192137,
+        "query_duration_ms": 41228,
+        "query_id": "a02f7bae-1f9e-4cfa-805d-93a989725a55",
+        "read_rows": 36457920,
+        "written_rows": 9718240
+      },
+      "accounted_allocated_bytes": 30084788224,
+      "retained_original_volume_reserve_bytes": 1742835712
+    }
+  ],
+  "retained_original_volume_reserve_bytes": 1742835712,
+  "overall_budget_bytes": 100000000000,
+  "observed_replay_peak_including_reserve_bytes": 32947503104,
+  "limitations": [
+    "Historical enumeration began under the retired Python wrapper and continued under Rust; the original WASM package and source identity remained frozen throughout",
+    "All retained capacity summaries are included, including failed and deliberately interrupted phases; successful later phases do not turn earlier failures into passes",
+    "Growth observations describe checksummed private prefixes; completeness is established by the final full checkpoint proof",
+    "Whole-directory samples include shared qualification data, runtime files and temporary workspace; private-generation part bytes are a narrower metric",
+    "The capacity cap is a sampled operating guard, not a hard filesystem quota or a guarantee for the unavailable customer account list",
+    "Current-package continuation, full paginated read/export/restore and hot-state retention remain separately measured acceptance steps"
+  ]
+}

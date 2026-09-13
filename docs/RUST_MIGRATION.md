@@ -50,6 +50,15 @@ failure after later data insertion but before cursor persistence.
 
 ## Completed real Rust measurements
 
+- [Full WBNB bootstrap](evidence/bsc-wbnb-bootstrap-rust-2026-09-13.json): Rust
+  verified all 9,718,240 nonzero slots, account metadata and bytecode at block
+  121466775 before publishing checkpoint `b18c1a13be41415f906209b5535e9b11`.
+  The proof phase completed in 166 seconds without rejected capacity samples.
+  The final replay interval also completed, with an observed 32.95 GB peak
+  including the retained original-volume reserve. Earlier stopped phases and
+  99 private-prefix growth observations remain in the record. Historical replay
+  began under the previous wrapper and retained its original frozen package;
+  this result is not qualification of the missing customer account list.
 - [Customer example](evidence/bsc-customer-example-rust-2026-09-12.json): Rust
   accepted the complete historical 8,156-slot state, continued 57,867 blocks with
   the rebuilt package, proved all 8,157 returned slots and exported/restored that

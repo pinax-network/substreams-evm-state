@@ -4,6 +4,12 @@ Status: prototype, 2026-09-12. **Do not publish v0.1.0 yet.** This records curre
 evidence and preserves the four original deliverables; partial coverage does not
 make an entire deliverable complete.
 
+Update, 2026-09-13: the [full historical WBNB bootstrap](evidence/bsc-wbnb-bootstrap-rust-2026-09-13.json)
+has passed complete Rust storage/account/bytecode proof verification at block
+121466775, with 9,718,240 nonzero slots. Hot-state read/export/restore and retention
+acceptance are still in progress. The older progress entries below remain a
+record of the same replay's intermediate, unverified states.
+
 | Deliverable | Evidence in this prototype | Remaining acceptance work |
 |---|---|---|
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication; 15-minute finalized follow; measured complete pinned reads; fixed finalized decode/spool latency; persistent OS host identity and explicit legacy hostname recovery | Customer latency targets and deployment conditions; storage must honor sync writes (physical host power loss is not emulated) |
