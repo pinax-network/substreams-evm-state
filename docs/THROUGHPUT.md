@@ -228,11 +228,15 @@ hashes. Do not copy API keys or cursor tokens into public evidence.
 
 ## Cost model
 
-Pinax's [published prices](https://pinax.network/pricing), checked September 12,
+Pinax's [published prices](https://pinax.network/pricing), checked September 13,
 2026, are **$150 per TiB of Substreams egress** and **$1.75 per million processed
 blocks**, in USD. A TiB is 1,099,511,627,776 bytes. The listed Pro plan is $49/month
 with $200 of included resource usage; resource cost and the subscription invoice
 are different quantities.
+
+The published Pro plan lists 50 Substreams workers. The 200-worker measurements
+in this report reflect the allocation admitted by the provider for the test
+account; plan selection must account for that difference when using these timings.
 
 For a 30-day illustration at 0.45 seconds/block, use 5,760,000 blocks:
 
