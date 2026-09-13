@@ -1,0 +1,97 @@
+{
+  "format_version": 1,
+  "qualification": "Current-package WBNB continuation with full inherited-state proof",
+  "runtime_source_commit": "f118424ebbec2490e8fc5e0040d4c481ecb1e03d",
+  "runtime_sha256": "7f3208cc6bbf1c4825c545429a2783c0cd51aaea3c01da9685a08edf2f6235dd",
+  "base_evidence": "bsc-wbnb-bootstrap-rust-2026-09-13.json",
+  "ingestion_evidence": "bsc-wbnb-continuation-staged-rust-2026-09-12.json",
+  "manifest": {
+    "account_count": 1,
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "base_snapshot": "b18c1a13be41415f906209b5535e9b11",
+    "chain_id": 56,
+    "created_at": 1789276950760412000,
+    "format_version": 1,
+    "header": {
+      "hash": "0x014f9de0d7aaf488230cc3c0a1e5d8ee57f619dfd794415cde2b2e22d99374d8",
+      "number": 121549935,
+      "parent_hash": "0x47d4ce1bf0f81ef819c151710019fd1c3690542c8528af4ad2799f15b852c04e",
+      "state_root": "0x8ee627de8f6d68c8317a9316929698dda3e5ec84c9b6db881b6c99679ecdb20c",
+      "timestamp": 1789259341
+    },
+    "header_trust": "provider-finalized-header",
+    "nonzero_slots": 9739339,
+    "retained_budget_bytes": 98257164288,
+    "snapshot_id": "ac2dd278e346446d9ab1d5c6d4b950df",
+    "state_sha256": "83aba7212302b5d2740c17032f70e1d7dd54efd0831d4fc5432893957d512266",
+    "status": "ready",
+    "verification": {
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c": {
+        "account_proof": "verified",
+        "nonzero_slots": 9739339,
+        "storage_root": "verified"
+      }
+    }
+  },
+  "sources": [
+    {
+      "database": "evm_wbnb_continuation_rust",
+      "start_block": 121466776,
+      "module_hash": "c6a4a3daaa47d8908d3b3e09d20341520e39463b",
+      "run_id": "11b8b247f40a427f823448a6d8d9f5b9",
+      "database_uuid": "7cb0ced4-2c9c-4936-8a0f-d06a93b3b19a",
+      "package_sha256": "07e41bd8d84435d8819b59c312e0eb985a33bb04252dbebc5dc6585c8f1b9992",
+      "accounts": [
+        "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+      ],
+      "final_blocks_only": true
+    }
+  ],
+  "account": {
+    "address": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "balance": "1587859194375171007624493",
+    "code_hash": "0xb7d84205eaaf83ce7b3940c6beaad6d22790255e34a9a2b486aa8cdfff118fe6",
+    "exists": true,
+    "header": {
+      "hash": "0x014f9de0d7aaf488230cc3c0a1e5d8ee57f619dfd794415cde2b2e22d99374d8",
+      "number": 121549935,
+      "parent_hash": "0x47d4ce1bf0f81ef819c151710019fd1c3690542c8528af4ad2799f15b852c04e",
+      "state_root": "0x8ee627de8f6d68c8317a9316929698dda3e5ec84c9b6db881b6c99679ecdb20c",
+      "timestamp": 1789259341
+    },
+    "nonce": 1,
+    "nonzero_slots": 9739339,
+    "snapshot_id": "ac2dd278e346446d9ab1d5c6d4b950df",
+    "storage_root": "0x9541ea25ca23afb3717a86e7ce0beb1071b3cebd03a936cc157e6d4b00ef497c"
+  },
+  "capacity": {
+    "command_exit_code": 0,
+    "config_sha256": "6a5d64350ef50f024d0f2d7033496d6d06dbf2d366da93936de4031896cd623a",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789276952664613000,
+    "format_version": 1,
+    "guard_samples": 5,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 6400732000,
+    "peak_observed_allocated_bytes": 14712479744,
+    "rejected_guard_stages": [],
+    "samples": 24,
+    "started_ns": 1789276820585463000,
+    "status": "completed",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "elapsed_seconds": 132.07915008,
+  "retained_original_volume_reserve_bytes": 1742835712,
+  "overall_budget_bytes": 100000000000,
+  "observed_peak_including_reserve_bytes": 16455315456,
+  "limitations": [
+    "The source interval was staged separately; this run measures checkpoint construction and complete proof acceptance using the proven historical base",
+    "Whole-directory samples include shared qualification data and workspaces; the capacity cap is a sampled operating guard",
+    "Header finality is trusted to the captured provider-finalized encoded header, not an independent BSC consensus verifier",
+    "The complete customer 19/64-account lists remain unavailable"
+  ]
+}

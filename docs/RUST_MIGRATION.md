@@ -95,8 +95,9 @@ failure after later data insertion but before cursor persistence.
 The [WBNB handoff record](evidence/wbnb-rust-handoff-2026-09-12.json) preserves
 an earlier incomplete directory-scan stop. Rust resumed the unchanged source
 identity and compacted its saved suffix from private-prefix block 56,645,978
-through durable block 56,974,989. The Rust historical replay continues toward
-121466775. No Python controller remains active for this work.
+through durable block 56,974,989. The Rust historical replay was progressing toward
+121466775 in that historical handoff record; the full proof now passes as recorded
+above. No Python controller remains active for this work.
 
 A later [Rust capacity stop and resume](evidence/wbnb-rust-capacity-resume-2026-09-12.json)
 preserves a timed-out disk scan at block 60,974,989. The compacted prefix and
@@ -109,7 +110,13 @@ is staged separately: 83,160 contiguous blocks from 121466776 through 121549935,
 with captured target proofs, validated native progress and encoded header, and
 288,345,987 logical protobuf output bytes. All three capacity phases completed
 without rejected samples. Complete-state publication still requires the pending
-historical base proof.
+historical base proof at that measurement stage. The
+[completed continuation proof](evidence/bsc-wbnb-continuation-rust-2026-09-13.json)
+now publishes block 121549935 with 9,739,339 nonzero slots in 132 seconds,
+without rejected capacity samples. A
+[complete pinned scan](evidence/bsc-wbnb-pinned-reads-rust-2026-09-13.json)
+also proves the older generation remains unchanged after newer publication and
+retention: all 9,718,240 slots match its original root across 972 pages.
 
 Growth recording now matches the destination generation at the beginning of a
 logged compaction query. The previous substring lookup also counted a later
@@ -141,8 +148,8 @@ through 77,735,079 with no rejected samples, without changing the capacity
 thresholds or accepting partial totals. Its `f118424` runtime also
 [passed all 188 CI tests](https://github.com/pinax-network/substreams-evm-state/actions/runs/34733481895).
 
-Full WBNB account-root acceptance, current-package continuation, hot-state
-export/restore and sustained-growth qualification remain release gates. The
+Full WBNB account-root acceptance and current-package continuation have passed.
+Hot-state export/restore and final retention qualification remain release gates. The
 customer's actual 19-account/76-slot list and proposed 64-account set are still
 unavailable. Keep those limits explicit in the final four-deliverable table and
 [release notes](RELEASE-v0.1.0.md). Publish v0.1.0 only after those gates and the

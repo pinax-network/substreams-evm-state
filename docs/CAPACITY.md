@@ -44,7 +44,12 @@ container scan. The container's data-byte total fell between the two host
 observations as background activity continued. The preceding larger replay
 attempt and its scan-timeout stop are retained in that record. Resumption
 compacted the saved suffix to 7,220,161 nonzero slots; this private state still
-needs its final account-root proof.
+needed its final account-root proof at that measurement stage. The later
+[complete Rust checkpoint](evidence/bsc-wbnb-bootstrap-rust-2026-09-13.json)
+verified all 9,718,240 nonzero slots at block 121466775. Its final replay phase
+completed with no rejected samples and an observed 32,947,503,104-byte peak,
+including the separate retained-volume reserve. Earlier interrupted phases
+remain failures in that evidence record.
 
 ## Storage placement and migration
 

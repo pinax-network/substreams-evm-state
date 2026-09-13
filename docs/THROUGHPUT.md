@@ -76,7 +76,10 @@ immediately after its checked private prefix. The customer source first recovere
 two local spool segments: all **78,009 blocks** between its private prefix and the
 new server session are present with continuous hashes and durable cursor coverage.
 Server session start alone therefore does not describe all data recovered during
-a native restart. These private prefixes still await their saved final proofs.
+a native restart. These were private prefixes at measurement time. The
+[customer example](evidence/bsc-customer-example-rust-2026-09-12.json) and
+[WBNB bootstrap](evidence/bsc-wbnb-bootstrap-rust-2026-09-13.json) subsequently
+passed complete proof verification at their captured targets.
 
 ## Historical chunk size
 
