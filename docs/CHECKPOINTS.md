@@ -49,11 +49,11 @@ valid durable progress and its initialized checkpoint controller.
 For a read spanning multiple requests, first protect the selected checkpoint:
 
 ```bash
-.venv/bin/evm-state --database checkpoints pin <snapshot-id> --purpose local-executor
-.venv/bin/evm-state --database checkpoints page <pin-id> --address <account> --limit 1000
-.venv/bin/evm-state --database checkpoints page <pin-id> --address <account> \
+target/release/evm-state --database checkpoints pin <snapshot-id> --purpose local-executor
+target/release/evm-state --database checkpoints page <pin-id> --address <account> --limit 1000
+target/release/evm-state --database checkpoints page <pin-id> --address <account> \
   --limit 1000 --cursor '<next-cursor>'
-.venv/bin/evm-state --database checkpoints unpin <pin-id>
+target/release/evm-state --database checkpoints unpin <pin-id>
 ```
 
 Use the returned `pin_id`. Repeat with `next_cursor` until it is null; null marks
@@ -72,11 +72,11 @@ SQL consumers must keep a pin for the full lifetime of their read.
 ## Portable export and offline verification
 
 ```bash
-.venv/bin/evm-state --database checkpoints export <snapshot-id> \
+target/release/evm-state --database checkpoints export <snapshot-id> \
   --output localdata/exports/checkpoint-1 --page-size 10000 \
   --work-dir localdata/verification
 
-.venv/bin/evm-state verify-export localdata/exports/checkpoint-1 \
+target/release/evm-state verify-export localdata/exports/checkpoint-1 \
   --expected-hash <trusted-block-hash> --work-dir localdata/verification
 ```
 
@@ -111,7 +111,7 @@ directories are not a mutable synchronization interface.
 Verify and restore into a fresh checkpoint database:
 
 ```bash
-.venv/bin/evm-state --database restored_checkpoints import-export \
+target/release/evm-state --database restored_checkpoints import-export \
   localdata/exports/checkpoint-1 --expected-hash <trusted-block-hash> \
   --work-dir localdata/verification --budget-bytes 100000000000
 ```
@@ -174,7 +174,7 @@ If `cursor.txt` is missing, empty or torn after an interrupted run, stop its nat
 writer and recover with the original immutable arguments and frozen package:
 
 ```bash
-SUBSTREAMS_SINK_DSN='<native-source-dsn>' .venv/bin/evm-state --database <source-db> \
+SUBSTREAMS_SINK_DSN='<native-source-dsn>' target/release/evm-state --database <source-db> \
   recover-cursor --package <state-dir>/package.spkg --state-dir <state-dir> \
   --endpoint <original-endpoint> --accounts <original-account-list> \
   --start-block <original-start> --checkpoint-database <checkpoint-db>
@@ -196,8 +196,8 @@ honor the configured filesystem sync operations.
 ## Checkpoint cleanup
 
 ```bash
-.venv/bin/evm-state --database checkpoints retention-plan --keep-latest 2
-.venv/bin/evm-state --database checkpoints prune-checkpoints --keep-latest 2
+target/release/evm-state --database checkpoints retention-plan --keep-latest 2
+target/release/evm-state --database checkpoints prune-checkpoints --keep-latest 2
 ```
 
 Both commands exclude active readers/exporters and publishers; they fail instead
@@ -224,9 +224,9 @@ Once a ready checkpoint covers every account of an exact native source, stop
 that source writer and preview cleanup:
 
 ```bash
-.venv/bin/evm-state --database <source-db> source-retention-plan <snapshot-id> \
+target/release/evm-state --database <source-db> source-retention-plan --checkpoint <snapshot-id> \
   --state-dir <state-dir> --keep-blocks 10000
-.venv/bin/evm-state --database <source-db> prune-source <snapshot-id> \
+target/release/evm-state --database <source-db> prune-source --checkpoint <snapshot-id> \
   --state-dir <state-dir> --keep-blocks 10000
 ```
 
@@ -255,9 +255,16 @@ workloads do not establish a universal or customer-specific 100 GB operating cap
 For new accounts with a long history, capture the final target's proofs first,
 then use a fresh guarded source with the intended checkpoint destination:
 
+Keep that proof bundle throughout replay. Historical block access does not imply
+historical `eth_getProof` access: the BSC provider rejected our later request for
+block 56645979 because it exceeded its maximum proof window. The
+[probe record](evidence/bsc-proof-window-2026-09-12.json) preserves the error;
+it does not identify the window length. WBNB's intended final-target proof was
+already captured before replay and remains available for acceptance.
+
 ```bash
 export SUBSTREAMS_SINK_DSN='clickhouse://<user>:<password>@<host>:9000/new_accounts'
-.venv/bin/evm-state --database new_accounts bootstrap-replay \
+target/release/evm-state --database new_accounts bootstrap-replay \
   --package spkg/evm-state-v0.1.0.spkg --accounts '<account-list>' \
   --start-block <history-start> --stop-block <target-plus-one> \
   --state-dir /absolute/persistent/path/new-accounts \
@@ -298,7 +305,7 @@ An already ingested initial range can also be compacted while its writer is
 stopped:
 
 ```bash
-.venv/bin/evm-state --database new_accounts compact-bootstrap \
+target/release/evm-state --database new_accounts compact-bootstrap \
   --state-dir /absolute/persistent/path/new-accounts
 ```
 

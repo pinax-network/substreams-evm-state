@@ -140,8 +140,14 @@ non-finalized rollback are outside this qualification.
 4. Build the checkpoint from that source interval. It is published only after
    storage, account metadata, bytecode and proofs all verify.
 
+Capture proofs before a long backfill: an RPC provider may retain historical
+blocks while limiting how far back `eth_getProof` works. Our BSC provider
+rejected a later request for block 56645979 as outside its proof window;
+the [recorded probe](docs/evidence/bsc-proof-window-2026-09-12.json) does not
+establish the window's length. Keep the captured bundle for final verification.
+
 ```bash
-.venv/bin/evm-state capture-proofs \
+target/release/evm-state capture-proofs \
   --accounts 0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff \
   --output localdata/bootstrap/proofs.json
 ```
@@ -175,13 +181,13 @@ bound at source preparation. It may be the same database as its source;
 checkpoint tables use separate names.
 
 ```bash
-.venv/bin/evm-state --database bootstrap_example checkpoint \
+target/release/evm-state --database bootstrap_example checkpoint \
   --proofs localdata/bootstrap/proofs.json \
   --sources localdata/bootstrap/sources.json \
   --work-dir localdata/bootstrap/verification \
   --output localdata/bootstrap/checkpoint.json
 
-.venv/bin/evm-state --database bootstrap_example show <snapshot-id> \
+target/release/evm-state --database bootstrap_example show <snapshot-id> \
   --address 0x98dd051fe7d43b2943b1245ca26e8c565dc5ffff
 ```
 
@@ -210,11 +216,11 @@ encoded header, account proofs, complete metadata/code and checksummed gzip
 storage pages. `manifest.json` is written last, after all exported state verifies.
 
 ```bash
-.venv/bin/evm-state --database bootstrap_example export <snapshot-id> \
+target/release/evm-state --database bootstrap_example export <snapshot-id> \
   --output localdata/exports/checkpoint-1
-.venv/bin/evm-state verify-export localdata/exports/checkpoint-1 \
+target/release/evm-state verify-export localdata/exports/checkpoint-1 \
   --expected-hash <independently-trusted-block-hash>
-.venv/bin/evm-state --database restored_state import-export \
+target/release/evm-state --database restored_state import-export \
   localdata/exports/checkpoint-1 --expected-hash <independently-trusted-block-hash>
 ```
 

@@ -37,6 +37,9 @@ The source-removal `make build` produced
 `29069bba7d656455388baf37fd0f714322be68a80215ab11c9a3fdb20415a954`;
 all three module hashes match the preceding package for the same parameters.
 Existing replay directories retain their original frozen packages.
+The subsequent Rust command-path/proof-window documentation build produced
+`07e41bd8d84435d8819b59c312e0eb985a33bb04252dbebc5dc6585c8f1b9992`;
+the package embeds its README, so documentation edits change its file checksum.
 
 Native failure tests prove:
 

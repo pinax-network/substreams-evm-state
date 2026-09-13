@@ -89,6 +89,12 @@ identity and compacted its saved suffix from private-prefix block 56,645,978
 through durable block 56,974,989. The Rust historical replay continues toward
 121466775. No Python controller remains active for this work.
 
+A later [Rust capacity stop and resume](evidence/wbnb-rust-capacity-resume-2026-09-12.json)
+preserves a timed-out disk scan at block 60,974,989. The compacted prefix and
+durable cursor agree at that block, with 5,916,295 nonzero slots. A fresh full
+measurement passed; the unchanged frozen binaries and source identity resumed
+under the same capacity policy. This remains private, unverified state.
+
 ## Release acceptance
 
 The Rust recovery phase passed CI at `b63b602`, including its dedicated hard

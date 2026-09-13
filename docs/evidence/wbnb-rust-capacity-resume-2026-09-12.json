@@ -1,0 +1,86 @@
+{
+  "format_version": 1,
+  "qualification": "Rust WBNB capacity stop and checked resume",
+  "runtime_source_commit": "b63b60274dd967896760d5ccc34153d3e2c94d36",
+  "stopped_run": {
+    "command_exit_code": -9,
+    "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+    "failed_guard_samples": 0,
+    "failed_samples": 1,
+    "finished_ns": 1789258854139989000,
+    "format_version": 1,
+    "guard_samples": 126,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 40634312000,
+    "peak_observed_allocated_bytes": 17435287552,
+    "rejected_guard_stages": [],
+    "samples": 112,
+    "started_ns": 1789257234079669000,
+    "status": "stopped",
+    "stop_reasons": [
+      "incomplete_capacity_sample"
+    ],
+    "termination_error": null
+  },
+  "saved_prefix": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "7a3625f4c4ae42af91341a0b6ff55d84",
+    "header": {
+      "hash": "0x055aeda46c34e9bb2e625ae430b6aa788a3fdb737c743437bd655367ec135fbc",
+      "number": 60974989,
+      "parent_hash": "0x9dbedd04d7500b3653e35106a92258b251968c384124ba5e8fffbeb6cff97b9f",
+      "state_root": "0x21cb3ce49408f32fa195e55864fd049878a143cc134f0fa91c008f5d004375db",
+      "timestamp": 1757729923
+    },
+    "nonzero_slots": 5916295,
+    "start_block": 149268,
+    "state_sha256": "babe5c18ff0af073fe28e1daff7e0a8c4c79d7905c896e8d7ca62d3930f303fe",
+    "status": "unverified-bootstrap"
+  },
+  "durable_position": {
+    "hash": "0x055aeda46c34e9bb2e625ae430b6aa788a3fdb737c743437bd655367ec135fbc",
+    "number": 60974989
+  },
+  "rejected_samples": [
+    {
+      "admitted": false,
+      "directory_changed": false,
+      "error_type": "DockerCapacityError",
+      "format_version": 1,
+      "inspection_operation": "data-directory scan",
+      "reasons": [
+        "incomplete_capacity_sample"
+      ],
+      "sample_finished_ns": 1789258839080265000,
+      "sample_started_ns": 1789258808996036000
+    }
+  ],
+  "fresh_capacity": {
+    "admitted": true,
+    "reasons": [],
+    "accounted_allocated_bytes": 11716595712,
+    "server_data_allocated_bytes": 9031573504,
+    "sample_started_ns": 1789259127709736000,
+    "sample_finished_ns": 1789259136833542000
+  },
+  "recovery": {
+    "binary_checksums_match": true,
+    "source_metadata_byte_identical": true,
+    "fresh_measurement_admitted": true,
+    "resumed_capacity_phase": "rust-resume1-capacity"
+  },
+  "limitations": [
+    "The failed directory scan hit its 30-second subprocess timeout; partial measurements were rejected",
+    "Preserved private state is not a complete account-root proof",
+    "The replay continues toward the previously captured final target at block 121466775"
+  ]
+}

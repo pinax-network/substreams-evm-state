@@ -91,7 +91,7 @@ be created later by the workload. They provide separate measurements without
 being added to the total again; overlapping component labels can overlap in size.
 
 ```bash
-.venv/bin/evm-state capacity-report --config <runtime>/capacity.json
+target/release/evm-state capacity-report --config <runtime>/capacity.json
 ```
 
 The report includes allocated and logical local bytes, whole server data bytes,
@@ -108,9 +108,9 @@ rejected if it is outside the declared scope.
 
 ```bash
 export EVM_STATE_HOME=<runtime>/control
-.venv/bin/evm-state capacity-run --config <runtime>/capacity.json \
+target/release/evm-state capacity-run --config <runtime>/capacity.json \
   --output <runtime>/measurements/bootstrap-1 --interval 1 -- \
-  .venv/bin/evm-state --database new_accounts bootstrap-replay \
+  target/release/evm-state --database new_accounts bootstrap-replay \
     --package spkg/evm-state-v0.1.0.spkg --accounts '<account-list>' \
     --start-block <history-start> --stop-block <target-plus-one> \
     --state-dir <runtime>/new-accounts --checkpoint-database checkpoints

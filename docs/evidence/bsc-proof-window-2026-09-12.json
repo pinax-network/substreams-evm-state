@@ -1,0 +1,41 @@
+{
+  "format_version": 1,
+  "qualification": "Historical BSC account-proof availability probe",
+  "provider": "bsc.rpc.pinax.network",
+  "account": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+  "diagnostic": {
+    "requested_block": 56645979,
+    "code": -32602,
+    "message": "distance to target block exceeds maximum proof window",
+    "has_proof": false
+  },
+  "capacity": {
+    "command_exit_code": 1,
+    "config_sha256": "91e345dc1f0875f966b9fee5e234513051766e0702287c56fb275b2071453197",
+    "failed_guard_samples": 0,
+    "failed_samples": 0,
+    "finished_ns": 1789258292383004000,
+    "format_version": 1,
+    "guard_samples": 1,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 12806737000,
+    "peak_observed_allocated_bytes": 17398284288,
+    "rejected_guard_stages": [],
+    "samples": 3,
+    "started_ns": 1789258259507175000,
+    "status": "stopped",
+    "stop_reasons": [],
+    "termination_error": null
+  },
+  "result": "No proof bundle was obtained; isolated aggregation results remain unverified against a full account proof",
+  "final_target": {
+    "number": 121466775,
+    "proof_bundle_captured_before_replay": true,
+    "complete_state_acceptance": "pending"
+  },
+  "limitations": [
+    "This probe establishes rejection at one historical block, not the configured proof-window length",
+    "Retained aggregation checksums do not establish complete account state",
+    "The previously captured final-target bundle remains the planned WBNB acceptance input"
+  ]
+}
