@@ -1,0 +1,129 @@
+{
+  "format_version": 1,
+  "qualification": "Verified host-bind capacity scanning during the WBNB bootstrap",
+  "runtime_source_commit": "380c9f7911c25cbdcc3e5b0ec7855a1c8cbed7bb",
+  "runtime_checksums": "31790582383fd408b802a1c0174027c8a5e99a1139edc386ac0ee64b6bcc1c66  localdata/qualification/wbnb-bootstrap/host-bind-scan/bin/evm-state\ndb2f9be54302a8819c7cb63975e9c8f086ceaeee8da96a6cde422afeb1b5a77c  localdata/qualification/wbnb-bootstrap/host-bind-scan/bin/evm-state-qualify\n",
+  "ci": {
+    "url": "https://github.com/pinax-network/substreams-evm-state/actions/runs/34731177435",
+    "conclusion": "success",
+    "standalone_native_tests": 91,
+    "regular_clickhouse_tests": 49,
+    "database_crash_tests": 1,
+    "postgres_tests": 2,
+    "mapper_tests": 43,
+    "total_tests": 186
+  },
+  "profiles": [
+    {
+      "admitted": true,
+      "data_scan_mode": "host_bind",
+      "sample_started_ns": 1789263794338461000,
+      "sample_finished_ns": 1789263795498692000,
+      "seconds": 1.160231168,
+      "server_data_allocated_bytes": 14265913344,
+      "accounted_allocated_bytes": 17498857472,
+      "bindings_verified": true
+    },
+    {
+      "admitted": true,
+      "data_scan_mode": "container",
+      "sample_started_ns": 1789263839984881000,
+      "sample_finished_ns": 1789263848992829000,
+      "seconds": 9.007948032,
+      "server_data_allocated_bytes": 14297698304,
+      "accounted_allocated_bytes": 17530646528,
+      "bindings_verified": null
+    },
+    {
+      "admitted": true,
+      "data_scan_mode": "host_bind",
+      "sample_started_ns": 1789263870964733000,
+      "sample_finished_ns": 1789263871672046000,
+      "seconds": 0.707313152,
+      "server_data_allocated_bytes": 14303686656,
+      "accounted_allocated_bytes": 17536638976,
+      "bindings_verified": true
+    }
+  ],
+  "container_bytes_between_host_observations": true,
+  "previous_larger_batch": {
+    "command_exit_code": 1,
+    "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+    "failed_guard_samples": 1,
+    "failed_samples": 1,
+    "finished_ns": 1789262481200593000,
+    "format_version": 1,
+    "guard_samples": 88,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 53633154000,
+    "peak_observed_allocated_bytes": 22514851840,
+    "rejected_guard_stages": [
+      "native-progress"
+    ],
+    "samples": 63,
+    "started_ns": 1789261533710753000,
+    "status": "stopped",
+    "stop_reasons": [
+      "incomplete_capacity_sample"
+    ],
+    "termination_error": null
+  },
+  "private_prefix_before": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "7a1627a24bbb4de796bc8538df4629a6",
+    "header": {
+      "hash": "0x4de373a878177b06fd24048fdbe8f9ba849297aa57bd95a228954d696eebb782",
+      "number": 63974991,
+      "parent_hash": "0x04f4e81cab82dbb7a0f04f4ecbcf127cd175f1a419cbf0b4ed9dece7314f6ee8",
+      "state_root": "0x1aa9493c083f161fd4d88f3540ade82e6ea0ee9cdb315cd772f5b193cd567029",
+      "timestamp": 1759980669
+    },
+    "nonzero_slots": 6033904,
+    "start_block": 149268,
+    "state_sha256": "0b92e288e06f3d8951c853a6d6b3813cf1b16409065ec74ecd95c7b9272a81ac",
+    "status": "unverified-bootstrap"
+  },
+  "private_prefix_after_resume": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "5e17e6a261d044b192e54ab409b01f49",
+    "header": {
+      "hash": "0x863d2ffc03f3698aad6346c06f4f24c77396e6df9b36fd2a53712f113b763f83",
+      "number": 66146986,
+      "parent_hash": "0x4ce7f9ce652433cb16d525f723852ee398c29b481b00b68cb39daa5ff0f77078",
+      "state_root": "0x7b1eb7668284e727defb41dd4f7b728652fdf978e19a0daafb4426744fd62e79",
+      "timestamp": 1761611090
+    },
+    "nonzero_slots": 7220161,
+    "start_block": 149268,
+    "state_sha256": "a8e57028b329f38736c6aa50c546f3a6681183ab1e67fc2bc9c8fa522bd4654a",
+    "status": "unverified-bootstrap"
+  },
+  "budget_bytes": 98257164288,
+  "headroom_bytes": 10000000000,
+  "retained_volume_reserve_bytes": 1742835712,
+  "source_metadata_byte_identical": true,
+  "limitations": [
+    "The previous five-million-block attempt stopped after an incomplete scan and did not complete its qualification",
+    "Measurements are sequential on a shared server with background activity; they are not an identical frozen-byte snapshot",
+    "The direct host counter includes temporary identity-probe files",
+    "The compacted prefix remains unverified account state; full final-target proof, continuation publication and hot-state export/restore remain required"
+  ]
+}

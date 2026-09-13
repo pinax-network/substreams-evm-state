@@ -38,6 +38,14 @@ host free-space counters; both host and ClickHouse free-space floors apply.
 Keep the mode explicit when comparing measurements. It does not change the byte
 budget, headroom reserve or incomplete-sample rejection.
 
+The [WBNB host-bind scan record](evidence/bsc-host-bind-scan-2026-09-12.json)
+measured 1.16 and 0.71 seconds for verified host scans around a 9.01-second
+container scan. The container's data-byte total fell between the two host
+observations as background activity continued. The preceding larger replay
+attempt and its scan-timeout stop are retained in that record. Resumption
+compacted the saved suffix to 7,220,161 nonzero slots; this private state still
+needs its final account-root proof.
+
 ## Storage placement and migration
 
 Compose defaults to the named `ch_data` volume. For a fresh database, create a
