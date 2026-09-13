@@ -1,8 +1,8 @@
-# v0.1.0 release notes — draft
+# v0.1.0 release notes
 
-**Do not publish yet.** Complete the gates below, replace this draft status with
-the final qualification results, and build the release asset from the final
-tested commit. Current acceptance evidence is in [QUALIFICATION.md](QUALIFICATION.md).
+First BSC prototype release. The four deliverables pass the scoped acceptance
+recorded in [QUALIFICATION.md](QUALIFICATION.md). Customer-specific account,
+capacity and latency conditions remain unqualified until the missing inputs are supplied.
 
 ## What this release delivers
 
@@ -35,6 +35,9 @@ not require a `DatabaseChanges` or `db_out` transformation.
 - Whole-directory capacity monitoring measures shared ClickHouse data, declared
   local runtime/work directories and temporary allocations. Guards reject
   incomplete measurements and stop work when the operating thresholds fail.
+- All first-party implementation, command-line tools, qualification workloads
+  and tests use Rust. Python and Go tooling and their dependency manifests have
+  been removed, and CI enforces that boundary. SQL and protobuf definitions remain.
 
 The granular `map_state_changes` module and PostgreSQL `db_out` path remain
 available. The ClickHouse qualification does not establish equivalent behavior
@@ -74,6 +77,51 @@ on durable storage. Restore matching database and runtime state; an older databa
 backup cannot be paired with a newer cursor. The [capacity guide](CAPACITY.md)
 describes measured roots, reserves, incomplete-sample handling and recovery.
 
+## Measured WBNB state
+
+The complete [historical bootstrap](evidence/bsc-wbnb-bootstrap-rust-2026-09-13.json)
+and [current-package continuation](evidence/bsc-wbnb-continuation-rust-2026-09-13.json)
+pass account, storage, bytecode and encoded-header verification. The source
+identities, frozen packages and earlier interrupted capacity phases remain in
+those records.
+
+| Operation | Completed measurement |
+|---|---|
+| Historical checkpoint at block 121466775 | 9,718,240 nonzero slots; full proof/publication in 166 s |
+| Continuation through block 121549935 | 83,160 update blocks; 9,739,339 slots; full proof/publication in 132 s |
+| Complete current-state read | 974 pages of at most 10,000 slots; page-call p50 154 ms and p95 226 ms; full scan, staging and proof in 404 s |
+| Portable export | 974 gzip storage pages; 431,101,963 bytes including metadata and proofs |
+| Fresh-database restore | Same block/hash, full storage root and state checksum; 18.6 min including file verification, durable writes, capacity guards and stored-state verification |
+| Final replay phase | 13,729,778 new blocks plus saved-suffix recovery; 32.95 GB observed peak including the retained-volume reserve; no rejected samples |
+
+These are shared local-server measurements. Native per-block ingestion and full
+proof-verified checkpoint publication have different costs; this release does
+not promise a newly proven WBNB snapshot on every BSC block. Page-call latency
+excludes client validation, SQLite staging and final trie reconstruction.
+Restore's 979 internal capacity checks consumed about 783 seconds of its elapsed
+time. The sampled operating cap remained 100 GB, including a separate
+1,742,835,712-byte retained-volume reserve and 10 GB of operating headroom.
+
+The supplied customer example also passes complete bootstrap, current-package
+continuation, reads and portable restore with 8,156/8,157 slots. The separate
+64-account synthetic workload exercises 104,032 slots, 50,000 clears/replacements
+and pin-aware retention; it does not represent the missing customer account list.
+Cold, cached and finalized-follow throughput and resource-price assumptions are
+kept separate in [THROUGHPUT.md](THROUGHPUT.md).
+
+[Portable and retention acceptance](evidence/bsc-wbnb-portable-retention-rust-2026-09-13.json)
+also verifies all 9,739,339 slots returned from the restored database. Its ordered
+checksum and proof root match the original reader. Releasing the old pin permits
+removal of that checkpoint; covered-history cleanup preserves the cursor, and a
+second verified export of the newer state has an identical manifest and page
+checksums. The 1,000-block recent window selected for this test retains 3,870
+blocks at daily-partition granularity. It does not change the CLI default or
+establish the customer's retention policy.
+
+All 12 hot-state acceptance phases completed with 535 periodic samples and 1,008
+internal guards, without rejections. Their observed peak was 17.48 GB including
+the retained-volume reserve, and the final retained sample was 15.40 GB.
+
 ## Qualification and limits to retain in the published notes
 
 - BSC mainnet and finalized blocks are the qualified chain/finality path.
@@ -93,30 +141,19 @@ describes measured roots, reserves, incomplete-sample handling and recovery.
   supplied. Named slots are samples, not complete storage. Do not present public
   or synthetic cohorts as qualification of that missing account set or its SLA.
 
-## Gates before publishing
+## Validation and release assets
 
-- [x] Complete the [Rust migration](RUST_MIGRATION.md): native CLI, operations,
-  verification, qualification tools and test transport; remove first-party
-  Python/Go code and Python dependencies, with behavior and recovery parity.
-  Rust-only CI passed at `eb3c0f4`: 87 standalone native, 48 regular ClickHouse,
-  one separate database-crash, two PostgreSQL and 43 mapper tests. The stopped
-  WBNB source resumed under Rust with unchanged identity and frozen package.
-- [x] Prove the supplied customer-example bootstrap, continue it with the rebuilt
-  package, and verify complete reads plus export/restore. The
-  [record](evidence/bsc-customer-example-rust-2026-09-12.json) contains source/package
-  identities, block hashes, 8,156/8,157 slot counts, roots and capacity phases.
-- [ ] Finish and prove the complete WBNB bootstrap, record its source/package
-  identity, exact block/hash, slot count and root, then advance it through a
-  recent finalized continuation using the current package.
-- [ ] Qualify export/restore, publication/read cost and retained-data growth for
-  the representative nonempty hot state, including temporary work and rotation.
-- [ ] Update the four-deliverable acceptance table with the resulting evidence
-  and any remaining customer-specific conditions, without treating narrow
-  samples as a broader guarantee.
-- [ ] Run the required final checks and verify green CI for the exact release
-  commit. Build the `.spkg` with `make build` and record its final SHA-256.
-- [ ] Publish GitHub `v0.1.0` from that commit with the `.spkg`, checksum and final
-  notes. Download the attached asset and verify its checksum and package metadata.
+The suite contains **188 Rust tests**: 93 standalone native, 49 regular ClickHouse,
+one separate database-crash, two PostgreSQL and 43 mapper tests. Two internal
+subprocess fixtures are excluded from these counts. The native tests exercise
+the pinned real Substreams sink, including direct/spooled restart, torn cursor
+recovery and a hard restart of a separate disposable ClickHouse container.
+Captured lifecycle and independent proof fixtures remain checked in.
 
-The test totals and performance/capacity figures in the final notes must come
-from the final commit and completed measurements, rather than this draft.
+The release assets are `evm-state-v0.1.0.spkg` and `SHA256SUMS`. The package is
+produced by `make build` from the release checkout; the published release records
+the exact commit, green CI run and final package checksum. Downloaded assets are
+checked against that checksum and their package metadata before release completion.
+Package SHA-256: `6a7a27737de0e4a131d4fd954748593cde4a6c5ed3664ec1e761e2b042bed7b8`.
+Historical runs retain their own frozen packages. A README-only package change
+changes the `.spkg` file checksum without changing the compiled module hash.

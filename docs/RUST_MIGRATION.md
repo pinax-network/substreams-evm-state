@@ -148,9 +148,12 @@ through 77,735,079 with no rejected samples, without changing the capacity
 thresholds or accepting partial totals. Its `f118424` runtime also
 [passed all 188 CI tests](https://github.com/pinax-network/substreams-evm-state/actions/runs/34733481895).
 
-Full WBNB account-root acceptance and current-package continuation have passed.
-Hot-state export/restore and final retention qualification remain release gates. The
+Full WBNB account-root acceptance, current-package continuation and
+[hot-state export/restore and retention](evidence/bsc-wbnb-portable-retention-rust-2026-09-13.json)
+have passed. The independently restored reader checked all 9,739,339 slots;
+old-generation removal and native-history cleanup preserve the newer state,
+whose second verified export has an identical manifest and file checksums. The
 customer's actual 19-account/76-slot list and proposed 64-account set are still
 unavailable. Keep those limits explicit in the final four-deliverable table and
-[release notes](RELEASE-v0.1.0.md). Publish v0.1.0 only after those gates and the
-final package-producing `make build` have passed.
+[release notes](RELEASE-v0.1.0.md). Release publication additionally requires the
+final package-producing `make build`, exact-commit CI and downloaded-asset checks.

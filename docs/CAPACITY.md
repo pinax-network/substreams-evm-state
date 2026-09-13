@@ -53,6 +53,30 @@ remain failures in that evidence record.
 
 ## Storage placement and migration
 
+The completed [WBNB acceptance](evidence/bsc-wbnb-portable-retention-rust-2026-09-13.json)
+extends the historical replay evidence through complete checkpoint proofs,
+original/current/restored page reads, a 431 MB portable export and verified fresh
+restore, followed by checkpoint and covered-history cleanup. All 12 acceptance
+phases pass with 535 periodic samples and 1,008 internal guards. Their observed
+peak including the retained-volume reserve is 17.48 GB; the final retained sample
+is 15.40 GB. These include shared qualification data and both portable copies.
+The separate final historical replay phase peaked at 32.95 GB. Earlier stopped
+measurements remain failures, including filesystem-disappearance and scan-timeout
+stops; successful fresh admission does not reclassify those observations.
+
+Portable import checks capacity after every 10,000-row page. Its 18.6-minute
+WBNB run includes 783 seconds in 979 internal measurements, in addition to file
+proofs, durable inserts and complete stored-state verification. This is guarded
+restore time, not isolated ClickHouse insertion throughput. Proof publication
+for the 9.74-million-slot continuation took 132 seconds; the cap does not imply
+that a full proof can be published on every BSC block.
+
+After the older pin was released, cleanup removed its checkpoint and 79,290
+covered source blocks using a 1,000-block recent window for this test. Daily
+partition granularity retained 3,870 blocks and the native cursor. A second full
+verified export after cleanup has the identical manifest and page checksums.
+This selected window is not an agreed customer policy or a change to CLI defaults.
+
 Compose defaults to the named `ch_data` volume. For a fresh database, create a
 persistent directory and set `CH_DATA_SOURCE=./localdata/clickhouse-data` in the
 ignored project `.env`, then run `make ch-up`. Use an absolute path for a directory
@@ -377,10 +401,10 @@ is committed before hashing and measurement; its entries are **hashed slots,
 not trie nodes**. It remains disposable workspace, not a checkpoint export.
 SQLite requests a 16 MiB page cache; this is not a hard process-memory bound.
 
-This reduces measured reconstruction cost. Larger state, complete hot-account
-proofs, checkpoint/export latency and sustained growth remain qualification
-gates. Do not extrapolate a fixed per-slot memory or time bound from these
-shared-machine measurements.
+This reduced measured reconstruction cost. The later full WBNB qualification
+above covers larger state, complete hot-account proofs, checkpoint/export costs
+and retained growth. Do not extrapolate a fixed per-slot memory or time bound
+from these shared-machine measurements or apply it to the missing customer set.
 
 To reproduce on the retained isolated comparison database, provide a JSON object
 mapping its account to the matching observed fields (`nonce`, decimal-string

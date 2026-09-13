@@ -1,21 +1,55 @@
 # ClickHouse qualification evidence
 
-Status: prototype, 2026-09-12. **Do not publish v0.1.0 yet.** This records current
-evidence and preserves the four original deliverables; partial coverage does not
-make an entire deliverable complete.
+Status: v0.1.0 prototype qualification, 2026-09-13. The four deliverables have
+passed the local acceptance described below. Customer-specific conditions remain
+explicit; the unavailable account list is not replaced by public or synthetic samples.
 
 Update, 2026-09-13: the [full historical WBNB bootstrap](evidence/bsc-wbnb-bootstrap-rust-2026-09-13.json)
 has passed complete Rust storage/account/bytecode proof verification at block
-121466775, with 9,718,240 nonzero slots. Hot-state read/export/restore and retention
-acceptance are still in progress. The older progress entries below remain a
+121466775, with 9,718,240 nonzero slots. The current-package continuation,
+complete reads, portable restore and retention also pass. The older entries below remain a
 record of the same replay's intermediate, unverified states.
 
 | Deliverable | Evidence in this prototype | Remaining acceptance work |
 |---|---|---|
 | Native finalized projection and coherent reads/restarts | One physical block envelope; generated native Nested schema; direct and spooled process-kill recovery; failure after block insertion before cursor write; frozen package/filter and database ownership guards; copied-directory/host rejection; inherited native writer lock; checked atomic cursor backup and explicit torn-cursor recovery; database-process SIGKILL before/after publication; 15-minute finalized follow; measured complete pinned reads; fixed finalized decode/spool latency; persistent OS host identity and explicit legacy hostname recovery | Customer latency targets and deployment conditions; storage must honor sync writes (physical host power loss is not emulated) |
-| Verified isolated bootstrap and onboarding | Real 180,090-block BSC replay; complete storage/account proof/code verification; immutable ready manifests; synthetic new-account catch-up; portable export and verified import; real restore followed by 9,427 BSC blocks and another 2,305-block continuation; 195,056-block replay with forced kill, cursor recovery and root verification; publication requires durable cursor coverage; real three-account cutover with a killed publisher, unchanged old reader and combined-filter continuation | Broader nonempty hot-account bootstrap and customer account qualification |
-| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; 26 additional captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases; native proof comparisons include failed distinct authorities and failed delegation clearing; captured post-Cancun existing-account SELFDESTRUCT preserves nonce/code on all three producers; v4 clear/reinstallation ordering survives reverted execution; invalid self-clear does not invent a change; deletion/recreation across native patches and inherited checkpoint storage; legacy verifiers fail on unknown/wrong metadata | Broader representative lifecycle replay and hot-account completeness; system-execution SELFDESTRUCT remains unsupported |
-| Retention/cost qualification and release | Whole-directory capacity monitoring, sampled headroom enforcement and publication/trie guards; measured 64-account synthetic checkpoint/export/restore/churn/retention; observed active merge space and real BSC spool; checkpoint/candidate cleanup preserving readers; native history cleanup and bounded bootstrap chunks; pinned toolchain and package-producing build; separated cold/cached/live results, current price model and old-contract cohort addition | Nonempty hot-account initial state and sustained-growth qualification, actual customer set when available, exact-head CI and v0.1.0 assets/notes |
+| Verified isolated bootstrap and onboarding | Complete WBNB creation-to-target bootstrap with 9,718,240 nonzero slots and current-package continuation to 9,739,339; supplied customer example with 8,156/8,157 slots; complete storage/account/code proofs; immutable ready manifests; isolated cohort cutover with killed publisher and unchanged old reader; restored-state continuation; forced native kill/cursor recovery | Qualification of the unavailable complete customer account list |
+| Completeness/lifecycle/proof tests | Wrong/missing proofs, missing/extra slots, bad metadata/code, wrong header commitments, gaps/forks/filter changes all fail; zero storage and proven non-inclusion pass; 26 captured v3/v4/v5 CREATE/CREATE2, deletion and authorization cases; failed sender/authority effects and delegation clearing; post-Cancun existing-account SELFDESTRUCT; deletion/recreation across inherited storage; complete WBNB and supplied-account roots | Customer-specific lifecycle qualification; system-execution SELFDESTRUCT remains unsupported |
+| Retention/cost qualification and release | Whole-directory capacity monitoring and publication/trie guards; 99 WBNB growth observations; 32.95 GB observed final-replay peak including reserve; complete pinned/current/restored reads; verified 431 MB hot-state export/restore; old-checkpoint removal and covered-history cleanup; byte-identical verified re-export after cleanup; synthetic 64-account churn/retention and active merge space; separated cold/cached/live and price models | Customer-set capacity and SLA remain conditional on the missing list and deployment details; final build, CI and asset identity are recorded with the release |
+
+## Complete hot-state acceptance
+
+The [current-package WBNB checkpoint](evidence/bsc-wbnb-continuation-rust-2026-09-13.json)
+at block 121549935 contains **9,739,339 nonzero slots**. Its complete proof and
+publication took **132 seconds**; the historical base took **166 seconds**.
+These are full-state publication costs, separate from per-block native ingestion.
+
+The [older pinned read](evidence/bsc-wbnb-pinned-reads-rust-2026-09-13.json),
+[current read](evidence/bsc-wbnb-current-reads-rust-2026-09-13.json) and
+[portable/retention acceptance](evidence/bsc-wbnb-portable-retention-rust-2026-09-13.json)
+each reconstruct the account root from every returned slot. The current reader
+made 974 page calls with p50 **154 ms** and p95 **226 ms**. Its complete scan,
+client staging and proof took **404 seconds**. The independently restored reader
+made 974 calls with p50 **73 ms**, p95 **163 ms** and **204 seconds** for the full
+pass. These sequential shared-server scans are not a cold-cache or concurrent API SLA.
+
+Export contains **431,101,963 bytes** across 974 gzip storage pages plus metadata
+and proofs. Fresh-database restore preserved the exact block/hash, storage root
+and state checksum. The guarded restore took **1,118 seconds**, including
+**783 seconds** in 979 internal whole-footprint measurements. The old checkpoint
+survived while pinned, then was removed after its reader released the pin.
+With a 1,000-block recent window selected for the retention test, cleanup removed
+79,290 covered native blocks and retained 3,870 blocks at daily-partition granularity.
+The cursor remained valid. Re-export after cleanup verified the full state and
+produced a byte-identical manifest, including every file checksum.
+
+All **12 acceptance phases** completed: **535 periodic samples** and **1,008
+internal guards**, with no rejections. Their observed peak was **17.48 GB**
+including the retained-volume reserve; the final retained sample was **15.40 GB**.
+The earlier final replay phase peaked at **32.95 GB**. These totals include the
+shared ClickHouse data and declared runtime/work roots, two portable copies and
+the separately reserved old volume. They are sampled observations, not a hard
+quota or a promise that an unknown customer account set will fit.
 
 ## Reproducible local checks
 
@@ -46,6 +80,11 @@ Existing replay directories retain their original frozen packages.
 The subsequent Rust command-path/proof-window documentation build produced
 `07e41bd8d84435d8819b59c312e0eb985a33bb04252dbebc5dc6585c8f1b9992`;
 the package embeds its README, so documentation edits change its file checksum.
+The final v0.1.0 `make build` produced
+`6a7a27737de0e4a131d4fd954748593cde4a6c5ed3664ec1e761e2b042bed7b8`.
+All three module hashes match the qualified current-package continuation when
+using the same parameters; the final change is the embedded README. The WBNB
+`map_block_state` hash remains `c6a4a3daaa47d8908d3b3e09d20341520e39463b`.
 
 Native failure tests prove:
 
@@ -435,7 +474,7 @@ the already captured target proofs and original native cursors. It keeps failed
 candidates and measurements for inspection. It does not qualify complete initial
 storage for a hot token or the missing customer list.
 
-## Inputs and release gates
+## Customer inputs and release provenance
 
 The [customer questions and ClickHouse proposal](CUSTOMER_PROPOSAL.md) are drafted,
 not sent. Their account list,
@@ -444,8 +483,9 @@ cap, retention window and header trust requirements are still unknown. Continue
 independent local qualification without substituting sample results for theirs.
 
 `make build` must produce the final `.spkg`, and the first GitHub release must be
-`v0.1.0` with detailed notes and package asset. Release remains gated by the open
-acceptance items above; do not call the goal complete based only on these tests.
+`v0.1.0` with detailed notes, package asset and checksum. Publication additionally
+requires green CI for the exact release commit and verification of the downloaded
+asset. The release notes retain customer-specific conditions and measured limits.
 
 ## Long replay host recovery
 
@@ -465,9 +505,8 @@ package, cursors and prefix were preserved, and the same bounded replay resumed.
 Tests cover network-name changes, another machine, copied/changed recovery
 records, damaged state, writer exclusion and interruption between the two
 sidecar writes. The [operations guide](CHECKPOINTS.md) explains this explicit
-operator attestation and its limits. WBNB remains unverified until its complete
-storage matches the saved final account proof; this recovery is not completion
-of the hot-account qualification.
+operator attestation and its limits. WBNB was unverified at that recovery stage;
+its completed proof and hot-state qualification are now recorded above.
 
 ## Supplied customer example
 
@@ -486,8 +525,8 @@ with full stored-state proof verification before readiness. All seven reported
 capacity phases completed without rejected samples. See
 [customer example evidence](evidence/bsc-customer-example-rust-2026-09-12.json).
 
-This qualifies the one supplied example. The 19/64-account lists, complete WBNB
-qualification and the remaining Rust migration gates are still outstanding.
+This qualifies the one supplied example. The 19/64-account lists remain
+unavailable; complete WBNB and Rust migration acceptance are now recorded above.
 The progress notes below describe earlier stages of this same replay.
 
 The customer supplied `0x32c59d556b16db81dfc32525efb3cb257f7e493d` as an example,

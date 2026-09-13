@@ -231,5 +231,6 @@ proof checks use `target/release/evm-state-qualify lifecycle-updates` as above.
 The formerly missing captured failed-clear and existing-account SELFDESTRUCT
 cases now pass their specific native comparisons. SELFDESTRUCT in system
 execution remains explicitly unsupported until its execution boundary is
-qualified. Broader representative-account replay and hot-account completeness
-remain release requirements; these observed-update checks do not replace them.
+qualified. Complete WBNB and supplied-example state now pass the separate
+[full-account acceptance](QUALIFICATION.md). These observed-update checks retain
+their narrower scope, and the missing customer set still needs qualification.

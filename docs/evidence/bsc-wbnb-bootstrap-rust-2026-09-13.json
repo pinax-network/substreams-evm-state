@@ -133,7 +133,7 @@
     "state_sha256": "69e4de92ba2ac3a23a8c1e9e614d201718c9f4122af9d16fb65470495711cc1b",
     "status": "unverified-bootstrap"
   },
-  "replay_capacity_history": [
+  "capacity_phase_history": [
     {
       "phase": "chunk-five-million-capacity",
       "capacity": {
@@ -4485,6 +4485,7 @@
     "Growth observations describe checksummed private prefixes; completeness is established by the final full checkpoint proof",
     "Whole-directory samples include shared qualification data, runtime files and temporary workspace; private-generation part bytes are a narrower metric",
     "The capacity cap is a sampled operating guard, not a hard filesystem quota or a guarantee for the unavailable customer account list",
-    "Current-package continuation, full paginated read/export/restore and hot-state retention remain separately measured acceptance steps"
+    "Current-package continuation, full paginated read/export/restore and hot-state retention remain separately measured acceptance steps",
+    "Capacity history includes replay, staging and measurement phases in the WBNB qualification; each original config hash identifies its measurement scope. The separate original-volume reserve applies after the recorded host-bind migration."
   ]
 }

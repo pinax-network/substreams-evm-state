@@ -1,6 +1,6 @@
 # EVM selective state: qualification scope
 
-Updated 2026-09-12. The review of prototype `8433af7` is in [REVIEW.md](REVIEW.md).
+Updated 2026-09-13. The review of prototype `8433af7` is in [REVIEW.md](REVIEW.md).
 The ClickHouse implementation now exists; acceptance evidence and remaining
 release gates are tracked in [QUALIFICATION.md](QUALIFICATION.md).
 
@@ -59,8 +59,10 @@ implemented. Portable exports, verified restores, persistent reader pins and
 whole-checkpoint cleanup are also implemented. Cursor validation/backup/recovery
 and native history partition cleanup are implemented. Initial replay can compact
 private state between bounded chunks. Whole-directory capacity monitoring and
-publication guards are implemented; representative customer-set capacity and
-sustained growth qualification remain unfinished.
+publication guards are implemented. Complete WBNB and supplied-example state,
+retained growth, portable restore and pin-aware cleanup are qualified in the
+linked evidence. Customer-set capacity and SLA remain conditional on the missing
+list and deployment details. All first-party code, tools and tests use Rust.
 
 ## Native ClickHouse route
 

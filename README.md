@@ -4,13 +4,15 @@ Selective BSC account state using a native Substreams map and ClickHouse.
 Reconstruct complete storage, code, balance and nonce at a fixed finalized block,
 verify the result, and publish an immutable checkpoint for local execution.
 
-**Prototype; v0.1.0 is not released yet.** Native ingestion, isolated checkpoint
+**v0.1.0 — BSC prototype.** Native ingestion, isolated checkpoint
 construction, proof verification, portable exports/restores, reader pins,
 cursor recovery and checkpoint/native-history cleanup are implemented and tested.
 Initial replay supports private compaction between bounded native chunks. Capacity
-monitoring covers data directories and temporary work. Cold/cached ingestion,
-15-minute finalized follow and a real interrupted three-account cutover are now
-measured; broader historical lifecycle and account-set qualification remain unfinished.
+monitoring covers data directories and temporary work. Qualification includes
+complete WBNB state with more than 9.7 million nonzero slots, the supplied customer
+example, cold/cached ingestion, 15-minute finalized follow, captured lifecycle
+cases and an interrupted three-account cutover. All first-party implementation,
+command-line tools, qualification workloads and tests use Rust.
 The customer's actual 19/64-account lists have not been supplied, so their
 capacity, latency and cost are not qualified. See [scope](docs/SCOPE.md) and
 [current evidence](docs/QUALIFICATION.md). The
