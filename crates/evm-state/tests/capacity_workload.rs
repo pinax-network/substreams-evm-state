@@ -95,7 +95,7 @@ fn real_directory_meter_accounts_for_allocated_server_data_and_local_workspace()
         "requires one local published ClickHouse container"
     );
     let config = json!({"format_version":1,"clickhouse_container":names[0],"databases":["default"],"local_paths":[root.path()],"components":{"native":[spool.parent().unwrap()],"spool":[spool],"future_export":[root.path().join("export")]},"budget_bytes":100_000_000_000u64,"headroom_bytes":10_000_000_000u64,"min_free_bytes":0});
-    let measured = Meter::new(&client, config)?.sample()?;
+    let measured = Meter::new(&client, config.clone())?.sample()?;
     assert_eq!(measured["admitted"], true);
     let server = measured["server_data_allocated_bytes"].as_u64().unwrap();
     assert!(server > 0);
@@ -125,6 +125,39 @@ fn real_directory_meter_accounts_for_allocated_server_data_and_local_workspace()
         .map(|v| evm_state::ch::uint(&v["bytes"]).unwrap())
         .sum();
     assert!(parts <= server);
+    let inspected = evm_state::process::capture(
+        Command::new("docker").args(["inspect", names[0]]),
+        Duration::from_secs(30),
+    )?
+    .unwrap();
+    assert!(inspected.status.success());
+    let inspected: serde_json::Value = serde_json::from_slice(&inspected.stdout)?;
+    let has_data_bind = inspected[0]["Mounts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|m| m["Destination"] == "/var/lib/clickhouse" && m["Type"] == "bind");
+    let mut host_config = config;
+    host_config["data_scan_mode"] = json!("host_bind");
+    let host_result = Meter::new(&client, host_config)?.sample();
+    if has_data_bind {
+        let host = host_result?;
+        assert_eq!(host["data_scan_mode"], "host_bind");
+        assert_eq!(
+            host["host_bind_scan"]["fresh_probes_verified_before_and_after"],
+            true
+        );
+        assert!(host["server_data_allocated_bytes"].as_u64().unwrap() >= parts);
+        assert_eq!(
+            host["accounted_allocated_bytes"].as_u64().unwrap(),
+            host["server_data_allocated_bytes"].as_u64().unwrap()
+                + host["local"]["allocated_bytes"].as_u64().unwrap()
+        );
+    } else {
+        // The default CI service uses a named volume, which must not be
+        // misrepresented as a readable directory on this process's host.
+        assert!(host_result.is_err());
+    }
     Ok(())
 }
 #[test]

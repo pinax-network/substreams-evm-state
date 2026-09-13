@@ -18,6 +18,26 @@ Killing only that client can leave its scan running inside the container; the
 inner deadline also terminates the scanner. A timed-out or incomplete scan still
 rejects admission, and its sample records the timeout when identified.
 
+For directory bind mounts visible to the Rust process, the optional capacity
+setting `"data_scan_mode": "host_bind"` measures allocated host inode blocks
+directly. This avoids Docker Desktop's metadata-walk overhead. It requires read
+access to every data directory and permission to create a small temporary probe.
+The default mode remains `"container"`.
+
+The host mode derives paths from Docker's actual mounts, then creates a random
+probe in each data root and reads it through the container before and after the
+walk. It also checks that the host directory was not replaced. Probe cleanup
+removes only the file inode created by that measurement. Missing or mismatched
+probes, unreadable directories, named volumes, file mounts and nested non-bind
+mounts fail admission. No guessed host path or stale copy is accepted.
+
+Directory symlinks are counted without following them, and hard links are
+deduplicated, as with the container scan. Temporary probe files are included in
+the conservative total. The report records the scan mode, verified mappings and
+host free-space counters; both host and ClickHouse free-space floors apply.
+Keep the mode explicit when comparing measurements. It does not change the byte
+budget, headroom reserve or incomplete-sample rejection.
+
 ## Storage placement and migration
 
 Compose defaults to the named `ch_data` volume. For a fresh database, create a

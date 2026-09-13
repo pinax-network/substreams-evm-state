@@ -2,6 +2,7 @@
 pub mod aggregation_qualification;
 pub mod bootstrap;
 pub mod capacity;
+mod capacity_host;
 pub mod capacity_qualification;
 pub mod ch;
 pub mod checkpoint;

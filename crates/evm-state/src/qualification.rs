@@ -203,6 +203,8 @@ pub fn record_growth(
                 "generation":generation,"header":prefix["header"],"nonzero_slots":prefix["nonzero_slots"],"state_sha256":prefix["state_sha256"],
                 "status":prefix["status"],"capacity_sample_finished_ns":sample["sample_finished_ns"],
                 "accounted_allocated_bytes":sample["accounted_allocated_bytes"],"admitted":sample["admitted"],"compaction_query":query,"generation_parts":parts,
+                "capacity_data_scan_mode":sample.get("data_scan_mode").cloned().unwrap_or(json!("container")),
+                "server_data_allocated_bytes":sample["server_data_allocated_bytes"],"local_allocated_bytes":sample["local"]["allocated_bytes"],
                 "qualification":"Checksummed private prefix and fresh admitted capacity sample; not a full account-root proof, retained-footprint bound or billing evidence. Query memory is server accounting, not process RSS."});
             writeln!(log, "{}", canonical_json(&record)?)?;
             log.flush()?;

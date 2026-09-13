@@ -39,6 +39,14 @@ pub fn roots(mut paths: Vec<PathBuf>) -> Vec<PathBuf> {
 }
 
 pub fn local_usage(paths: &[PathBuf]) -> Result<Value> {
+    usage(paths, false)
+}
+
+pub(crate) fn data_usage(paths: &[PathBuf]) -> Result<Value> {
+    usage(paths, true)
+}
+
+fn usage(paths: &[PathBuf], data_directory: bool) -> Result<Value> {
     let mut seen = BTreeSet::new();
     let mut allocated = 0_u64;
     let mut logical = 0_u64;
@@ -53,7 +61,7 @@ pub fn local_usage(paths: &[PathBuf]) -> Result<Value> {
         while let Some(path) = pending.pop() {
             let metadata = fs::symlink_metadata(&path)?;
             ensure!(
-                !metadata.is_symlink(),
+                data_directory || !metadata.is_symlink(),
                 "capacity roots contain a symlink; declare its target as a separate root"
             );
             if !seen.insert((metadata.dev(), metadata.ino())) {
@@ -71,7 +79,7 @@ pub fn local_usage(paths: &[PathBuf]) -> Result<Value> {
                 for entry in fs::read_dir(&path)? {
                     pending.push(entry?.path());
                 }
-            } else if metadata.is_file() {
+            } else if metadata.is_file() || data_directory {
                 logical = logical
                     .checked_add(metadata.len())
                     .context("logical byte count overflow")?;
@@ -141,7 +149,8 @@ fn decode_docker_output(
             && !error.contains("Permission denied");
         return Err(DockerCapacityError {
             operation,
-            timed_out: operation == "data-directory scan" && output.status.code() == Some(124),
+            timed_out: matches!(operation, "data-directory scan" | "host-bind verification")
+                && output.status.code() == Some(124),
             directory_changed: changed,
         }
         .into());
@@ -202,6 +211,7 @@ impl Meter {
             "budget_bytes",
             "headroom_bytes",
             "min_free_bytes",
+            "data_scan_mode",
         ];
         ensure!(
             config
@@ -214,6 +224,13 @@ impl Meter {
         let budget = integer(&config, "budget_bytes", 1)?;
         let headroom = integer(&config, "headroom_bytes", 1)?;
         let min_free = integer(&config, "min_free_bytes", 0)?;
+        ensure!(
+            matches!(
+                config.get("data_scan_mode").and_then(Value::as_str),
+                None | Some("container" | "host_bind")
+            ) && config.get("data_scan_mode").is_none_or(Value::is_string),
+            "data_scan_mode must be container or host_bind"
+        );
         ensure!(
             headroom < budget,
             "headroom must be smaller than the capacity budget"
@@ -337,6 +354,29 @@ impl Meter {
         let info = self.inspect()?;
         let disks = self.client.rows("SELECT name,path,type,is_remote,total_space,free_space,unreserved_space FROM system.disks ORDER BY name",&Default::default())?.collect::<Result<Vec<_>>>()?;
         let (mut available, disk_paths) = data_disks(&info, &disks)?;
+        let host_scan = if self.config["data_scan_mode"] == "host_bind" {
+            Some(crate::capacity_host::sample(&info, &disk_paths, |path| {
+                decode_docker_output(
+                    "host-bind verification",
+                    process::capture(
+                        Command::new("docker").args([
+                            "exec",
+                            self.container_id.as_deref().unwrap(),
+                            "timeout",
+                            "--signal=TERM",
+                            "--kill-after=2s",
+                            "25s",
+                            "cat",
+                            "--",
+                            path.to_str().context("invalid container probe path")?,
+                        ]),
+                        Duration::from_secs(30),
+                    )?,
+                )
+            })?)
+        } else {
+            None
+        };
         let mut arguments = vec![
             "exec".into(),
             self.container_id.clone().unwrap(),
@@ -363,8 +403,12 @@ impl Meter {
                 })
                 .collect::<Result<Vec<_>>>()?,
         );
-        let output = retry_scan(|| docker(&arguments))?;
-        let server_bytes = du_total(&output)?;
+        let server_bytes = if let Some(scan) = &host_scan {
+            available = available.min(uint(&scan["available_bytes"])?);
+            uint(&scan["allocated_bytes"])?
+        } else {
+            du_total(&retry_scan(|| docker(&arguments))?)?
+        };
         let local = retry_local(|| local_usage(&self.paths))?;
         let used = server_bytes
             .checked_add(uint(&local["allocated_bytes"])?)
@@ -412,6 +456,7 @@ impl Meter {
         let reasons = admission_reasons(used, self.headroom, self.budget, available, self.min_free);
         Ok(
             json!({"format_version":1,"sample_started_ns":started,"sample_finished_ns":now_ns()?,"container_id":self.container_id,
+            "data_scan_mode":if host_scan.is_some(){"host_bind"}else{"container"},"host_bind_scan":host_scan,
             "server_data_roots":disk_paths,"server_data_allocated_bytes":server_bytes,"local_roots":self.paths,
             "local":local,"local_components":components,"accounted_allocated_bytes":used,"budget_bytes":self.budget,"headroom_bytes":self.headroom,
             "available_above_headroom_bytes":i128::from(self.budget)-i128::from(self.headroom)-i128::from(used),"min_free_bytes":self.min_free,
@@ -531,7 +576,11 @@ mod tests {
     }
     #[test]
     fn docker_failures_discard_partial_output_and_only_retry_disappearing_files() {
-        for operation in ["container inspection", "data-directory scan"] {
+        for operation in [
+            "container inspection",
+            "data-directory scan",
+            "host-bind verification",
+        ] {
             for (stderr, expected) in [
                 ("du: No such file or directory", true),
                 ("du: Permission denied", false),
@@ -552,7 +601,7 @@ mod tests {
                     assert_eq!(error.operation, operation);
                     assert_eq!(
                         error.timed_out,
-                        operation == "data-directory scan" && status == 124
+                        operation != "container inspection" && status == 124
                     );
                     assert_eq!(
                         error.directory_changed,
