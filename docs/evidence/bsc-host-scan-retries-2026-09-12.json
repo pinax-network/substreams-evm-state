@@ -1,0 +1,265 @@
+{
+  "format_version": 1,
+  "qualification": "WBNB capacity stage diagnostics and bounded local scan retries",
+  "runtime_source_commit": "b904bd3f0a03ce07e10eb84dd4fded3b2b2db4bc",
+  "runtime_checksums": "f1b92cd16ee69f7c1f76620b81a26b5b62327fae9bd9fc2a44146fa02e42c8f6  bin/evm-state\n730084a240e7a9247e1e98d70d35b17168b0a848ae10e31fff920a19c1de50f2  bin/evm-state-qualify\n",
+  "previous_run": {
+    "command_exit_code": 1,
+    "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+    "failed_guard_samples": 0,
+    "failed_samples": 1,
+    "finished_ns": 1789264569334957000,
+    "format_version": 1,
+    "guard_samples": 255,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 6321807000,
+    "peak_observed_allocated_bytes": 18605158400,
+    "rejected_guard_stages": [],
+    "samples": 101,
+    "started_ns": 1789263978430550000,
+    "status": "stopped",
+    "stop_reasons": [
+      "incomplete_capacity_sample"
+    ],
+    "termination_error": null
+  },
+  "previous_failed_samples": [
+    {
+      "admitted": false,
+      "error_type": "CapacityError",
+      "format_version": 1,
+      "reasons": [
+        "incomplete_capacity_sample"
+      ],
+      "sample_finished_ns": 1789264568291029000,
+      "sample_started_ns": 1789264567960968000
+    }
+  ],
+  "admission": {
+    "admitted": true,
+    "reasons": [],
+    "data_scan_mode": "host_bind",
+    "accounted_allocated_bytes": 14419877888,
+    "sample_started_ns": 1789265308654020000,
+    "sample_finished_ns": 1789265309443717000
+  },
+  "private_prefix_before": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "5e17e6a261d044b192e54ab409b01f49",
+    "header": {
+      "hash": "0x863d2ffc03f3698aad6346c06f4f24c77396e6df9b36fd2a53712f113b763f83",
+      "number": 66146986,
+      "parent_hash": "0x4ce7f9ce652433cb16d525f723852ee398c29b481b00b68cb39daa5ff0f77078",
+      "state_root": "0x7b1eb7668284e727defb41dd4f7b728652fdf978e19a0daafb4426744fd62e79",
+      "timestamp": 1761611090
+    },
+    "nonzero_slots": 7220161,
+    "start_block": 149268,
+    "state_sha256": "a8e57028b329f38736c6aa50c546f3a6681183ab1e67fc2bc9c8fa522bd4654a",
+    "status": "unverified-bootstrap"
+  },
+  "private_prefix_after_recovery": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "f5116d3549b34e6dbcc7cb1cc49f7989",
+    "header": {
+      "hash": "0xe53b0bcbdc7287858bb68f35b791be1928357e314064ab1546c59618602554d7",
+      "number": 67735079,
+      "parent_hash": "0x9a95a2477c6760695e4aaf07a013ec1458d08fba3f6becfc239b98c0df909edb",
+      "state_root": "0xe70fc3c21ea4708737182d4180ffcac4e42a4f3e37a745f02249e58af21def8c",
+      "timestamp": 1762802313
+    },
+    "nonzero_slots": 7438253,
+    "start_block": 149268,
+    "state_sha256": "315e2b19ab5fe900d4ab3afe58d44b4c046b42c56eca559d19b4331e18dd2d2b",
+    "status": "unverified-bootstrap"
+  },
+  "budget_bytes": 98257164288,
+  "headroom_bytes": 10000000000,
+  "retained_volume_reserve_bytes": 1742835712,
+  "ci": {
+    "url": "https://github.com/pinax-network/substreams-evm-state/actions/runs/34732261907",
+    "conclusion": "success",
+    "standalone_native_tests": 93,
+    "regular_clickhouse_tests": 49,
+    "database_crash_tests": 1,
+    "postgres_tests": 2,
+    "mapper_tests": 43,
+    "total_tests": 188
+  },
+  "limitations": [
+    "The earlier incomplete sample failed in about 0.33 seconds, but lacked a measurement stage; the specific cause is unconfirmed",
+    "New diagnostics identify future failures and do not retroactively attribute the earlier failure",
+    "The private prefixes remain unverified account state; full final-target proof, current-package continuation and hot-state export/restore remain required",
+    "The five-million-block child completed replay and compaction, but its capacity supervisor stopped after a host data-directory NotFound error exhausted five fresh walks; this is not a passing capacity run",
+    "The elapsed trial includes recovery of a retained earlier suffix, the new batch, compaction and cleanup; it is not isolated ingestion time",
+    "Streaming directory traversal is a subsequent mitigation whose sustained replay result is still pending"
+  ],
+  "five_million_trial": {
+    "command_exit_code": 0,
+    "config_sha256": "853d4a64094ef24eeff19277d32eca67a8543c9af43d3d6ecb6978a2be6afde8",
+    "failed_guard_samples": 0,
+    "failed_samples": 1,
+    "finished_ns": 1789266660854335000,
+    "format_version": 1,
+    "guard_samples": 532,
+    "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+    "maximum_sample_gap_ns": 6802477000,
+    "peak_observed_allocated_bytes": 20596969472,
+    "rejected_guard_stages": [],
+    "samples": 218,
+    "started_ns": 1789265360813771000,
+    "status": "stopped",
+    "stop_reasons": [
+      "incomplete_capacity_sample"
+    ],
+    "termination_error": null,
+    "elapsed_seconds": 1300.040563968,
+    "recovered_suffix_before_batch": {
+      "from_exclusive": 66146986,
+      "to_inclusive": 67735079
+    },
+    "new_block_interval": {
+      "from_inclusive": 67735080,
+      "to_inclusive": 72735079,
+      "blocks": 5000000
+    }
+  },
+  "five_million_failed_samples": [
+    {
+      "admitted": false,
+      "error_type": "CapacityError",
+      "format_version": 1,
+      "io_error_code": 2,
+      "io_error_kind": "NotFound",
+      "measurement_stage": "host data-directory scan",
+      "reasons": [
+        "incomplete_capacity_sample"
+      ],
+      "sample_finished_ns": 1789266655587831000,
+      "sample_started_ns": 1789266651211786000
+    }
+  ],
+  "private_prefix_after_trial": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "binding": {
+      "database_uuid": "6546969b-2504-4962-949b-cbaf457a94d5",
+      "format_version": 1,
+      "identity_sha256": "80b3489d90d7bf0bab6c8b7e767f1ebbe5faac124993bc4ce41cc42c77105aa2",
+      "run_id": "62b4938ec1554bc093644232ef4b469d"
+    },
+    "format_version": 1,
+    "generation": "69582fa5b4f24bbd8db4039edc4c3c98",
+    "header": {
+      "hash": "0xc4750c4b049339d4d548869132b0eb686546374bf1f0dd62adf387c08c51447d",
+      "number": 72735079,
+      "parent_hash": "0x5b3a699075ceb728998c4ca7d54a87a0f870a28d719537d06f8b0e0c29377efa",
+      "state_root": "0x5ae77c636ce70164db85fdb8e97f94168d1f5fc4dc08551ce4a81946606b72ba",
+      "timestamp": 1766553332
+    },
+    "nonzero_slots": 7884601,
+    "start_block": 149268,
+    "state_sha256": "0ae99a7d85611c863d3a4cd0cfa29f08b9faae37194e1524ac9167d9dafad541",
+    "status": "unverified-bootstrap"
+  },
+  "growth_observation": {
+    "accounted_allocated_bytes": 20584550400,
+    "admitted": true,
+    "capacity_data_scan_mode": "host_bind",
+    "capacity_sample_finished_ns": 1789266615002932000,
+    "cohort": "wbnb-bootstrap",
+    "compaction_query": {
+      "event_time": "2026-09-13 02:29:41",
+      "exception_code": 0,
+      "external_events": {
+        "ExternalAggregationCompressedBytes": 764235159,
+        "ExternalAggregationMerge": 1,
+        "ExternalAggregationUncompressedBytes": 1869747367,
+        "ExternalAggregationWritePart": 41,
+        "ExternalProcessingCompressedBytesTotal": 764235159,
+        "ExternalProcessingFilesTotal": 41,
+        "ExternalProcessingUncompressedBytesTotal": 1869747367
+      },
+      "memory_usage": 3390224319,
+      "query_duration_ms": 25806,
+      "query_id": "de8f5304-2d90-4222-b3e0-155e86806e2e",
+      "read_rows": 17438253,
+      "written_rows": 7884601
+    },
+    "generation": "69582fa5b4f24bbd8db4039edc4c3c98",
+    "generation_parts": {
+      "active_manifest_rows": 1,
+      "active_part_bytes": 573474771,
+      "active_storage_rows": 7884601,
+      "generation": "69582fa5b4f24bbd8db4039edc4c3c98",
+      "inactive_part_bytes": 471340313,
+      "parts": [
+        {
+          "active": 1,
+          "compressed_bytes": 2965,
+          "part_bytes": 3474,
+          "parts": 1,
+          "rows": 1,
+          "table": "bootstrap_generations"
+        },
+        {
+          "active": 0,
+          "compressed_bytes": 471291168,
+          "part_bytes": 471340313,
+          "parts": 6,
+          "rows": 6435550,
+          "table": "bootstrap_storage"
+        },
+        {
+          "active": 1,
+          "compressed_bytes": 573416119,
+          "part_bytes": 573471297,
+          "parts": 3,
+          "rows": 7884601,
+          "table": "bootstrap_storage"
+        }
+      ],
+      "scope": "ClickHouse part catalog for this private generation only; excludes native history, other generations, exports, workspaces and server-wide allocation"
+    },
+    "header": {
+      "hash": "0xc4750c4b049339d4d548869132b0eb686546374bf1f0dd62adf387c08c51447d",
+      "number": 72735079,
+      "parent_hash": "0x5b3a699075ceb728998c4ca7d54a87a0f870a28d719537d06f8b0e0c29377efa",
+      "state_root": "0x5ae77c636ce70164db85fdb8e97f94168d1f5fc4dc08551ce4a81946606b72ba",
+      "timestamp": 1766553332
+    },
+    "local_allocated_bytes": 2730139648,
+    "module_hash": "8240ea7b266870ebb8669a3a33ce2005635a9bfb",
+    "nonzero_slots": 7884601,
+    "observed_ns": 1789266620739512000,
+    "overall_budget_bytes": 100000000000,
+    "package_sha256": "a814a618fc24ef0bc21e4a3ec107a7df61dc096d224f8841d4a9c9a5253f8963",
+    "phase": "host-stage-five-million-capacity",
+    "prefix_json_sha256": "138fe694f494de4cf92dd8fea23c42084a136a774689bc4c65e50bdfffd36a68",
+    "qualification": "Checksummed private prefix and fresh admitted capacity sample; not a full account-root proof, retained-footprint bound or billing evidence. Query memory is server accounting, not process RSS.",
+    "retained_original_volume_reserve_bytes": 1742835712,
+    "run_id": "62b4938ec1554bc093644232ef4b469d",
+    "server_data_allocated_bytes": 17854410752,
+    "state_sha256": "0ae99a7d85611c863d3a4cd0cfa29f08b9faae37194e1524ac9167d9dafad541",
+    "status": "unverified-bootstrap"
+  }
+}

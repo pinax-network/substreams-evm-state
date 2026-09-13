@@ -51,41 +51,56 @@ fn usage(paths: &[PathBuf], data_directory: bool) -> Result<Value> {
     let mut allocated = 0_u64;
     let mut logical = 0_u64;
     let mut files = 0_u64;
+    let mut visit = |metadata: &fs::Metadata| -> Result<bool> {
+        ensure!(
+            data_directory || !metadata.is_symlink(),
+            "capacity roots contain a symlink; declare its target as a separate root"
+        );
+        if !seen.insert((metadata.dev(), metadata.ino())) {
+            return Ok(false);
+        }
+        allocated = allocated
+            .checked_add(
+                metadata
+                    .blocks()
+                    .checked_mul(512)
+                    .context("allocated byte count overflow")?,
+            )
+            .context("allocated byte count overflow")?;
+        if metadata.is_dir() {
+            return Ok(true);
+        }
+        if metadata.is_file() || data_directory {
+            logical = logical
+                .checked_add(metadata.len())
+                .context("logical byte count overflow")?;
+            files += 1;
+        } else {
+            anyhow::bail!("capacity roots contain an unsupported special file");
+        }
+        Ok(false)
+    };
     for root in roots(
         paths
             .iter()
             .map(fs::canonicalize)
             .collect::<std::io::Result<_>>()?,
     ) {
-        let mut pending = vec![root];
-        while let Some(path) = pending.pop() {
-            let metadata = fs::symlink_metadata(&path)?;
-            ensure!(
-                data_directory || !metadata.is_symlink(),
-                "capacity roots contain a symlink; declare its target as a separate root"
-            );
-            if !seen.insert((metadata.dev(), metadata.ino())) {
+        if !visit(&fs::symlink_metadata(&root)?)? {
+            continue;
+        }
+        // Measure each entry immediately. Queuing paths for an entire directory
+        // leaves a wider race with ClickHouse part cleanup before metadata reads.
+        // Open iterators bound pending work by depth, without following symlinks.
+        let mut directories = vec![fs::read_dir(&root)?];
+        while let Some(directory) = directories.last_mut() {
+            let Some(entry) = directory.next() else {
+                directories.pop();
                 continue;
-            }
-            allocated = allocated
-                .checked_add(
-                    metadata
-                        .blocks()
-                        .checked_mul(512)
-                        .context("allocated byte count overflow")?,
-                )
-                .context("allocated byte count overflow")?;
-            if metadata.is_dir() {
-                for entry in fs::read_dir(&path)? {
-                    pending.push(entry?.path());
-                }
-            } else if metadata.is_file() || data_directory {
-                logical = logical
-                    .checked_add(metadata.len())
-                    .context("logical byte count overflow")?;
-                files += 1;
-            } else {
-                anyhow::bail!("capacity roots contain an unsupported special file");
+            };
+            let entry = entry?;
+            if visit(&entry.metadata()?)? {
+                directories.push(fs::read_dir(entry.path())?);
             }
         }
     }

@@ -122,6 +122,12 @@ two internal subprocess fixtures are excluded from those counts.
 The host-bind scanner's [CI run](https://github.com/pinax-network/substreams-evm-state/actions/runs/34731177435)
 passed all 186 tests at `380c9f7`. Its new cases cover fresh physical-mount
 challenges, copied or replaced directories, nested mounts and filesystem aliases.
+The capacity-stage diagnostics [passed CI](https://github.com/pinax-network/substreams-evm-state/actions/runs/34732261907)
+at `b904bd3`, with 188 tests. They subsequently identified a host filesystem
+disappearance during the [five-million-block trial](evidence/bsc-host-scan-retries-2026-09-12.json).
+Replay and private compaction completed, but the rejected cleanup measurement
+keeps that capacity run failed. Streaming directory traversal is being qualified
+without changing the capacity thresholds or accepting partial totals.
 
 Full WBNB account-root acceptance, current-package continuation, hot-state
 export/restore and sustained-growth qualification remain release gates. The

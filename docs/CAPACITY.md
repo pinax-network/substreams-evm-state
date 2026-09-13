@@ -212,6 +212,20 @@ the operating system error kind/code without exposing paths or error text.
 Exhausted retries still reject the measurement; an
 incomplete scan is never accepted as zero usage.
 
+The [stage-diagnostic replay record](evidence/bsc-host-scan-retries-2026-09-12.json)
+contains a completed five-million-block ingestion/compaction whose capacity
+supervisor nevertheless stopped during cleanup: five fresh host walks encountered
+missing files. The child exited zero, but the rejected sample still made the
+overall result fail. Its private prefix reached 72,735,079 with 7,884,601 slots;
+the compaction took 25.8 seconds and used 3.39 GB of query memory. Active parts for
+that generation were 573 MB, while the observed whole-scope peak was 20.60 GB
+before the 1.74 GB retained-volume reserve. These are different scopes, and none
+of these private-state measurements establishes complete account-root verification.
+The host walker now measures entries as they are read instead of queuing their
+paths until later, shortening the race window with part cleanup. Its sustained
+replay qualification remains pending; missing-file errors still require a fresh
+whole walk and exhausted retries still reject the sample.
+
 The [bootstrap retry record](evidence/bootstrap-capacity-retries-2026-09-12.json)
 preserves two stopped runs, their failed periodic samples and admitted resume
 observations. Those older samples reported only `RuntimeError`, so their precise
