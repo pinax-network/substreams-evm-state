@@ -205,7 +205,11 @@ They can miss excursions between samples. A Docker directory scan that reports
 disappearing files is retried from scratch up to four times, with 0.1, 0.2, 0.4 and
 0.8 second delays. Only a complete fresh traversal supplies a byte total. Permission
 errors, timeouts and other Docker failures stop immediately. Local file-replacement
-races have one fresh retry. Exhausted retries still reject the measurement; an
+races allow at most five complete walks, with 100, 200, 400 and 800 ms backoff.
+Only file-not-found errors are retried; permission and other errors fail
+immediately. Failed samples identify the measurement stage and, when available,
+the operating system error kind/code without exposing paths or error text.
+Exhausted retries still reject the measurement; an
 incomplete scan is never accepted as zero usage.
 
 The [bootstrap retry record](evidence/bootstrap-capacity-retries-2026-09-12.json)

@@ -98,6 +98,15 @@ pub struct DockerCapacityError {
     pub timed_out: bool,
     pub directory_changed: bool,
 }
+
+#[derive(Debug)]
+pub(crate) struct SampleStage(pub &'static str);
+impl fmt::Display for SampleStage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "capacity measurement failed at {}", self.0)
+    }
+}
+impl std::error::Error for SampleStage {}
 impl fmt::Display for DockerCapacityError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
@@ -351,9 +360,12 @@ impl Meter {
 
     pub fn sample(&mut self) -> Result<Value> {
         let started = now_ns()?;
-        let info = self.inspect()?;
-        let disks = self.client.rows("SELECT name,path,type,is_remote,total_space,free_space,unreserved_space FROM system.disks ORDER BY name",&Default::default())?.collect::<Result<Vec<_>>>()?;
-        let (mut available, disk_paths) = data_disks(&info, &disks)?;
+        let info = self
+            .inspect()
+            .context(SampleStage("container inspection"))?;
+        let disks = (|| self.client.rows("SELECT name,path,type,is_remote,total_space,free_space,unreserved_space FROM system.disks ORDER BY name",&Default::default())?.collect::<Result<Vec<_>>>())().context(SampleStage("ClickHouse disk query"))?;
+        let (mut available, disk_paths) =
+            data_disks(&info, &disks).context(SampleStage("data disk mapping and counters"))?;
         let host_scan = if self.config["data_scan_mode"] == "host_bind" {
             Some(crate::capacity_host::sample(&info, &disk_paths, |path| {
                 decode_docker_output(
@@ -407,9 +419,11 @@ impl Meter {
             available = available.min(uint(&scan["available_bytes"])?);
             uint(&scan["allocated_bytes"])?
         } else {
-            du_total(&retry_scan(|| docker(&arguments))?)?
+            (|| du_total(&retry_scan(|| docker(&arguments))?))()
+                .context(SampleStage("container data-directory scan"))?
         };
-        let local = retry_local(|| local_usage(&self.paths))?;
+        let local = retry_local(|| local_usage(&self.paths))
+            .context(SampleStage("runtime directory scan"))?;
         let used = server_bytes
             .checked_add(uint(&local["allocated_bytes"])?)
             .context("accounted byte count overflow")?;
@@ -425,7 +439,8 @@ impl Meter {
                         }
                     }
                     local_usage(&existing)
-                })?,
+                })
+                .context(SampleStage("component directory scan"))?,
             );
         }
         let selected = |sql: &str| -> Result<Vec<Value>> {
@@ -442,14 +457,16 @@ impl Meter {
                 })
                 .collect())
         };
-        let parts = selected("SELECT database,active,sum(bytes_on_disk) AS bytes FROM system.parts GROUP BY database,active ORDER BY database,active")?;
-        let detached = selected("SELECT database,sum(bytes_on_disk) AS bytes FROM system.detached_parts GROUP BY database ORDER BY database")?;
+        let parts = selected("SELECT database,active,sum(bytes_on_disk) AS bytes FROM system.parts GROUP BY database,active ORDER BY database,active").context(SampleStage("ClickHouse part accounting"))?;
+        let detached = selected("SELECT database,sum(bytes_on_disk) AS bytes FROM system.detached_parts GROUP BY database ORDER BY database").context(SampleStage("ClickHouse detached-part accounting"))?;
         let merges = selected(
             "SELECT database,total_size_bytes_compressed AS input_bytes FROM system.merges",
-        )?;
+        )
+        .context(SampleStage("ClickHouse merge accounting"))?;
         let mut local_disks = Vec::new();
         for path in &self.paths {
-            let free = fs2::available_space(path)?;
+            let free =
+                fs2::available_space(path).context(SampleStage("runtime filesystem free space"))?;
             available = available.min(free);
             local_disks.push(json!({"path":path,"available_bytes":free}));
         }
@@ -532,6 +549,60 @@ fn admission_reasons(
 mod tests {
     use super::*;
     use std::os::unix::process::ExitStatusExt;
+    #[test]
+    fn local_walk_retries_only_transient_disappearance_and_discards_partial_work() {
+        use std::io::{Error, ErrorKind};
+        for (kind, failures, expected_calls) in [
+            (ErrorKind::NotFound, 3, 4),
+            (ErrorKind::NotFound, 5, 5),
+            (ErrorKind::PermissionDenied, 1, 1),
+            (ErrorKind::Other, 1, 1),
+        ] {
+            let mut calls = 0;
+            let result = retry_local(|| -> Result<u64> {
+                calls += 1;
+                // Each call represents a fresh whole walk, never an accumulated subtotal.
+                if calls <= failures {
+                    return Err(Error::new(kind, "sensitive filesystem path").into());
+                }
+                Ok(600)
+            });
+            assert_eq!(calls, expected_calls);
+            if kind == ErrorKind::NotFound && failures < 5 {
+                assert_eq!(result.unwrap(), 600);
+            } else {
+                assert_eq!(
+                    result.unwrap_err().downcast_ref::<Error>().unwrap().kind(),
+                    kind
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn failed_samples_expose_only_static_stage_and_safe_io_metadata() -> Result<()> {
+        let error = anyhow::Error::from(std::io::Error::from_raw_os_error(libc::ENOENT))
+            .context("sensitive filesystem path and credentials")
+            .context(SampleStage("runtime directory scan"));
+        let measured = failure(&error, now_ns()?)?;
+        assert_eq!(measured["measurement_stage"], "runtime directory scan");
+        assert_eq!(measured["io_error_kind"], "NotFound");
+        assert_eq!(measured["io_error_code"], libc::ENOENT);
+        assert_eq!(measured["admitted"], false);
+        assert_eq!(measured["reasons"], json!(["incomplete_capacity_sample"]));
+        assert!(measured.get("accounted_allocated_bytes").is_none());
+        assert!(!measured.to_string().contains("sensitive"));
+        assert!(!measured.to_string().contains("credentials"));
+        let plain = failure(
+            &anyhow::anyhow!("untrusted endpoint or SQL error"),
+            now_ns()?,
+        )?;
+        assert!(plain.get("measurement_stage").is_none());
+        assert!(plain.get("io_error_kind").is_none());
+        assert!(!plain.to_string().contains("untrusted"));
+        Ok(())
+    }
+
     #[test]
     fn local_disk_validation_and_skewed_counters_fail_closed() -> Result<()> {
         let info = json!({"Mounts":[{"Type":"volume","Destination":"/var/lib/clickhouse"}]});
@@ -640,17 +711,21 @@ pub fn retry_scan(mut scan: impl FnMut() -> Result<Vec<u8>>) -> Result<Vec<u8>> 
     unreachable!()
 }
 
-fn retry_local<T>(mut sample: impl FnMut() -> Result<T>) -> Result<T> {
-    match sample() {
-        Err(error)
-            if error
-                .downcast_ref::<std::io::Error>()
-                .is_some_and(|e| e.kind() == std::io::ErrorKind::NotFound) =>
-        {
-            sample()
+pub(crate) fn retry_local<T>(mut sample: impl FnMut() -> Result<T>) -> Result<T> {
+    for attempt in 0..5 {
+        match sample() {
+            Err(error)
+                if attempt < 4
+                    && error
+                        .downcast_ref::<std::io::Error>()
+                        .is_some_and(|e| e.kind() == std::io::ErrorKind::NotFound) =>
+            {
+                std::thread::sleep(Duration::from_millis(100 << attempt));
+            }
+            result => return result,
         }
-        result => result,
     }
+    unreachable!()
 }
 
 pub fn du_total(output: &[u8]) -> Result<u64> {
@@ -679,6 +754,13 @@ pub fn du_total(output: &[u8]) -> Result<u64> {
 fn failure(error: &anyhow::Error, started: u64) -> Result<Value> {
     let mut value = json!({"format_version":1,"sample_started_ns":started,"sample_finished_ns":now_ns()?,"admitted":false,
         "reasons":["incomplete_capacity_sample"],"error_type":"CapacityError"});
+    if let Some(stage) = error.downcast_ref::<SampleStage>() {
+        value["measurement_stage"] = json!(stage.0);
+    }
+    if let Some(error) = error.downcast_ref::<std::io::Error>() {
+        value["io_error_kind"] = json!(format!("{:?}", error.kind()));
+        value["io_error_code"] = json!(error.raw_os_error());
+    }
     if let Some(error) = error.downcast_ref::<DockerCapacityError>() {
         value["error_type"] = json!("DockerCapacityError");
         value["inspection_operation"] = json!(error.operation);

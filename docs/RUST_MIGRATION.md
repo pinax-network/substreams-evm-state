@@ -116,7 +116,7 @@ ClickHouse restart test. The Rust-only source-removal commit `eb3c0f4` also
 Reproduce with `make test`, `make test-integration` and
 `make test-postgres`; integration tests use disposable databases, and the crash
 test needs space for a separate disposable Docker container.
-The suite contains 91 standalone native tests, 49 regular ClickHouse tests,
+The suite contains 93 standalone native tests, 49 regular ClickHouse tests,
 one separate database-crash test, two PostgreSQL tests and 43 mapper tests;
 two internal subprocess fixtures are excluded from those counts.
 The host-bind scanner's [CI run](https://github.com/pinax-network/substreams-evm-state/actions/runs/34731177435)

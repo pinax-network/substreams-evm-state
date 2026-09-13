@@ -1,5 +1,9 @@
 //! Explicit host-bind measurement, with fresh checks against the actual container.
-use crate::{capacity, control::new_id, proof::string};
+use crate::{
+    capacity::{self, SampleStage},
+    control::new_id,
+    proof::string,
+};
 use anyhow::{ensure, Context, Result};
 use serde_json::{json, Value};
 use std::{
@@ -138,13 +142,16 @@ pub(crate) fn sample(
     disks: &[PathBuf],
     mut read: impl FnMut(&Path) -> Result<Vec<u8>>,
 ) -> Result<Value> {
-    let bindings = bindings(info, disks)?;
+    let bindings = bindings(info, disks).context(SampleStage("host-bind mapping"))?;
     let probes = bindings
         .iter()
         .map(Probe::create)
-        .collect::<Result<Vec<_>>>()?;
+        .collect::<Result<Vec<_>>>()
+        .context(SampleStage("host-bind probe creation"))?;
     for probe in &probes {
-        probe.verify(&mut read)?;
+        probe
+            .verify(&mut read)
+            .context(SampleStage("host-bind verification before scan"))?;
     }
     let all_roots = bindings
         .iter()
@@ -152,25 +159,19 @@ pub(crate) fn sample(
         .collect::<BTreeSet<_>>();
     let roots = capacity::roots(all_roots.iter().cloned().collect());
     // A concurrent sampler can remove its own probe; discard and retry the walk.
-    let usage = match capacity::data_usage(&roots) {
-        Err(error)
-            if error
-                .downcast_ref::<std::io::Error>()
-                .is_some_and(|e| e.kind() == std::io::ErrorKind::NotFound) =>
-        {
-            capacity::data_usage(&roots)?
-        }
-        result => result?,
-    };
+    let usage = capacity::retry_local(|| capacity::data_usage(&roots))
+        .context(SampleStage("host data-directory scan"))?;
     let mut available = u64::MAX;
     let mut filesystems = Vec::new();
     for root in &all_roots {
-        let free = fs2::available_space(root)?;
+        let free = fs2::available_space(root).context(SampleStage("host filesystem free space"))?;
         available = available.min(free);
         filesystems.push(json!({"path":root,"available_bytes":free}));
     }
     for probe in &probes {
-        probe.verify(&mut read)?;
+        probe
+            .verify(&mut read)
+            .context(SampleStage("host-bind verification after scan"))?;
     }
     Ok(
         json!({"allocated_bytes":usage["allocated_bytes"],"logical_bytes":usage["logical_bytes"],
