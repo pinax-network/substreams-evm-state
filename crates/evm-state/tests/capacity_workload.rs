@@ -5,6 +5,47 @@ use evm_state::{
     ch::ClickHouse,
     control::new_id,
 };
+
+#[test]
+#[ignore = "requires ClickHouse with query logging"]
+fn growth_matches_compaction_destination_and_rejects_duplicate_writes() -> Result<()> {
+    use evm_state::{ch::params, qualification::compaction_query};
+    use serde_json::json;
+    let admin = ClickHouse::new("default")?;
+    let name = format!("evm_test_rust_{}", new_id());
+    admin.execute(&format!("CREATE DATABASE {name}"), &Default::default())?;
+    let client = admin.with_database(&name)?;
+    let operation = (|| -> Result<()> {
+        client.execute("CREATE TABLE bootstrap_storage (generation String, n UInt64) ENGINE=MergeTree ORDER BY generation", &Default::default())?;
+        let first = new_id();
+        let second = new_id();
+        let arguments = params(json!({"first":first,"second":second}))?;
+        client.execute(
+            "INSERT INTO bootstrap_storage SELECT {first:String},number FROM numbers(2)",
+            &arguments,
+        )?;
+        client.execute("INSERT INTO bootstrap_storage SELECT {second:String},n FROM bootstrap_storage WHERE generation={first:String}", &arguments)?;
+        admin.execute("SYSTEM FLUSH LOGS", &Default::default())?;
+        let original = compaction_query(&client, &first, 2)?;
+        let successor = compaction_query(&client, &second, 2)?;
+        assert!(!original.is_null() && !successor.is_null());
+        assert_ne!(original["query_id"], successor["query_id"]);
+        assert!(compaction_query(&client, &first, 1).is_err());
+        assert!(compaction_query(&client, "invalid-generation", 2).is_err());
+        assert!(compaction_query(&client, &new_id(), 2)?.is_null());
+
+        // A real second write to the same destination remains an error.
+        client.execute(
+            "INSERT INTO bootstrap_storage SELECT {first:String},number FROM numbers(2)",
+            &arguments,
+        )?;
+        admin.execute("SYSTEM FLUSH LOGS", &Default::default())?;
+        assert!(compaction_query(&client, &first, 2).is_err());
+        Ok(())
+    })();
+    admin.execute(&format!("DROP DATABASE {name}"), &Default::default())?;
+    operation
+}
 #[test]
 #[ignore = "requires ClickHouse in a local published Docker container"]
 fn real_directory_meter_accounts_for_allocated_server_data_and_local_workspace() -> Result<()> {

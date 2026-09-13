@@ -1,0 +1,132 @@
+{
+  "format_version": 1,
+  "qualification": "Current-package WBNB continuation interval staged for later verified publication",
+  "runtime_source_commit": "b63b60274dd967896760d5ccc34153d3e2c94d36",
+  "runtime_checksums": "7d090814459dbe672e050350a072e548451e7ae245d59ce68d08e49e29e41325  localdata/qualification/wbnb-bootstrap/rust-handoff/bin/evm-state\n332c0d566385635cc40ee5768f201fc90276ff58778c73a0af0a855ffb16bdcd  localdata/qualification/wbnb-bootstrap/rust-handoff/bin/evm-state-qualify\n",
+  "package_source_commit": "5ebea1b2f6a3cd33ab7c5075e5bc168670c8cea2",
+  "source": {
+    "run_id": "11b8b247f40a427f823448a6d8d9f5b9",
+    "database_uuid": "7cb0ced4-2c9c-4936-8a0f-d06a93b3b19a",
+    "identity": {
+      "accounts": [
+        "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+      ],
+      "checkpoint_database": "evm_wbnb_checkpoints",
+      "database": "evm_wbnb_continuation_rust",
+      "endpoint": "bsc.substreams.pinax.network:443",
+      "final_blocks_only": true,
+      "format_version": 3,
+      "module": "map_block_state",
+      "module_hash": "c6a4a3daaa47d8908d3b3e09d20341520e39463b",
+      "network": "bsc",
+      "package_sha256": "07e41bd8d84435d8819b59c312e0eb985a33bb04252dbebc5dc6585c8f1b9992",
+      "schema_version": 1,
+      "start_block": 121466776
+    }
+  },
+  "output": {
+    "accounts": [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    ],
+    "blocks": 83160,
+    "changed_rows": {
+      "balances": 81645,
+      "codes": 0,
+      "lifecycle": 0,
+      "nonces": 0,
+      "storage": 1399574
+    },
+    "database": "evm_wbnb_continuation_rust",
+    "digest_encoding": "ascending blocks; deterministic protobuf; each prefixed by its uint64 big-endian byte length",
+    "end_block": 121549935,
+    "first_block_timestamp": 1789221912,
+    "format_version": 1,
+    "header": {
+      "hash": "0x014f9de0d7aaf488230cc3c0a1e5d8ee57f619dfd794415cde2b2e22d99374d8",
+      "number": 121549935,
+      "parent_hash": "0x47d4ce1bf0f81ef819c151710019fd1c3690542c8528af4ad2799f15b852c04e",
+      "state_root": "0x8ee627de8f6d68c8317a9316929698dda3e5ec84c9b6db881b6c99679ecdb20c",
+      "timestamp": 1789259341
+    },
+    "header_trust": "provider-finalized-header",
+    "limitations": [
+      "account storage completeness is not established by this update sample",
+      "logical protobuf output reconstructed from deduplicated native rows; excludes framing, retries and billing adjustments",
+      "cache warmth and wall time are separate measurements"
+    ],
+    "logical_protobuf_bytes": 288345987,
+    "max_protobuf_bytes_per_block": 23586,
+    "mean_block_interval_seconds": 0.4500895874168761,
+    "mean_protobuf_bytes_per_block": 3467.363961038961,
+    "module_hash": "c6a4a3daaa47d8908d3b3e09d20341520e39463b",
+    "ordered_output_sha256": "0938f5200bd7e8b64b76554c4b6f777b3bd5a67e1ee5bd9681109b124abb26b6",
+    "package_sha256": "07e41bd8d84435d8819b59c312e0eb985a33bb04252dbebc5dc6585c8f1b9992",
+    "run_id": "11b8b247f40a427f823448a6d8d9f5b9",
+    "start_block": 121466776,
+    "validation": "encoded header, native interval and durable cursor verified"
+  },
+  "capacity": {
+    "proof_capture": {
+      "command_exit_code": 0,
+      "config_sha256": "d5cf132d5b6618f59aec99e1e925ae1b019e81836ead7fc2939f579c33b1b8c4",
+      "failed_guard_samples": 0,
+      "failed_samples": 0,
+      "finished_ns": 1789259346223345000,
+      "format_version": 1,
+      "guard_samples": 1,
+      "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+      "maximum_sample_gap_ns": 6845779000,
+      "peak_observed_allocated_bytes": 10568978432,
+      "rejected_guard_stages": [],
+      "samples": 2,
+      "started_ns": 1789259335698794000,
+      "status": "completed",
+      "stop_reasons": [],
+      "termination_error": null
+    },
+    "ingestion": {
+      "command_exit_code": 0,
+      "config_sha256": "65aaf67f0899a3c7a8ccb5c542793d826241aa4aef07ef6efd5552de6a56b5d8",
+      "failed_guard_samples": 0,
+      "failed_samples": 0,
+      "finished_ns": 1789259464779664000,
+      "format_version": 1,
+      "guard_samples": 8,
+      "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+      "maximum_sample_gap_ns": 18927232000,
+      "peak_observed_allocated_bytes": 12531027968,
+      "rejected_guard_stages": [],
+      "samples": 8,
+      "started_ns": 1789259385152669000,
+      "status": "completed",
+      "stop_reasons": [],
+      "termination_error": null
+    },
+    "interval_validation": {
+      "command_exit_code": 0,
+      "config_sha256": "65aaf67f0899a3c7a8ccb5c542793d826241aa4aef07ef6efd5552de6a56b5d8",
+      "failed_guard_samples": 0,
+      "failed_samples": 0,
+      "finished_ns": 1789259510691523000,
+      "format_version": 1,
+      "guard_samples": 0,
+      "limit_kind": "sampled operating guard; excursions between samples are not bounded by this report",
+      "maximum_sample_gap_ns": 18241246000,
+      "peak_observed_allocated_bytes": 14332014592,
+      "rejected_guard_stages": [],
+      "samples": 3,
+      "started_ns": 1789259481572845000,
+      "status": "completed",
+      "stop_reasons": [],
+      "termination_error": null
+    }
+  },
+  "binary_checksums_rechecked_after_execution": true,
+  "status": "verified-update-interval; complete-state publication pending",
+  "limitations": [
+    "The historical WBNB base through block 121466775 must pass its full account-root proof before these updates can publish a ready continuation",
+    "The interval validates continuity, native identity, durable cursor and encoded header; it does not prove complete initial account state",
+    "Capacity figures include the concurrently running historical backfill and other shared server data",
+    "Logical protobuf bytes are reconstructed output, excluding framing, retries and billing adjustments"
+  ]
+}

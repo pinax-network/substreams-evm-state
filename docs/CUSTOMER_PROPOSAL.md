@@ -31,9 +31,11 @@ manifest only after verification. See ClickHouse's
 
 We are developing against the conservative end of your budget: 100 GB of retained
 data, with headroom for ingestion, merges, verification and checkpoints. Small
-real-account and larger synthetic tests have passed. Full historical bootstraps
-for WBNB and your supplied example contract are still being qualified. We cannot yet confirm the footprint or
-bootstrap time for your account set. This remains technical qualification, with
+real-account and larger synthetic tests have passed. Your supplied example
+contract passed complete historical-state verification, a later continuation,
+complete reads and export/restore with 8,157 nonzero slots. The larger WBNB
+historical bootstrap is still being qualified. We cannot yet confirm the
+footprint or bootstrap time for your account set. This remains technical qualification, with
 no purchase or subscription change requested.
 
 To make the next test useful, could you share:

@@ -95,6 +95,19 @@ durable cursor agree at that block, with 5,916,295 nonzero slots. A fresh full
 measurement passed; the unchanged frozen binaries and source identity resumed
 under the same capacity policy. This remains private, unverified state.
 
+The [current-package continuation interval](evidence/bsc-wbnb-continuation-staged-rust-2026-09-12.json)
+is staged separately: 83,160 contiguous blocks from 121466776 through 121549935,
+with captured target proofs, validated native progress and encoded header, and
+288,345,987 logical protobuf output bytes. All three capacity phases completed
+without rejected samples. Complete-state publication still requires the pending
+historical base proof.
+
+Growth recording now matches the destination generation at the beginning of a
+logged compaction query. The previous substring lookup also counted a later
+compaction that read the same generation and stopped the recorder. A real
+ClickHouse regression covers that sequence, wrong row counts and duplicate
+writes to one destination. This changes measurement selection, not replay state.
+
 ## Release acceptance
 
 The Rust recovery phase passed CI at `b63b602`, including its dedicated hard
@@ -103,7 +116,7 @@ ClickHouse restart test. The Rust-only source-removal commit `eb3c0f4` also
 Reproduce with `make test`, `make test-integration` and
 `make test-postgres`; integration tests use disposable databases, and the crash
 test needs space for a separate disposable Docker container.
-The suite contains 87 standalone native tests, 48 regular ClickHouse tests,
+The suite contains 87 standalone native tests, 49 regular ClickHouse tests,
 one separate database-crash test, two PostgreSQL tests and 43 mapper tests;
 two internal subprocess fixtures are excluded from those counts.
 

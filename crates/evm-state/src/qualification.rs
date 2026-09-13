@@ -1,6 +1,7 @@
 //! Evidence collection utilities. Private replay prefixes are never ready state.
 use crate::{
     ch::{params, uint, ClickHouse},
+    control::object_id,
     cursor,
     files::{canonical_json, resolve},
     proof::string,
@@ -46,6 +47,33 @@ pub fn admit_growth(prefix: &Value, run: &Value, sample: &Value, now: u64) -> Re
     }
     let finished = uint(&sample["sample_finished_ns"])?;
     Ok(finished <= now && now - finished <= 60_000_000_000)
+}
+
+pub fn compaction_query(
+    client: &ClickHouse,
+    generation: &str,
+    expected_rows: u64,
+) -> Result<Value> {
+    // A later INSERT also mentions its input generation. Match the destination
+    // literal at the start of ClickHouse's normalized query, not any occurrence.
+    let destination = format!(
+        "INSERT INTO bootstrap_storage SELECT '{}',",
+        object_id(generation)?
+    );
+    let queries = client.rows("SELECT query_id,event_time,query_duration_ms,read_rows,written_rows,memory_usage,exception_code,mapFilter((k,v)->startsWith(k,'External'),ProfileEvents) AS external_events FROM system.query_log WHERE current_database={db:String} AND type='QueryFinish' AND startsWith(query,{destination:String})",
+        &params(json!({"db":client.database,"destination":destination}))?)?.collect::<Result<Vec<_>>>()?;
+    ensure!(
+        queries.len() <= 1,
+        "multiple compaction completions for one generation"
+    );
+    let query = queries.into_iter().next().unwrap_or(Value::Null);
+    if !query.is_null() {
+        ensure!(
+            uint(&query["exception_code"])? == 0 && uint(&query["written_rows"])? == expected_rows,
+            "compaction completion differs from private prefix"
+        );
+    }
+    Ok(query)
 }
 
 pub fn record_growth(
@@ -119,20 +147,7 @@ pub fn record_growth(
                 run["identity"]["http_url"] == client.url,
                 "growth recorder source URL differs from its native run"
             );
-            let queries = client.rows("SELECT query_id,event_time,query_duration_ms,read_rows,written_rows,memory_usage,exception_code,mapFilter((k,v)->startsWith(k,'External'),ProfileEvents) AS external_events FROM system.query_log WHERE current_database={db:String} AND type='QueryFinish' AND query LIKE 'INSERT INTO bootstrap_storage%' AND position(query,{generation:String})>0",
-                &params(json!({"db":client.database,"generation":generation}))?)?.collect::<Result<Vec<_>>>()?;
-            ensure!(
-                queries.len() <= 1,
-                "multiple compaction completions for one generation"
-            );
-            let query = queries.first().cloned().unwrap_or(Value::Null);
-            if !query.is_null() {
-                ensure!(
-                    uint(&query["exception_code"])? == 0
-                        && uint(&query["written_rows"])? == uint(&prefix["nonzero_slots"])?,
-                    "compaction completion differs from private prefix"
-                );
-            }
+            let query = compaction_query(&client, &generation, uint(&prefix["nonzero_slots"])?)?;
             let record = json!({"phase":phase,"retained_original_volume_reserve_bytes":reserve_bytes,"overall_budget_bytes":budget_bytes,
                 "observed_ns":now,"cohort":name,"run_id":run["run_id"],"module_hash":run["identity"]["module_hash"],
                 "package_sha256":run["identity"]["package_sha256"],"prefix_json_sha256":hex::encode(Sha256::digest(raw)),
